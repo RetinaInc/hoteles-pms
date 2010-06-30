@@ -2,14 +2,27 @@
 
 $lang['Running'] = 'Funcionando';
 $lang['Out of service'] = 'Fuera de servicio';
+$lang['Checked-In'] = 'Chequeada';
+$lang['Checked-Out'] = 'Checked-Out';
+$lang['Canceled'] = 'Cancelada';
+$lang['Reserved'] = 'Reservada';
+$lang['Guaranteed Reservation'] = 'Reservaci&oacute;n garantizada';
+$lang['No Show'] = 'No apareci&oacute;';
 $lang['number'] = 'N&uacute;mero';
 $lang['name'] = 'Nombre';
+$lang['last_name'] = 'Apellido';
 $lang['status'] = 'Estado';
 $lang['room_type'] = 'Tipo de habitaci&oacute;n';
-$lang['abrv'] = 'Abreviatura';
+$lang['abrv'] = 'Abrev.';
 $lang['beds'] = 'Cantidad de camas';
 $lang['sleeps'] = 'Max. personas';
-$lang['details'] = 'Detalles';
+$lang['telephone'] = 'Tel&eacute;fono';
+$lang['email'] = 'Correo electr&oacute;nico';
+$lang['address'] = 'Direcci&oacute;n';
+
+$lang['Mon'] = 'Lun';
+$lang['Fri'] = 'Vier';
+
 
 
 $lang['required'] 			= "El campo %s es obligatorio.";
