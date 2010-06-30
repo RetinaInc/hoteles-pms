@@ -16,26 +16,26 @@ echo 'Total tipos de habitación: ', $room_types_count;?><br><?php
     <td width="90">
 		<?php 
 			echo form_open(base_url().'rooms/view_room_types');
-			echo form_hidden('order', 'name');
-			echo form_submit('name', 'Tipo de habitación');
+			echo form_hidden('order', 'NAME');
+			echo 'Nombre ', form_submit('sumit', '^');
         	echo form_close();
 		?>   	</td>
-    <td width="84">Abrev</td>
-  <td width="90">
+    <td width="55">Abrev</td>
+<td width="119">
 		<?php 
 			echo form_open(base_url().'rooms/view_room_types');
-			echo form_hidden('order', 'beds');
-			echo form_submit('beds', 'Camas');
+			echo form_hidden('order', 'BEDS');
+			echo 'Cant. Camas ', form_submit('sumit', '^');
         	echo form_close();
 		?>    </td>
-<td width="107">
+<td width="137">
 		<?php 
 			echo form_open(base_url().'rooms/view_room_types');
-			echo form_hidden('order', 'sleeps');
-			echo form_submit('sleeps', 'Max Personas');
+			echo form_hidden('order', 'SLEEPS');
+			echo 'Max. Personas ', form_submit('sumit', '^');
         	echo form_close();
 		?>    </td>
-    <td width="91">Ver</td>
+    <td width="61">Ver</td>
   </tr>
 	<?php
 	
@@ -53,4 +53,6 @@ foreach ($room_types as $row)
  }
  ?>
 </table>
+
+<p><a href="<?php echo base_url().'rooms/view_rooms/'?>">Volver</a></p>
 

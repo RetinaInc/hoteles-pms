@@ -15,15 +15,15 @@ echo 'Total habitaciones fuera de servicio: ', $rooms_count_oos;
 ?>
 </p>
 
-<table width="530" border="1">
+<table width="483" border="1">
   <tr>
     <td width="70">
-		<?php 
-			echo form_open(base_url().'rooms/view_rooms');
-			echo form_hidden('order', 'number');
-			echo form_submit('number', 'Número');
-        	echo form_close();
-		?>
+    	<?php
+        echo form_open(base_url().'rooms/view_rooms');
+		echo form_hidden('order', 'NUMBER');
+		echo 'Número ', form_submit('sumit', '^');
+        echo form_close();
+		?> 
    	</td>
    	<?php 
 	foreach ($rooms as $row)
@@ -31,12 +31,12 @@ echo 'Total habitaciones fuera de servicio: ', $rooms_count_oos;
 		if ($row['NAME'] != NULL)
 		{$name = 'Yes';?>
         <td width="90">
-		<?php 
+			<?php 
 			echo form_open(base_url().'rooms/view_rooms');
-			echo form_hidden('order', 'name');
-			echo form_submit('name', 'Nombre');
+			echo form_hidden('order', 'NAME');
+			echo 'Nombre ', form_submit('sumit', '^');
         	echo form_close();
-		?>
+			?>
         </td><?php 
 		}
 		else
@@ -44,21 +44,21 @@ echo 'Total habitaciones fuera de servicio: ', $rooms_count_oos;
 			$name = 'No';
 		}
 	}?>
-    <td width="150">
+    <td width="120">
 		<?php 
 			echo form_open(base_url().'rooms/view_rooms');
-			echo form_hidden('order', 'status');
-			echo form_submit('status', 'Estado');
+			echo form_hidden('order', 'STATUS');
+			echo 'Estado ', form_submit('sumit', '^');
         	echo form_close();
 		?>    </td>
-    <td width="140">
+  <td width="130">
 		<?php 
 			echo form_open(base_url().'rooms/view_rooms');
-			echo form_hidden('order', 'rtname');
-			echo form_submit('room_type', 'Tipo de habitación');
+			echo form_hidden('order', 'RTNAME');
+			echo 'Tipo de habitación ', form_submit('sumit', '^');
         	echo form_close();
 		?>    </td>
-    <td width="46">Ver</td>
+    <td width="39">Ver</td>
   </tr>
 	<?php
 	

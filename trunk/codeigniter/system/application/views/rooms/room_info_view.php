@@ -14,16 +14,16 @@ echo 'INFO HABITACIÓN #'.$room_number;?><br /><br /><?php
 
 foreach ($room as $row)
 {
-	echo 'Número: ', $row['NUMBER'];?><br /><br /><?php
+	echo 'Número: ', $row['NUMBER'];?><br /><?php
 	
 	if ($row['NAME'] != NULL)
 	{
-		echo 'Nombre: ', $row['NAME'];?><br /><br /><?php
+		echo 'Nombre: ', $row['NAME'];?><br /><?php
 	}
 	
-	echo 'Estado: ', lang($row['STATUS']);?><br /><br /><?php
+	echo 'Estado: ', lang($row['STATUS']);?><br /><?php
 	
-	echo 'Tipo de habitación: ', $row['RTNAME'];?><br /><br /><?php
+	echo 'Tipo de habitación: ', $row['RTNAME'];?><br /><?php
 	
 	foreach ($room_types as $row1)
 	{
@@ -41,41 +41,85 @@ foreach ($room as $row)
 
 
 
-<table width="870" border="1">
+<table width="900" border="1">
   <tr>
-    <td width="109"># Confirmación</td>
-    <td width="120">Fecha Llegada</td>
-    <td width="120">Fecha Salida</td>
-    <td width="163">Nombre</td>
-    <td width="104">Status</td>
-    <td width="67">Adultos</td>
-    <td width="61">Niños</td>
-    <td width="92">Pago</td>
+    <td width="106">
+    	<?php
+		echo '# Confirmación';
+        echo form_open(base_url().'rooms/info_room/'.$room_id);
+		echo form_hidden('order', 'RE.CONFIRM_NUM');
+		echo form_submit('sumit', '^');
+        echo form_close();
+		?>    
+    </td>
+    <td width="117">
+    	<?php
+		echo 'Fecha Check-In';
+        echo form_open(base_url().'rooms/info_room/'.$room_id);
+		echo form_hidden('order', 'RE.CHECK_IN DESC');
+		echo form_submit('sumit', '^');
+        echo form_close();
+		?>    
+    </td>
+    <td width="117">
+    	<?php
+		echo 'Fecha Check-Out';
+        echo form_open(base_url().'rooms/info_room/'.$room_id);
+		echo form_hidden('order', 'RE.CHECK_OUT DESC');
+		echo form_submit('sumit', '^');
+        echo form_close();
+		?>    
+    </td>
+    <td width="194">
+    	<?php
+		echo 'Nombre Cliente';
+        echo form_open(base_url().'rooms/info_room/'.$room_id);
+		echo form_hidden('order', 'G.LAST_NAME');
+		echo form_submit('sumit', '^');
+        echo form_close();
+		?>    
+    </td>
+    <td width="103">
+    	<?php
+		echo 'Estado';
+        echo form_open(base_url().'rooms/info_room/'.$room_id);
+		echo form_hidden('order', 'RE.STATUS');
+		echo form_submit('sumit', '^');
+        echo form_close();
+		?>    
+    </td>
+    <td width="60">Adultos</td>
+    <td width="63">Niños</td>
+    <td width="88">Pago</td>
   </tr>
  
  <?php 
- foreach ($reservation as $row)
+ foreach ($reservations as $row)
  {
  ?>
   <tr>
-    <td><?php echo $row['CONFIRM_NUM'];?></td>
+    <td><?php echo anchor(base_url().'reservations/info_reservation/'.$row['ID_RESERVATION'],$row['CONFIRM_NUM']);?></td>
     <td>
 	<?php 
 		$check_in = $row['CHECK_IN'];
-		$check_in_array = explode ('-',$check_in);
-		$year = $check_in_array[0];
-		$month = $check_in_array[1];
-		$day = $check_in_array[2];
+		$check_in_array = explode (' ',$check_in);
+		$date = $check_in_array[0];
+		$date_array = explode ('-',$date);
+		$year = $date_array[0];
+		$month = $date_array[1];
+		$day = $date_array[2];
 		echo $day.'-'.$month.'-'.$year;
 	?>
     </td>
     <td>
 	<?php 
 		$check_out = $row['CHECK_OUT'];
-		$check_out_array = explode ('-',$check_out);
-		$year = $check_out_array[0];
-		$month = $check_out_array[1];
-		$day = $check_out_array[2];
+		$check_out_array = explode (' ',$check_out);
+		$date = $check_out_array[0];
+		$date_array = explode ('-',$date);
+		$year = $date_array[0];
+		$month = $date_array[1];
+		$day = $date_array[2];
 		echo $day.'-'.$month.'-'.$year;
 	?>
     </td>
@@ -83,16 +127,16 @@ foreach ($room as $row)
 		{
 			if ($row1['ID_GUEST'] == $row['FK_ID_GUEST'])
 			{
-				echo $row1['NAME'].' '.$row1['LAST_NAME'];?><br /><?php
+				echo $row1['LAST_NAME'].', '.$row1['NAME'];?><br /><?php
 				echo $row1['TELEPHONE'];?><br /><?php
 				echo $row1['EMAIL'];?><br /><br /><?php
 			}
 		}
 		?>    </td>
-    <td><?php echo $row['STATUS'];?></td>
+    <td><?php echo lang($row['STATUS']);?></td>
     <td><?php echo $row['ADULTS'];?></td>
     <td><?php echo $row['CHILDREN'];?></td>
-    <td></td>
+    <td>&nbsp;</td>
   </tr>
   <?php
   }
@@ -101,11 +145,4 @@ foreach ($room as $row)
 
 
 
-
-
-
-
-
-
-
-<a href="<?php echo base_url().'rooms/view_rooms/'?>">Volver</a>
+<p><a href="<?php echo base_url().'rooms/view_rooms/'?>">Volver</a></p>

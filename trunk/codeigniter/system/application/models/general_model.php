@@ -15,7 +15,7 @@ class General_model extends Model
   		}
 		if ($order != null)
 		{
-  			$this->db->order_by($order,"asc");
+  			$this->db->order_by($order);
   		}
 		
 		$this->db->where($table.'.'.'DISABLE', 1); 
@@ -23,7 +23,7 @@ class General_model extends Model
 		if ($table == 'ROOM')
 		{
 			$this->db->select('ROOM.*');
-			$this->db->select('ROOM_TYPE.NAME as RTNAME');
+			$this->db->select('ROOM_TYPE.ABRV as RTNAME');
 			$this->db->join('ROOM_TYPE', 'ROOM_TYPE.ID_ROOM_TYPE = ROOM.FK_ID_ROOM_TYPE','left');
 		}
 		

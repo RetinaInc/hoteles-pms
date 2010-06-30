@@ -18,43 +18,32 @@ echo form_open(base_url().'rooms/edit_room_type/'.$room_type_id.'/'.$room_type_n
 
 foreach ($room_type as $row)
 {?>
-	<p>Nombre: 
+	<p>* Nombre: 
 	<input name="room_type_name" type="text" id="room_type_name" value="<?php echo $row['NAME']; ?>" size="30" maxlength="50"/>
     </p>
     
-    <?php 
-	if ($row['ABRV'] != NULL)
-	{?>
-    	<p>Abrev.: 
-		<input name="room_type_abrv" type="text" id="room_type_abrv" value="<?php echo $row['ABRV']; ?>" size="5" maxlength="5"/>
-    	</p>
-    <?php
-    }
-	?>
-    
-    <p>Cantidad de camas: 
+    <p>Abrev.: 
+	<input name="room_type_abrv" type="text" id="room_type_abrv" value="<?php echo $row['ABRV']; ?>" size="5" maxlength="5"/>
+    </p>
+   
+    <p>* Cantidad de camas: 
 	<input name="room_type_beds" type="text" id="room_type_beds" value="<?php echo $row['BEDS']; ?>" size="5" maxlength="5"/>
     </p>
     
-    <p>Max. personas: 
+    <p>* Max. personas: 
 	<input name="room_type_sleeps" type="text" id="room_type_sleeps" value="<?php echo $row['SLEEPS']; ?>" size="5" maxlength="5"/>
     </p>
     
-    <?php 
-	if ($row['DETAILS'] != NULL)
-	{?>
-    	<p>Detalles: 
-		<textarea name="room_type_details" rows="3" id="room_type_details"><?php echo $row['DETAILS'];  ?></textarea>
-    	</p>
-    <?php
-    }
-	?>
+    <p>Detalles: </p>
+	<p><textarea name="room_type_details" rows="3" id="room_type_details"><?php echo $row['DETAILS'];  ?></textarea></p>
+    
     
 <?php
 }
 
-echo form_submit('sumit', 'Enviar');?><br /><br /><?php
-
+echo form_submit('sumit', 'Enviar');
+echo form_close();
 ?>
+<br /><br />
 
 <a href="<?php echo base_url().'rooms/info_room_type/'.$room_type_id?>">Volver</a>

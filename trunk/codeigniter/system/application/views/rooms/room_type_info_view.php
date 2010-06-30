@@ -16,7 +16,10 @@ foreach ($room_type as $row)
 {
 	echo 'Nombre: ', $row['NAME'];?><br /><br /><?php
 	
-	echo 'Abrv: ', $row['ABRV'];?><br /><br /><?php
+	if ($row['ABRV'] != NULL)
+	{
+		echo 'Abrv: ', $row['ABRV'];?><br /><br /><?php
+	}
 	
 	echo 'Camas: ', $row['BEDS'];?><br /><br /><?php
 	
