@@ -34,9 +34,11 @@ foreach ($room as $row)
 	}
 	
 	?><a href="<?php echo base_url().'rooms/edit_room/'.$room_id?>">Editar Info</a><br /><br /><?php
-	?><a href="<?php echo base_url().'rooms/delete_room/'.$room_id ?>" onClick="return confirm('Seguro que desea eliminar?')">Eliminar Habitación</a><br /><br /><?php
+	?><a href="<?php echo base_url().'rooms/delete_room/'.$room_id ?>" onClick="return confirm('Seguro que desea eliminar?')">Eliminar Habitación</a><br /><br />
+	
+    	
+<?php
 }
-
 ?>
 
 
@@ -98,7 +100,7 @@ foreach ($room as $row)
  {
  ?>
   <tr>
-    <td><?php echo anchor(base_url().'reservations/info_reservation/'.$row['ID_RESERVATION'],$row['CONFIRM_NUM']);?></td>
+    <td><?php echo anchor(base_url().'reservations/info_reservation/'.$row['ID_RESERVATION'],$row['ID_RESERVATION']);?></td>
     <td>
 	<?php 
 		$check_in = $row['CHECK_IN'];

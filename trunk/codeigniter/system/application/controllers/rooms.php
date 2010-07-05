@@ -288,7 +288,7 @@ class Rooms extends Controller
 	
 	function delete_room_type($room_type_id)
 	{
-		$room_type_reservation = $this->RM->get_rooms_reservations('ROOM.FK_ID_ROOM_TYPE', $room_type_id);
+		$room_type_reservation = $this->REM->get_reservation_room_guest('RO.FK_ID_ROOM_TYPE', $room_type_id, null);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time = time();
