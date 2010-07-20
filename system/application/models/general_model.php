@@ -7,7 +7,7 @@ class General_model extends Model
 		parent::Model();
 	}
 	
-	function get_info($table, $field, $value, $order, $lim1, $lim2, $disable)
+	function getInfo($table, $field, $value, $order, $lim1, $lim2, $disable)
 	{
 		if ($field != null and $value != null)
 		{
@@ -44,7 +44,7 @@ class General_model extends Model
 	}
 	
 	
-	function get_count($table, $field1, $value1, $field2, $value2)
+	function getCount($table, $field1, $value1, $field2, $value2)
 	{
 		if ($field1 != null and $value1 != null)
 		{
@@ -63,7 +63,7 @@ class General_model extends Model
 	}
 	
 	
-	function get_max($table, $field)
+	function getMax($table, $field)
 	{
 		$this->db->select_max($field);
 		$this->db->where('DISABLE', 1); 
@@ -72,7 +72,7 @@ class General_model extends Model
 	}
 	
 	
-	function validation_check($table, $field1, $value1, $field2, $value2)
+	function validationCheck($table, $field1, $value1, $field2, $value2)
 	{
 		if ($field1 != null and $value1 != null)
 		{

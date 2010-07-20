@@ -20,35 +20,35 @@ class Guests extends Controller
 	}
 	
 	
-	function view_guests()
+	function viewGuests()
 	{
-		$guests = $this->GM->get_info('GUEST', null, null, 'LAST_NAME', null, null, 1);
+		$guests = $this->GM->getInfo('GUEST', null, null, 'LAST_NAME', null, null, 1);
 		
 		$data['guests'] = $guests;
 		
-		$this->load->view('guests/guests_view', $data);
+		$this->load->view('pms/guests/guests_view', $data);
 	}
 	
 	
-	function info_guest_reservations($guest_id)
+	function infoGuestReservations($guestId)
 	{
 		//$order = $_POST["order"];
 		$order = 'CHECK_IN DESC';
 		
-		$guest = $this->GM->get_info('GUEST', 'ID_GUEST', $guest_id, null, null, null, 1);
-		$reservations = $this->GM->get_info('RESERVATION', 'FK_ID_GUEST', $guest_id, $order, null, null, 1);
-		$reservation_rooms = $this->GM->get_info('ROOM_RESERVATION', null, null, null, null, null, 1);
+		$guest            = $this->GM->getInfo('GUEST',           'ID_GUEST',    $guestId, null,   null, null, 1);
+		$reservations     = $this->GM->getInfo('RESERVATION',     'FK_ID_GUEST', $guestId, $order, null, null, 1);
+		$reservationRooms = $this->GM->getInfo('ROOM_RESERVATION', null,          null,    null,   null, null, 1);
 		
 		$data['guest'] = $guest;
 		$data['reservations'] = $reservations;
-		$data['reservation_rooms'] = $reservation_rooms;
+		$data['reservationRooms'] = $reservationRooms;
 		
-		$this->load->view('guests/guest_reservations_info_view', $data);
+		$this->load->view('pms/guests/guest_reservations_info_view', $data);
 	}
 	
 	
 	/*
-	function add_guests()
+	function addGuests()
 	{
 		$this->form_validation->set_rules('room_number','number','required|max_length[20]|callback_check_room_number');
 		$this->form_validation->set_rules('room_name','lang:name','max_length[50]');
@@ -63,7 +63,7 @@ class Guests extends Controller
 			$data['room_types'] = $room_types;
 			$data['max_room_number'] = $max_room_number;
 		
-			$this->load->view('rooms/room_add_view', $data);
+			$this->load->view('pms/rooms/room_add_view', $data);
 		}
 		else
 		{
@@ -88,14 +88,14 @@ class Guests extends Controller
 			
 			$this->GM->insert('ROOM', $data);  
 				
-			$this->view_rooms(); 
+			$this->viewRooms(); 
 		}
 		
 	}
 	*/
 	
 	
-	function edit_guest($guest_id)
+	function editGuest($guestId)
 	{
 		$this->form_validation->set_rules('guest_name','lang:name','required|max_length[30]');
 		$this->form_validation->set_rules('guest_last_name','lang:last_name','required|max_length[30]');
@@ -103,84 +103,83 @@ class Guests extends Controller
 		$this->form_validation->set_rules('guest_email','lang:email','required|valid_email|max_length[50]');
 		$this->form_validation->set_rules('guest_address','lang:address','max_length[300]');
 		
-		if ($this->form_validation->run() == FALSE)
-		{
-			$guest = $this->GM->get_info('GUEST', 'ID_GUEST', $guest_id, null, null, null, 1);
+		if ($this->form_validation->run() == FALSE) {
+		
+			$guest = $this->GM->getInfo('GUEST', 'ID_GUEST', $guestId, null, null, null, 1);
 			
 			$data['guest'] = $guest;
 
-			$this->load->view('guests/guest_edit_view', $data);
-		}
-		else
-		{
-			$guest_name = set_value('guest_name');
-			$guest_last_name = set_value('guest_last_name');
-			$guest_telephone = set_value('guest_telephone');
-			$guest_email = set_value('guest_email');
-			$guest_address = set_value('guest_address');
+			$this->load->view('pms/guests/guest_edit_view', $data);
+			
+		} else {
+		
+			$guestName      = set_value('guest_name');
+			$guestLastName  = set_value('guest_last_name');
+			$guestTelephone = set_value('guest_telephone');
+			$guestEmail     = set_value('guest_email');
+			$guestAddress   = set_value('guest_address');
 			
 			$data = array(
-				'NAME' => ucwords(strtolower($guest_name)),
-				'LAST_NAME' => ucwords(strtolower($guest_last_name)),
-				'TELEPHONE' => $guest_telephone,
-				'EMAIL' => $guest_email,
-				'ADDRESS' => $guest_address
+				'NAME'      => ucwords(strtolower($guestName)),
+				'LAST_NAME' => ucwords(strtolower($guestLastName)),
+				'TELEPHONE' => $guestTelephone,
+				'EMAIL'     => $guestEmail,
+				'ADDRESS'   => $guestAddress
 				);
 			
-			$this->GM->update('GUEST', 'ID_GUEST', $guest_id, $data);  
+			$this->GM->update('GUEST', 'ID_GUEST', $guestId, $data);  
 				
-			$this->info_guest_reservations($guest_id); 
+			$this->infoGuestReservations($guestId); 
 		}
-		
 	}
 	
 	
-	function delete_guest($guest_id)
+	function deleteGuest($guestId)
 	{
-		$guest_reservation = $this->GM->get_info('RESERVATION', 'FK_ID_GUEST', $guest_id, null, null, null, 1);
+		$guestReservation = $this->GM->getInfo('RESERVATION', 'FK_ID_GUEST', $guestId, null, null, null, 1);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time = time();
 		$date = mdate($datestring, $time);
 		
 		$delete = 'Yes';
-		$ini_res_num = array();
+		$iniResNum = array();
 		
-		foreach ($guest_reservation as $row)
-		{
-		 	$res_num = $row['ID_RESERVATION'];
-			$check_in = $row['CHECK_IN'];
-			$check_out = $row['CHECK_OUT'];
-			$status = $row['STATUS'];
+		foreach ($guestReservation as $row) {
+		
+		 	$resNum   = $row['ID_RESERVATION'];
+			$checkIn  = $row['CHECK_IN'];
+			$checkOut = $row['CHECK_OUT'];
+			$status   = $row['STATUS'];
 
-if ( (($check_in > $date) && ($status != 'Canceled') && ($status != 'No Show')) || (($check_in < $date) && ($date < $check_out) && ($status != 'Canceled') && ($status != 'No Show')) )
-			{
-				$delete = 'No';
+            if (  (($checkIn > $date) && ($status != 'Canceled') && ($status != 'No Show')) 
+		       || (($checkIn < $date) && ($date < $checkOut) && ($status != 'Canceled') && ($status != 'No Show'))
+		       ) {
+			        $delete = 'No';
 				
-				$new_res_num = array ($res_num);
-				$resultado = array_merge($ini_res_num, $new_res_num);
-				$ini_res_num = $resultado;
+				    $newResNum = array ($resNum);
+				    $resultado = array_merge($iniResNum, $newResNum);
+				    $iniResNum = $resultado;
 				
-				//echo 'new: ', print_r($new_res_num). "<br>";
-				//echo 'res: ', print_r($resultado). "<br>";
-				//echo 'ini: ', print_r($ini_res_num). "<br>";
-				
-			}
+				    //echo 'new: ', print_r($new_res_num). "<br>";
+				    //echo 'res: ', print_r($resultado). "<br>";
+				    //echo 'ini: ', print_r($ini_res_num). "<br>";
+	        }
 		}
 		
-		if ($delete == 'No')
-		{
+		if ($delete == 'No') {
+		
 			echo 'No se puede eliminar porque tiene reservaciones pendientes: '."<br>";
 			foreach ($resultado as $actual)
     		echo '# ',$actual . "<br>"; 
 			
-			$this->info_guest_reservations($guest_id);
-		}
-		else
-		{
-			$this->GM->disable('GUEST', 'ID_GUEST', $guest_id);  
+			$this->infoGuestReservations($guestId);
+			
+		} else {
+		
+			$this->GM->disable('GUEST', 'ID_GUEST', $guestId);  
 			echo 'Cliente eliminado!';
-			$this->view_guests(); 
+			$this->viewGuests(); 
 		}	
 	}
 	
