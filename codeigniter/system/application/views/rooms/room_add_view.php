@@ -1,7 +1,7 @@
 
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 
 echo 'NUEVA HABITACIÓN';?><br /><br /><?php
@@ -20,6 +20,10 @@ foreach ($max_room_number as $row)
     <input name="room_number" type="text" id="room_number" value="<?php echo $next_room; ?>" size="5" maxlength="20" />
     </p>
 	
+    <p>Nombre: 
+  	<input name="room_name" type="text" id="room_name" value="<?php echo set_value('room_name'); ?>" size="30" maxlength="50"/>
+	</p>
+    
     <p>Estado:			
 	<select name="room_status" id="room_status">
     	<option value="Running" <?php echo set_select('room_status', 'Running'); ?> >Funcionando</option>

@@ -2,7 +2,7 @@
 
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 foreach ($room as $row)
 {
@@ -25,31 +25,27 @@ foreach ($room as $row)
 	
 	echo 'Tipo de habitación: ', $row['RTNAME'];?><br /><?php
 	
-	foreach ($room_types as $row1)
+	if ($row['RTDETAILS'] != NULL)
 	{
-		if ($row1['ID_ROOM_TYPE'] == $row['FK_ID_ROOM_TYPE'] && $row1['DETAILS'] != NULL)
-		{
-			echo 'Detalles tipo de habitación: ',$row1['DETAILS'];?><br /><br /><?php
-		}
+		echo 'Detalles tipo de habitación: ',$row['RTDETAILS'];?><br /><br /><?php
 	}
-	
-	?><a href="<?php echo base_url().'rooms/edit_room/'.$room_id?>">Editar Info</a><br /><br /><?php
-	?><a href="<?php echo base_url().'rooms/delete_room/'.$room_id ?>" onClick="return confirm('Seguro que desea eliminar?')">Eliminar Habitación</a><br /><br />
-	
-    	
-<?php
 }
-?>
+	
+	?><a href="<?php echo base_url().'rooms/edit_room/'.$room_id?>">Editar Info</a><br /><?php
+	?><a href="<?php echo base_url().'rooms/delete_room/'.$room_id ?>" onClick="return confirm('Seguro que desea eliminar?')">Eliminar Habitación</a><br /><br />
 
 
-
+<?php
+echo 'RESERVACIONES'."<br><br>";
+if ($room_reservations)
+{?>
 <table width="900" border="1">
   <tr>
     <td width="106">
     	<?php
 		echo '# Confirmación';
         echo form_open(base_url().'rooms/info_room/'.$room_id);
-		echo form_hidden('order', 'RE.CONFIRM_NUM');
+		echo form_hidden('order', 'RE.ID_RESERVATION');
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>    
@@ -96,7 +92,7 @@ foreach ($room as $row)
   </tr>
  
  <?php 
- foreach ($reservations as $row)
+ foreach ($room_reservations as $row)
  {
  ?>
   <tr>
@@ -129,9 +125,7 @@ foreach ($room as $row)
 		{
 			if ($row1['ID_GUEST'] == $row['FK_ID_GUEST'])
 			{
-				echo $row1['LAST_NAME'].', '.$row1['NAME'];?><br /><?php
-				echo $row1['TELEPHONE'];?><br /><?php
-				echo $row1['EMAIL'];?><br /><br /><?php
+				echo anchor(base_url().'guests/info_guest_reservations/'.$row1['ID_GUEST'],$row1['LAST_NAME'].', '.$row1['NAME']);
 			}
 		}
 		?>    </td>
@@ -144,6 +138,12 @@ foreach ($room as $row)
   }
   ?>
 </table>
+<?php 
+}
+else
+{
+	echo 'No existen reservaciones en esta habitación!';
+}?>
 
 
 

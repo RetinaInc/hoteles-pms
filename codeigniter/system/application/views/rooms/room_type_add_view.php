@@ -2,7 +2,7 @@
 
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 echo 'CREAR TIPO DE HABITACIÓN';?><br /><br /><?php
 
