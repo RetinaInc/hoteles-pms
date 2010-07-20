@@ -125,7 +125,7 @@
 	}
 
 //---------------------------------------------TRADUCCION EN ESPAÑOL-----------------------------------------------------------------------------
-	var	monthName =	new	Array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Augosto","Septiembre","Octubre","Noviembre","Diciembre")
+	var	monthName =	new	Array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre")
 	var	monthName2 = new Array("ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC")
 	if (startAt==0)
 	{
@@ -300,7 +300,7 @@
 			
 //Dentro de el siguiente ciclo se generan los años, en el caso de que sea introcir fecha de nacimiento restale 30---- i>=(yearNow-30)-----
 //CAMBIA el siguiente for por este " for	(i=yearNow; i<=(yearNow+4); i++) { " si quieres que los años empizen en el actual en adelante		
-			for	(i=yearNow; i>=(yearNow-30); i--) {		
+			for	(i=yearNow; i<=(yearNow+4); i++) {		
 				sName =	i;
 				if (i==yearSelected){
 					sName =	"<B>" +	sName +	"</B>"

@@ -16,13 +16,13 @@
  */	
 
 
-function get_count($table, $field1, $value1, $field2, $value2)
+function getCount($table, $field1, $value1, $field2, $value2)
 {
 	$CI =& get_instance();
 
 	$CI->load->model('general_model');
 	
-	$result = $CI->general_model->get_count($table, $field1, $value1, $field2, $value2);
+	$result = $CI->general_model->getCount($table, $field1, $value1, $field2, $value2);
 		
 	return $result;
 }
