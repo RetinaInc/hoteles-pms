@@ -2,7 +2,7 @@
 
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 foreach ($room as $row)
 {
