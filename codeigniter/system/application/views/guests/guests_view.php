@@ -1,7 +1,7 @@
 
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 echo 'CLIENTES';
 
@@ -26,8 +26,8 @@ echo 'CLIENTES';
     <td><?php echo $row['TELEPHONE'];?></td>
     <td><?php echo $row['EMAIL'];?></td>
     <td><?php echo $row['ADDRESS'];?></td>
-    <td><?php echo anchor(base_url().'guests/info_guest_reservations/'.$row['ID_GUEST'],'Ver Reservaciones');?></td>
-    <td><?php echo anchor(base_url().'guests/edit_guest/'.$row['ID_GUEST'],'Editar');?></td>
+    <td><?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['ID_GUEST'],'Ver Reservaciones');?></td>
+    <td><?php echo anchor(base_url().'guests/editGuest/'.$row['ID_GUEST'],'Editar');?></td>
   </tr>
   <?php
   }

@@ -1,8 +1,7 @@
 
-
 <?php 
 
-$this->load->view('header'); 
+$this->load->view('pms/header'); 
 
 foreach ($guest as $row)
 {
@@ -13,7 +12,7 @@ echo 'EDITAR DATOS CLIENTE';?><br /><br /><?php
 
 echo validation_errors();
 
-echo form_open(base_url().'guests/edit_guest/'.$guest_id);
+echo form_open(base_url().'guests/editGuest/'.$guest_id);
 
 foreach ($guest as $row)
 {?>
@@ -44,5 +43,10 @@ echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
 
-<p><a href="<?php echo base_url().'guests/delete_guest/'.$guest_id?>" onclick="return confirm('Seguro que desea eliminar?')">  Eliminar Cliente</a></p>
-<p><a href="<?php echo base_url().'guests/view_guests/'.$guest_id?>">Volver</a></p>
+<p><a href="<?php echo base_url().'guests/deleteGuest/'.$guest_id?>" onclick="return confirm('Seguro que desea eliminar?')">  Eliminar Cliente</a></p>
+
+<?php
+$referer = $_SERVER['HTTP_REFERER'];
+echo "<a href='" . $referer . "'> Volver</a><br>";
+?>
+
