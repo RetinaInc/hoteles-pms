@@ -3,84 +3,78 @@
 
 $this->load->view('pms/header');
 
-echo anchor(base_url().'reservations/addReservation/','Crear Nueva Reservación');?><br /><br /><?php
-
 echo 'RESERVACIONES';
 
 ?>
 <br /><br />
 
-<table width="1057" border="1">
-
+<table width="852" border="1">
   <tr>
     <td width="101">
     	<?php
 		echo '# Confirmación';
-        echo form_open(base_url().'reservations/viewReservations');
+        echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'RE.ID_RESERVATION');
 		echo form_submit('sumit', '^');
         echo form_close();
-		?>    
-    </td>
-    <td width="94">
-   	<?php
-		echo '# Habitación';
-        echo form_open(base_url().'reservations/viewReservations');
-		echo form_hidden('order', 'RO.NUMBER');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-  <td width="101">
-    	<?php
-		echo 'Tipo habitación';
-        echo form_open(base_url().'reservations/viewReservations');
-		echo form_hidden('order', 'RT.ABRV');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-<td width="205">
+		?>  	</td>
+	<td width="187">
         <?php
 		echo 'Nombre Cliente ';
-        echo form_open(base_url().'reservations/viewReservations');
+        echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'G.LAST_NAME');
 		echo form_submit('sumit', '^');
         echo form_close();
-		?>    </td>
-<td width="114">
+		?>   	</td>
+	<td width="110">
     	<?php
 		echo 'Fecha Check-In';
-        echo form_open(base_url().'reservations/viewReservations');
+        echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'RE.CHECK_IN DESC');
 		echo form_submit('sumit', '^');
         echo form_close();
-		?>    </td>
-  <td width="114">
+		?>  	</td>
+	<td width="119">
     	<?php
 		echo 'Fecha Check-Out';
-        echo form_open(base_url().'reservations/viewReservations');
+        echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'RE.CHECK_OUT DESC');
 		echo form_submit('sumit', '^');
         echo form_close();
-		?>    </td>
-<td width="163">
+		?> 	</td>
+	<td width="150">
     	<?php
 		echo 'Estado';
-        echo form_open(base_url().'reservations/viewReservations');
+        echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'RE.STATUS');
 		echo form_submit('sumit', '^');
         echo form_close();
-		?>    </td>
-    <td width="54">Pago</td>
-    <td width="53">Debe</td>
+		?>   	</td>
+    <td width="59">Habitación(nes)</td>
+    <td width="37">Pago</td>
+    <td width="37">Debe</td>
   </tr>
 	
   <?php foreach ($reservations as $row)
-  {?>
+  {$reservation_rooms = get_count('ROOM_RESERVATION', 'FK_ID_RESERVATION', $row['ID_RESERVATION'], null, null);?>
   <tr>
     <td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['ID_RESERVATION'],$row['ID_RESERVATION']);?></td>
-    <td><?php echo $row['NUMBER'];?></td>
-    <td><?php echo $row['ABRV'];?></td>
-    <td><?php echo $row['LAST_NAME'].', '.$row['NAME'];?></td>
+    <td>
+    	<?php foreach ($guests as $row1)
+		{
+			if ($row1['ID_GUEST'] == $row['FK_ID_GUEST'])
+			{
+				if ($row1['DISABLE'] == 1)
+				{
+					echo anchor(base_url().'guests/infoGuestReservations/'.$row1['ID_GUEST'],$row1['LAST_NAME'].', '.$row1['NAME']);
+				}
+				else
+				{
+					echo $row1['LAST_NAME'].', '.$row1['NAME'];
+				}
+			}
+		}?>
+    </td>
     <td>
 		<?php
 		$check_in = $row['CHECK_IN'];
@@ -106,12 +100,23 @@ echo 'RESERVACIONES';
 		?>
     </td>
     <td><?php echo lang($row['STATUS']);?></td>
+    <td>
+    <?php 
+	echo $reservation_rooms;
+    foreach($rooms as $row1)
+	{
+		if ($row1['ID_RESERVATION'] == $row['ID_RESERVATION'])
+		{
+			echo ' ('.$row1 ['NUMBER'].')';
+		}
+	}?>
+   </td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
   </tr>
   <?php
   }
   ?>
-
 </table>
 
+<p><a href="<?php echo base_url().'reservations/viewPendingReservations'?>">Volver</a></p>
