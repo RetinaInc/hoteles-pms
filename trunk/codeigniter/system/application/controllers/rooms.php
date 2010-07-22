@@ -26,12 +26,12 @@ class Rooms extends Controller
 	{
 		//$order = $_POST["order"];
 		
-		$order = 'NUMBER';
+		$order = 'number';
 	
 		$rooms             = $this->GM->getInfo('ROOM', null, null, $order, null, null, 1);
 		$roomsCount        = $this->GM->getCount('ROOM', null,     null,             null, null, 1);
-		$roomsCountRunning = $this->GM->getCount('ROOM', 'STATUS', 'Running',        null, null, 1);
-		$roomsCountOos     = $this->GM->getCount('ROOM', 'STATUS', 'Out of service', null, null, 1);
+		$roomsCountRunning = $this->GM->getCount('ROOM', 'status', 'Running',        null, null, 1);
+		$roomsCountOos     = $this->GM->getCount('ROOM', 'status', 'Out of service', null, null, 1);
 		
 		$data['rooms']             = $rooms;
 		$data['roomsCount']        = $roomsCount;
@@ -61,14 +61,14 @@ class Rooms extends Controller
 	{
 		//$order = $_POST["order"];
 		
-		$order = 'RE.CHECKIN DESC';
+		$order = 'RE.checkIn DESC';
 		
-		$room             = $this->GM->getInfo('ROOM', 'ID_ROOM', $roomId, null, null, null, 1);
 		$guest            = $this->GM->getInfo('GUEST', null,     null,    null, null, null, null);
-		$roomReservations = $this->RM->getReservationRoomGuest('RO.ID_ROOM', $roomId, $order);
+		$room             = $this->GM->getInfo('ROOM', 'id_room', $roomId, null, null, null, 1);
+		$roomReservations = $this->RM->getReservationRoomGuest('RO.id_room', $roomId, $order);
 		
-		$data['room']             = $room;
 		$data['guest']            = $guest;
+		$data['room']             = $room;
 		$data['roomReservations'] = $roomReservations;
 		
 		$this->load->view('pms/rooms/room_info_view', $data);
@@ -77,12 +77,12 @@ class Rooms extends Controller
 	
 	function infoRoomType($roomTypeId)
 	{
-		$roomType             = $this->GM->getInfo('ROOM_TYPE', 'ID_ROOM_TYPE', $roomTypeId, null, null, null, 1);
+		$roomType             = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 		$guest                = $this->GM->getInfo('GUEST',     null,           null,        null, null, null, null);
-		$roomTypeCount        = $this->GM->getCount('ROOM', 'FK_ID_ROOM_TYPE', $roomTypeId,  null,     null,            1);
-		$roomTypeCountRunning = $this->GM->getCount('ROOM', 'FK_ID_ROOM_TYPE', $roomTypeId, 'STATUS', 'Running',        1);
-		$roomTypeCountOos     = $this->GM->getCount('ROOM', 'FK_ID_ROOM_TYPE', $roomTypeId, 'STATUS', 'Out of service', 1);
-		$roomTypeReservations = $this->RM->getReservationRoomGuest('RT.ID_ROOM_TYPE', $roomTypeId, 'RE.CHECK_IN DESC');
+		$roomTypeCount        = $this->GM->getCount('ROOM', 'fk_room_type', $roomTypeId,  null,     null,            1);
+		$roomTypeCountRunning = $this->GM->getCount('ROOM', 'fk_room_type', $roomTypeId, 'status', 'Running',        1);
+		$roomTypeCountOos     = $this->GM->getCount('ROOM', 'fk_room_type', $roomTypeId, 'status', 'Out of service', 1);
+		$roomTypeReservations = $this->RM->getReservationRoomGuest('RT.id_room_type', $roomTypeId, 'RE.checkIn DESC');
 	
 		$data['roomType']             = $roomType;
 		$data['guest']                = $guest;
@@ -97,14 +97,14 @@ class Rooms extends Controller
 	
 	function addRoom()
 	{
-		$this->form_validation->set_rules('room_number', 'lang:number', 'required|max_length[20]|callback_check_room_number');
+		$this->form_validation->set_rules('room_number', 'lang:number', 'required|max_length[20]|callback_checkRoomNumber');
 		$this->form_validation->set_rules('room_name', 'lang:name', 'max_length[50]');
 		$this->form_validation->set_rules('room_status', 'lang:status', 'required|max_length[20]');
 		$this->form_validation->set_rules('room_room_type','lang:room_type','required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$maxRoomNumber = $this->GM->getMax('ROOM', 'NUMBER');
+			$maxRoomNumber = $this->GM->getMax('ROOM', 'number');
 			$roomTypes     = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
 		
 			$data['maxRoomNumber'] = $maxRoomNumber;
@@ -118,7 +118,7 @@ class Rooms extends Controller
 			
 			foreach ($hotel as $row) {
 			
-				$hotelId = $row['ID_HOTEL'];
+				$hotelId = $row['id_hotel'];
 			}
 			
 			$roomNumber   = set_value('room_number');
@@ -127,11 +127,11 @@ class Rooms extends Controller
 			$roomRoomType = set_value('room_room_type');
 			
 			$data = array(
-				'NUMBER'          => $roomNumber,
-				'NAME'            => ucwords(strtolower($roomName)),
-				'STATUS'          => $roomStatus,
-				'FK_ID_HOTEL'     => $hotelId,
-				'FK_ID_ROOM_TYPE' => $roomRoomType
+				'number'       => $roomNumber,
+				'name'         => ucwords(strtolower($roomName)),
+				'status'       => $roomStatus,
+				'fk_hotel'     => $hotelId,
+				'fk_room_type' => $roomRoomType
 				);
 			
 			$this->GM->insert('ROOM', $data);  
@@ -143,11 +143,12 @@ class Rooms extends Controller
 	
 	function addRoomType()
 	{
-		$this->form_validation->set_rules('room_type_name', 'lang:name','required|max_length[50]|callback_check_room_type_name');
-		$this->form_validation->set_rules('room_type_abrv', 'lang:abrv', 'max_length[5]|callback_check_room_type_abrv');
+		$this->form_validation->set_rules('room_type_name', 'lang:name','required|max_length[50]|callback_checkRoomTypeName');
+		$this->form_validation->set_rules('room_type_abrv', 'lang:abrv', 'max_length[5]|callback_checkRoomTypeAbrv');
+		$this->form_validation->set_rules('room_type_paxStd', 'lang:paxStd', 'required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_paxMax', 'lang:paxMax', 'required|numeric|max_length[5]');
 		$this->form_validation->set_rules('room_type_beds', 'lang:beds', 'required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_sleeps', 'lang:sleeps', 'required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_details', 'lang:details', 'max_length[300]');
+		$this->form_validation->set_rules('room_type_description', 'lang:description', 'max_length[300]');
 			
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -155,18 +156,20 @@ class Rooms extends Controller
 			
 		} else {
 		
-			$roomTypeName    = set_value('room_type_name');
-			$roomTypeAbrv    = set_value('room_type_abrv');
-			$roomTypeBeds    = set_value('room_type_beds');
-			$roomTypeSleeps  = set_value('room_type_sleeps');
-			$roomTypeDetails = set_value('room_type_details');
+			$roomTypeName        = set_value('room_type_name');
+			$roomTypeAbrv        = set_value('room_type_abrv');
+			$roomTypePaxStd      = set_value('room_type_paxStd');
+			$roomTypePaxMax      = set_value('room_type_paxMax');
+			$roomTypeBeds        = set_value('room_type_beds');
+			$roomTypeDescription = set_value('room_type_description');
 			
 			$data = array(
-				'NAME'    => ucwords(strtolower($roomTypeName)),
-				'ABRV'    => strtoupper($roomTypeAbrv),
-				'BEDS'    => $roomTypeBeds,
-				'SLEEPS'  => $roomTypeSleeps,
-				'DETAILS' => $roomTypeDetails,
+				'name'        => ucwords(strtolower($roomTypeName)),
+				'abrv'        => strtoupper($roomTypeAbrv),
+				'paxStd'      => $roomTypePaxStd,
+				'paxMax'      => $roomTypePaxMax,
+				'beds'        => $roomTypeBeds,
+				'description' => $roomTypeDescription,
 				);
 			
 			$this->GM->insert('ROOM_TYPE', $data);  
@@ -178,14 +181,14 @@ class Rooms extends Controller
 	
 	function editRoom($roomId)
 	{
-		$this->form_validation->set_rules('room_number','lang:number','required|max_length[20]|callback_check_room_number');
+		$this->form_validation->set_rules('room_number','lang:number','required|max_length[20]|callback_checkRoomNumber');
 		$this->form_validation->set_rules('room_name','lang:name','max_length[50]');
 		$this->form_validation->set_rules('room_status','lang:status','required|max_length[20]');
 		$this->form_validation->set_rules('room_room_type','lang:room_type','required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$room      = $this->GM->getInfo('ROOM',     'ID_ROOM', $roomId, null, null, null, 1);
+			$room      = $this->GM->getInfo('ROOM',     'id_room', $roomId, null, null, null, 1);
 			$roomTypes = $this->GM->getInfo('ROOM_TYPE', null,     null,    null, null, null, 1);
 		
 			$data['room']      = $room;
@@ -201,13 +204,13 @@ class Rooms extends Controller
 			$roomRoomType = set_value('room_room_type');
 			
 			$data = array(
-				'NUMBER'          => $roomNumber,
-				'NAME'            => ucwords(strtolower($roomName)),
-				'STATUS'          => $roomStatus,
-				'FK_ID_ROOM_TYPE' => $roomRoomType
+				'number'       => $roomNumber,
+				'name'         => ucwords(strtolower($roomName)),
+				'status'       => $roomStatus,
+				'fk_room_type' => $roomRoomType
 				);
 			
-			$this->GM->update('ROOM', 'ID_ROOM', $roomId, $data);  
+			$this->GM->update('ROOM', 'id_room', $roomId, $data);  
 				
 			$this->infoRoom($roomId); 
 		}	
@@ -216,15 +219,16 @@ class Rooms extends Controller
 	
 	function editRoomType($roomTypeId)
 	{
-		$this->form_validation->set_rules('room_type_name','lang:name','required|max_length[50]|callback_check_room_type_name');
-		$this->form_validation->set_rules('room_type_abrv','lang:abrv','max_length[5]|callback_check_room_type_abrv');
+		$this->form_validation->set_rules('room_type_name','lang:name','required|max_length[50]|callback_checkRoomTypeName');
+		$this->form_validation->set_rules('room_type_abrv','lang:abrv','max_length[5]|callback_checkRoomTypeAbrv');
+		$this->form_validation->set_rules('room_type_paxStd','lang:paxStd','required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_paxMax','lang:paxMax','required|numeric|max_length[5]');
 		$this->form_validation->set_rules('room_type_beds','lang:beds','required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_sleeps','lang:sleeps','required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_details','lang:details','max_length[300]');
+		$this->form_validation->set_rules('room_type_description','lang:description','max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$roomType = $this->GM->getInfo('ROOM_TYPE', 'ID_ROOM_TYPE', $roomTypeId, null, null, null, 1);
+			$roomType = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 			
 			$data['roomType'] = $roomType;
 			
@@ -232,21 +236,23 @@ class Rooms extends Controller
 			
 		} else {
 		
-			$roomTypeName    = set_value('room_type_name');
-			$roomTypeAbrv    = set_value('room_type_abrv');
-			$roomTypeBeds    = set_value('room_type_beds');
-			$roomTypeSleeps  = set_value('room_type_sleeps');
-			$roomTypeDetails = set_value('room_type_details');
+			$roomTypeName        = set_value('room_type_name');
+			$roomTypeAbrv        = set_value('room_type_abrv');
+			$roomTypePaxStd      = set_value('room_type_paxStd');
+			$roomTypePaxMax      = set_value('room_type_paxMax');
+			$roomTypeBeds        = set_value('room_type_beds');
+			$roomTypeDescription = set_value('room_type_description');
 			
 			$data = array(
-				    'NAME'    => ucwords(strtolower($roomTypeName)),
-				    'ABRV'    => strtoupper($roomTypeAbrv),
-				    'BEDS'    => $roomTypeBeds,
-				    'SLEEPS'  => $roomTypeSleeps,
-				    'DETAILS' => $roomTypeDetails
+				    'name'        => ucwords(strtolower($roomTypeName)),
+				    'abrv'        => strtoupper($roomTypeAbrv),
+					'paxStd'      => $roomTypePaxStd,
+					'paxMax'      => $roomTypePaxMax,
+				    'beds'        => $roomTypeBeds,
+				    'description' => $roomTypeDescription
 				    );
 			
-			$this->GM->update('ROOM_TYPE', 'ID_ROOM_TYPE', $roomTypeId, $data);  
+			$this->GM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data);  
 				
 			$this->infoRoomType($roomTypeId); 
 		}
@@ -255,7 +261,7 @@ class Rooms extends Controller
 	
 	function deleteRoom($roomId)
 	{
-		$roomReservation = $this->RM->getReservationRoomGuest('RO.ID_ROOM', $roomId, null);
+		$roomReservation = $this->RM->getReservationRoomGuest('RO.id_room', $roomId, null);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time       = time();
@@ -266,10 +272,10 @@ class Rooms extends Controller
 		
 		foreach ($roomReservation as $row) {
 		
-		 	$resNum   = $row['ID_RESERVATION'];
-			$checkIn  = $row['CHECK_IN'];
-			$checkOut = $row['CHECK_OUT'];
-			$status   = $row['STATUS'];
+		 	$resNum   = $row['id_reservation'];
+			$checkIn  = $row['checkIn'];
+			$checkOut = $row['checkOut'];
+			$status   = $row['status'];
 			
 			if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')){
 			
@@ -290,7 +296,7 @@ class Rooms extends Controller
 			
 		} else {
 		
-			$this->GM->disable('ROOM', 'ID_ROOM', $roomId);  
+			$this->GM->disable('ROOM', 'id_room', $roomId);  
 			$this->viewRooms(); 
 		}	
 	}
@@ -298,7 +304,7 @@ class Rooms extends Controller
 	
 	function deleteRoomType($roomTypeId)
 	{
-		$roomTypeReservation = $this->RM->getReservationRoomGuest('RT.ID_ROOM_TYPE', $roomTypeId, null);
+		$roomTypeReservation = $this->RM->getReservationRoomGuest('RT.id_room_type', $roomTypeId, null);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time       = time();
@@ -309,10 +315,10 @@ class Rooms extends Controller
 		
 		foreach ($roomTypeReservation as $row) {
 		
-			$resNum   = $row['ID_RESERVATION'];
-			$checkIn  = $row['CHECK_IN'];
-			$checkOut = $row['CHECK_OUT'];
-			$status   = $row['STATUS'];
+			$resNum   = $row['id_reservation'];
+			$checkIn  = $row['checkIn'];
+			$checkOut = $row['checkOut'];
+			$status   = $row['status'];
 			
 			if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')) {
 				
@@ -333,8 +339,8 @@ class Rooms extends Controller
 			
 		} else {
 		
-			$this->GM->disable('ROOM_TYPE', 'ID_ROOM_TYPE',    $roomTypeId); 
-			$this->GM->disable('ROOM',      'FK_ID_ROOM_TYPE', $roomTypeId);   
+			$this->GM->disable('ROOM_TYPE', 'id_room_type', $roomTypeId); 
+			$this->GM->disable('ROOM',      'fk_room_type', $roomTypeId);   
 			$this->viewRoomTypes(); 
 		}	
 	}
@@ -344,11 +350,11 @@ class Rooms extends Controller
 	{
 		$roomId = $this->uri->segment(3);
 		
-		$rooms = $this->GM->validationCheck('ROOM', 'NUMBER', $str, 'ID_ROOM !=', $roomId);
+		$rooms = $this->GM->validationCheck('ROOM', 'number', $str, 'id_room !=', $roomId);
 
 		if ($rooms) {
 		
-			$this->form_validation->set_message('check_room_number', 'Número de habitación no disponible');
+			$this->form_validation->set_message('checkRoomNumber', 'Número de habitación no disponible');
 			return FALSE;
 			
 		} else {
@@ -361,11 +367,11 @@ class Rooms extends Controller
 	{
 		$roomTypeId = $this->uri->segment(3);
 		
-		$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'NAME', $str, 'ID_ROOM_TYPE !=', $roomTypeId);
+		$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'name', $str, 'id_room_type !=', $roomTypeId);
 
 		if ($roomTypes) {
 		
-			$this->form_validation->set_message('check_room_type_name', 'Nombre de tipo de habitación no disponible');
+			$this->form_validation->set_message('checkRoomTypeName', 'Nombre de tipo de habitación no disponible');
 			return FALSE;
 			
 		} else {
@@ -384,11 +390,11 @@ class Rooms extends Controller
 		
 			$roomTypeId = $this->uri->segment(3);
 		
-			$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'ABRV', $str, 'ID_ROOM_TYPE !=', $roomTypeId);
+			$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'abrv', $str, 'id_room_type !=', $roomTypeId);
 
 			if ($roomTypes) {
 			
-				$this->form_validation->set_message('check_room_type_abrv', 'Abrev. no disponible');
+				$this->form_validation->set_message('checkRoomTypeAbrv', 'Abrev. no disponible');
 				return FALSE;
 				
 			} else {

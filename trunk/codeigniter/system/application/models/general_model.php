@@ -28,7 +28,7 @@ class General_model extends Model
 		
 			$this->db->select('ROOM.*');
 			$this->db->select('ROOM_TYPE.abrv as rtabrv');
-			$this->db->select('ROOM_TYPE.description as rtdescrption');
+			$this->db->select('ROOM_TYPE.description as rtdescription');
 			$this->db->join('ROOM_TYPE', 'ROOM_TYPE.id_room_type = ROOM.fk_room_type','left');
 		}
 		

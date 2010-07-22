@@ -8,19 +8,30 @@ class Reservations_model extends Model
 	}
 	
 	
+	function getWhereInRoom()
+	{
+		$where = "id_room_type IN (SELECT DISTINCT(fk_room_type) FROM ROOM)";
+		
+		$this->db->where($where);
+		
+		$query = $this->db->get('ROOM_TYPE');
+		return $query->result_array();
+	}
+	
+	
 	function getReservationRoom($field, $value, $order)
 	{
-		if ($field != null and $value != null){
+		if ($field != null and $value != null) {
   			$this->db->where($field, $value);
   		}
 		
-		if ($order != null){
+		if ($order != null) {
   			$this->db->order_by($order);
   		}
 		
-		$this->db->select('RT.ID_ROOM_TYPE, RT.ABRV, (RT.NAME)RTNAME, RT.DESCRIPTION, RO.ID_ROOM, RO.NUMBER, (RO.NAME)RNAME, RR.ADULTS, RR.CHILDREN, RE.ID_RESERVATION, (RE.STATUS)RESTATUS, RE.CHECKIN, RE.CHECKOUT, RE.FK_GUEST');
+		$this->db->select('RT.id_room_type, RT.abrv, (RT.name)rtname, RT.description, RO.id_room, RO.number, (RO.name)rname, RR.adults, RR.children, RE.id_reservation, (RE.status)restatus, RE.checkIn, RE.checkOut, RE.fk_guest');
 		$this->db->from('ROOM_TYPE RT, ROOM RO, ROOM_RESERVATION RR, RESERVATION RE');
-		$this->db->where('RT.ID_ROOM_TYPE = RO.FK_ROOM_TYPE AND RO.ID_ROOM = RR.FK_ROOM AND RR.FK_RESERVATION = RE.ID_RESERVATION');
+		$this->db->where('RT.id_room_type = RO.fk_room_type AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation');
 		
 		$query = $this->db->get();
 		return $query->result_array();
@@ -29,13 +40,13 @@ class Reservations_model extends Model
 	
 	function getAvailability($roomType, $checkIn, $checkOut)
 	{
-		$where = "ID_ROOM NOT IN(SELECT RO.ID_ROOM FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.FK_ROOM_TYPE = ".$roomType." AND RO.ID_ROOM = RR.FK_ROOM AND RR.FK_RESERVATION = RE.ID_RESERVATION AND RE.STATUS != 'Canceled' AND ((RE.CHECKIN <= '".$checkIn."' AND RE.CHECKOUT > '".$checkIn."') OR (RE.CHECKIN < '".$checkOut."' AND RE.CHECKOUT >= '".$checkOut."') OR (RE.CHECKIN >= '".$checkIn."' AND RE.CHECKOUT <= '".$checkOut."')))";
+		$where = "id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.fk_room_type = ".$roomType." AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.status != 'Canceled' AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
 		
-		$this->db->select('ID_ROOM, NUMBER');
+		$this->db->select('id_room, number');
 		$this->db->from('ROOM');
-		$this->db->where('FK_ROOM_TYPE', $roomType);
-		$this->db->where('STATUS', 'Running');
-		$this->db->where('DISABLE', 1);
+		$this->db->where('fk_room_type', $roomType);
+		$this->db->where('status', 'Running');
+		$this->db->where('disable', 1);
 		$this->db->where($where);
 		$query = $this->db->get();
 		return $query->result_array();
@@ -44,17 +55,16 @@ class Reservations_model extends Model
 	
 	function getAvailabilityOther($checkIn, $checkOut, $totalPer)
 	{
-		$where = "RO.ID_ROOM NOT IN(SELECT RO.ID_ROOM FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.ID_ROOM = RR.FK_ROOM AND RR.FK_RESERVATION = RE.ID_RESERVATION AND RE.STATUS != 'Canceled' AND ((RE.CHECKIN <= '".$checkIn."' AND RE.CHECKOUT > '".$checkIn."') OR (RE.CHECKIN < '".$checkOut."' AND RE.CHECKOUT >= '".$checkOut."') OR (RE.CHECKIN >= '".$checkIn."' AND RE.CHECKOUT <= '".$checkOut."')))";
+		$where = "RO.id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.status != 'Canceled' AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
 		
-		$this->db->select('RO.ID_ROOM, RO.NUMBER, RO.FK_ROOM_TYPE, RT.ABRV');
-		//$this->db->select('ROOM_TYPE.ABRV as RTAB');
+		$this->db->select('RO.id_room, RO.number, RO.fk_room_type, RT.abrv');
 		$this->db->from('ROOM RO, ROOM_TYPE RT');
-		$this->db->where('RO.STATUS', 'Running');
-		$this->db->where('RO.DISABLE', 1);
-		$this->db->where('RO.FK_ROOM_TYPE = RT.ID_ROOM_TYPE');
-		$this->db->where('RT.MAX >=', $totalPer);
+		$this->db->where('RO.status', 'Running');
+		$this->db->where('RO.disable', 1);
+		$this->db->where('RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.paxMax >=', $totalPer);
 		$this->db->where($where);
-		//$this->db->join('ROOM_TYPE', 'ROOM_TYPE.ID_ROOM_TYPE = ROOM.FK_ID_ROOM_TYPE','left');
+		
 		$query = $this->db->get();
 		return $query->result_array();
 	}
@@ -71,43 +81,6 @@ class Reservations_model extends Model
 		$this->db->update($table, $data);
 	}
 	
-	
-	
-	/*
-	function getAvailability($room_type, $check_in, $check_out)
-	{
-		$where = "((RE.CHECK_IN <= '".$check_in."' AND RE.CHECK_OUT > '".$check_in."') OR (RE.CHECK_IN < '".$check_out."' AND RE.CHECK_OUT >= '".$check_out."') OR (RE.CHECK_IN >= '".$check_in."' AND RE.CHECK_OUT <= '".$check_out."'))";
-		
-		$this->db->select('DISTINCT(RO.NUMBER)');
-		$this->db->from('ROOM RO, ROOM_RESERVATION RR, RESERVATION RE');
-		$this->db->where('RO.FK_ID_ROOM_TYPE', $room_type);
-		$this->db->where('RO.ID_ROOM = RR.FK_ID_ROOM');
-		$this->db->where('RR.FK_ID_RESERVATION = RE.ID_RESERVATION');
-		$this->db->where($where);
-		$query = $this->db->get();
-		return $query->result_array();
-	}
-	
-	
-	function getAvailable($room_type, $occupied)
-	{	
-		foreach ($occupied as $row)
-		{
-			echo 'Habitaciones ocupadas: ', $row['NUMBER'];?><br /><br /><?php
-		}
-		
-	//	$occ = array('101', '102');
-					
-		$this->db->select('NUMBER');
-		$this->db->from('ROOM');
-		$this->db->where('FK_ID_ROOM_TYPE', $room_type);
-		$this->db->where_not_in('NUMBER', $occupied);
-		$query = $this->db->get();
-		return $query->result_array();
-		
-	}
-	
-	*/
 	
 	
 	
