@@ -2,7 +2,7 @@
 
 $lang['Running'] = 'Funcionando';
 $lang['Out of service'] = 'Fuera de servicio';
-$lang['Checked-In'] = 'Chequeada';
+$lang['Checked-In'] = 'Checked-In';
 $lang['Checked-Out'] = 'Checked-Out';
 $lang['Canceled'] = 'Cancelada';
 $lang['Reserved'] = 'Reservada';
@@ -15,13 +15,15 @@ $lang['status'] = 'Estado';
 $lang['room_type'] = 'Tipo de habitaci&oacute;n';
 $lang['abrv'] = 'Abrev.';
 $lang['beds'] = 'Cantidad de camas';
-$lang['sleeps'] = 'Max. personas';
+$lang['paxStd'] = 'Pax est&aacute;ndar';
+$lang['paxMax'] = 'Pax m&aacute;ximo';
 $lang['telephone'] = 'Tel&eacute;fono';
 $lang['email'] = 'Correo electr&oacute;nico';
 $lang['address'] = 'Direcci&oacute;n';
+$lang['adults'] = 'Cantidad de adultos';
+$lang['children'] = 'Cantidad de ni&ntilde;o';
 
-$lang['Mon'] = 'Lun';
-$lang['Fri'] = 'Vier';
+
 
 
 

@@ -6,7 +6,7 @@ class Guests extends Controller
 	{
 		parent::Controller();
 		$this->load->model('general_model','GM');
-		$this->lang->load ('form_validation','spanish');
+		$this->lang->load('form_validation','spanish');
 		$this->load->library('form_validation');
 		$this->load->helper('hoteles');
 		$this->load->helper('form');
@@ -22,7 +22,7 @@ class Guests extends Controller
 	
 	function viewGuests()
 	{
-		$guests = $this->GM->getInfo('GUEST', null, null, 'LASTNAME', null, null, 1);
+		$guests = $this->GM->getInfo('GUEST', null, null, 'lastName', null, null, 1);
 		
 		$data['guests'] = $guests;
 		
@@ -33,10 +33,10 @@ class Guests extends Controller
 	function infoGuestReservations($guestId)
 	{
 		//$order = $_POST["order"];
-		$order = 'CHECK_IN DESC';
+		$order = 'checkIn DESC';
 		
-		$guest        = $this->GM->getInfo('GUEST',           'ID_GUEST',    $guestId, null,   null, null, 1);
-		$reservations = $this->GM->getInfo('RESERVATION',     'FK_ID_GUEST', $guestId, $order, null, null, 1);
+		$guest        = $this->GM->getInfo('GUEST',       'id_guest', $guestId, null,   null, null, 1);
+		$reservations = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, $order, null, null, 1);
 		
 		$data['guest']        = $guest;
 		$data['reservations'] = $reservations;
@@ -55,7 +55,7 @@ class Guests extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$guest = $this->GM->getInfo('GUEST', 'ID_GUEST', $guestId, null, null, null, 1);
+			$guest = $this->GM->getInfo('GUEST', 'id_guest', $guestId, null, null, null, 1);
 			
 			$data['guest'] = $guest;
 
@@ -70,14 +70,14 @@ class Guests extends Controller
 			$guestAddress   = set_value('guest_address');
 			
 			$data = array(
-				'NAME'      => ucwords(strtolower($guestName)),
-				'LAST_NAME' => ucwords(strtolower($guestLastName)),
-				'TELEPHONE' => $guestTelephone,
-				'EMAIL'     => $guestEmail,
-				'ADDRESS'   => $guestAddress
+				'name'      => ucwords(strtolower($guestName)),
+				'lastName'  => ucwords(strtolower($guestLastName)),
+				'telephone' => $guestTelephone,
+				'email'     => $guestEmail,
+				'address'   => $guestAddress
 				);
 			
-			$this->GM->update('GUEST', 'ID_GUEST', $guestId, $data);  
+			$this->GM->update('GUEST', 'id_guest', $guestId, $data);  
 				
 			$this->infoGuestReservations($guestId); 
 		}
@@ -86,7 +86,7 @@ class Guests extends Controller
 	
 	function deleteGuest($guestId)
 	{
-		$guestReservation = $this->GM->getInfo('RESERVATION', 'FK_ID_GUEST', $guestId, null, null, null, 1);
+		$guestReservation = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, null, null, null, 1);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time       = time();
@@ -97,10 +97,10 @@ class Guests extends Controller
 		
 		foreach ($guestReservation as $row) {
 		
-		 	$resNum   = $row['ID_RESERVATION'];
-			$checkIn  = $row['CHECK_IN'];
-			$checkOut = $row['CHECK_OUT'];
-			$status   = $row['STATUS'];
+		 	$resNum   = $row['id_reservation'];
+			$checkIn  = $row['checkIn'];
+			$checkOut = $row['checkOut'];
+			$status   = $row['status'];
 
             if (  (($checkIn > $date) && ($status != 'Canceled') && ($status != 'No Show')) 
 		       || (($checkIn < $date) && ($date < $checkOut) && ($status != 'Canceled') && ($status != 'No Show'))
@@ -128,7 +128,7 @@ class Guests extends Controller
 			
 		} else {
 		
-			$this->GM->disable('GUEST', 'ID_GUEST', $guestId);  
+			$this->GM->disable('GUEST', 'id_guest', $guestId);  
 			echo 'Cliente eliminado!';
 			$this->viewGuests(); 
 		}	

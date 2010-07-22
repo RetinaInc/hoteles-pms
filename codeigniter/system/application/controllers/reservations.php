@@ -33,7 +33,7 @@ class Reservations extends Controller
 		}
 		*/
 	
-		$order = 'CHECK_IN DESC';
+		$order = 'checkIn DESC';
 		
 		$rooms        = $this->REM->getReservationRoom(null, null, null);
 		$guests       = $this->GM->getInfo('GUEST',       null, null, null,   null, null, null);
@@ -51,7 +51,7 @@ class Reservations extends Controller
 	{
 		//$order = $_POST["order"];
 		
-		$order = 'ID_RESERVATION';
+		$order = 'id_reservation';
 		
 		$datestring = "%Y-%m-%d";
 		$time       = time();
@@ -72,17 +72,17 @@ class Reservations extends Controller
 	
 	function infoReservation($reservationId)
 	{
-		$room                  = $this->REM->getReservationRoom('ID_RESERVATION', $reservationId, null);
-		$reservationRoomsCount = $this->GM->getCount('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservationId, null, null, null);
-		$reservation           = $this->GM->getInfo('RESERVATION',      'ID_RESERVATION',    $reservationId, null, null, null, 1);
-        $reservationRoomInfo   = $this->GM->getInfo('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservationId, null, null, null, 1);
+		$room                  = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
+		$reservationRoomsCount = $this->GM->getCount('ROOM_RESERVATION', 'fk_reservation', $reservationId, null, null, null);
+		$reservation           = $this->GM->getInfo('RESERVATION',       'id_reservation', $reservationId, null, null, null, 1);
+        $reservationRoomInfo   = $this->GM->getInfo('ROOM_RESERVATION',  'fk_reservation', $reservationId, null, null, null, null);
 		
 		
 		foreach ($reservation as $row) {
 		
-			$guestId  = $row['FK_ID_GUEST'];
-			$checkIn  = $row['CHECK_IN'];
-			$checkOut = $row['CHECK_OUT'];
+			$guestId  = $row['fk_guest'];
+			$checkIn  = $row['checkIn'];
+			$checkOut = $row['checkOut'];
 			
 			$checkIn_array = explode (' ',$checkIn);
 			$ciDate = $checkIn_array[0];
@@ -93,7 +93,7 @@ class Reservations extends Controller
 			$nights = (strtotime($coDate) - strtotime($ciDate)) / (60 * 60 * 24);
 		}
 		
-		$guest = $this->GM->getInfo('GUEST', 'ID_GUEST', $guestId, null, null, null, null);
+		$guest = $this->GM->getInfo('GUEST', 'id_guest', $guestId, null, null, null, null);
 		
 		$data['room']                  = $room;
 		$data['reservationRoomsCount'] = $reservationRoomsCount;
@@ -109,15 +109,15 @@ class Reservations extends Controller
 	function cancelReservation($reservationId, $guestId)
 	{
 		$data = array(
-				'STATUS' => 'Canceled'
+				'status' => 'Canceled'
 				);
 				
-		$this->GM->update('RESERVATION', 'ID_RESERVATION', $reservationId, $data);  
+		$this->GM->update('RESERVATION', 'id_reservation', $reservationId, $data);  
 				
-		$order = 'CHECK_IN DESC';
+		$order = 'checkIn DESC';
 		
-		$guest        = $this->GM->getInfo('GUEST',           'ID_GUEST',    $guestId, null,   null, null, 1);
-		$reservations = $this->GM->getInfo('RESERVATION',     'FK_ID_GUEST', $guestId, $order, null, null, 1);
+		$guest        = $this->GM->getInfo('GUEST',       'id_guest', $guestId, null,   null, null, 1);
+		$reservations = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, $order, null, null, 1);
 		
 		$data['guest']        = $guest;
 		$data['reservations'] = $reservations;
@@ -135,7 +135,7 @@ class Reservations extends Controller
 		if ($this->form_validation->run() == FALSE) {
 		
 			$rates     = $this->GM->getInfo('RATE',      null, null, null, null, null, 1);
-			$roomTypes = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
+			$roomTypes = $this->REM->getWhereInRoom();
 		
 			$data['rates'] = $rates;
 			$data['roomTypes'] = $roomTypes;
@@ -161,7 +161,7 @@ class Reservations extends Controller
 			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
 		
 			$available    = $this->REM->getAvailability($reservationRoomType, $checkIn, $checkOut);
-			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'ID_ROOM_TYPE', $reservationRoomType, null, null, null, 1);
+			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
 			
 			$data['available']           = $available; 
 			$data['roomTypeInfo']        = $roomTypeInfo; 
@@ -180,8 +180,8 @@ class Reservations extends Controller
 		$reservationCheckIn  = $_POST["check_in"];
 		$reservationCheckOut = $_POST["check_out"];
 		
-		$roomInfo     = $this->GM->getInfo('ROOM',      'ID_ROOM',      $roomId,   null, null, null, 1);
-		$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'ID_ROOM_TYPE', $roomType, null, null, null, 1);
+		$roomInfo     = $this->GM->getInfo('ROOM',      'id_room',      $roomId,   null, null, null, 1);
+		$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
 		
 		$ci_array = explode ('-',$reservationCheckIn);
 		$day      = $ci_array[0];
@@ -227,8 +227,8 @@ class Reservations extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$roomInfo     = $this->GM->getInfo('ROOM',      'ID_ROOM',      $roomId,   null, null, null, 1);
-			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'ID_ROOM_TYPE', $roomType, null, null, null, 1);
+			$roomInfo     = $this->GM->getInfo('ROOM',      'id_room',      $roomId,   null, null, null, 1);
+			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
 			
 			$checkIn_array  = explode (' ',$checkIn);
 			$ciDate         = $checkIn_array[0];
@@ -274,17 +274,17 @@ class Reservations extends Controller
 	
 	function modifyReservationRooms($reservationId, $roomId)
 	{
-		$reservationRooms = $this->REM->getReservationRoom('ID_ROOM', $roomId, null);
+		$reservationRooms = $this->REM->getReservationRoom('id_room', $roomId, null);
 		$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
 		
 		foreach ($reservationRooms as $row) {
 		
-			if ($row['ID_RESERVATION'] == $reservationId) {
+			if ($row['id_reservation'] == $reservationId) {
 			
-				$roomType = $row['ID_ROOM_TYPE'];
-				$checkIn  = $row['CHECK_IN'];
-				$checkOut = $row['CHECK_OUT'];
-				$totalPer = $row['ADULTS'] + $row['CHILDREN'];
+				$roomType = $row['id_room_type'];
+				$checkIn  = $row['checkIn'];
+				$checkOut = $row['checkOut'];
+				$totalPer = $row['adults'] + $row['children'];
 			}
 		}
 		
@@ -304,10 +304,10 @@ class Reservations extends Controller
 	function modifyReservationRooms2($reservationId, $oldRoomNum, $newRoomNum)
 	{
 		$data = array(
-				'FK_ID_ROOM' => $newRoomNum
+				'fk_room' => $newRoomNum
 				);
 				
-		$this->REM->doubleUpdate('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservationId, 'FK_ID_ROOM', $oldRoomNum, $data); 
+		$this->REM->doubleUpdate('ROOM_RESERVATION', 'fk_reservation', $reservationId, 'fk_room', $oldRoomNum, $data); 
 		
 		echo 'Habitacion cambiada!'; 
 		
@@ -322,7 +322,7 @@ class Reservations extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$reservationRooms = $this->REM->getReservationRoom('ID_RESERVATION', $reservationId, null);
+			$reservationRooms = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
 			
 			$data['reservationRooms'] = $reservationRooms; 
 			
@@ -345,13 +345,13 @@ class Reservations extends Controller
 			$year     = $co_array[2];
 			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
 			
-			$reservationRooms = $this->REM->getReservationRoom('ID_RESERVATION', $reservationId, null);
+			$reservationRooms = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
 			$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
 	
 			foreach ($reservationRooms as $row) {
 			
-				$roomType = $row['ID_ROOM_TYPE'];
-				$totalPer = $row['ADULTS'] + $row['CHILDREN'];
+				$roomType = $row['id_room_type'];
+				$totalPer = $row['adults'] + $row['children'];
 			}
 		
 			$availableType  = $this->REM->getAvailability ($roomType, $checkIn, $checkOut);
