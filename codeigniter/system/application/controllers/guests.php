@@ -8,6 +8,7 @@ class Guests extends Controller
 		$this->load->model('general_model','GM');
 		$this->lang->load('form_validation','spanish');
 		$this->load->library('form_validation');
+		$this->load->helper('language');
 		$this->load->helper('hoteles');
 		$this->load->helper('form');
 		$this->load->helper('date');
@@ -120,7 +121,7 @@ class Guests extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo 'No se puede eliminar porque tiene reservaciones pendientes: '."<br>";
+			echo lang(errorPendingReservation)."<br>";
 			foreach ($resultado as $actual)
     		echo '# ',$actual . "<br>"; 
 			
@@ -128,8 +129,8 @@ class Guests extends Controller
 			
 		} else {
 		
-			$this->GM->disable('GUEST', 'id_guest', $guestId);  
-			echo 'Cliente eliminado!';
+			$this->GM->disable('GUEST', 'id_guest', $guestId);
+			echo lang(guestDeleted);
 			$this->viewGuests(); 
 		}	
 	}

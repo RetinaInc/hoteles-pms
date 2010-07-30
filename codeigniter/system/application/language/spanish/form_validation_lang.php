@@ -22,8 +22,18 @@ $lang['email'] = 'Correo electr&oacute;nico';
 $lang['address'] = 'Direcci&oacute;n';
 $lang['adults'] = 'Cantidad de adultos';
 $lang['children'] = 'Cantidad de ni&ntilde;o';
+$lang['dateStart'] = 'Fecha inicio';
+$lang['dateEnd'] = 'Fecha fin';
+$lang['season'] = 'Temporada a la que pertenece';
 
+$lang['errorPendingReservation'] = 'No se puede eliminar porque tiene reservaciones pendientes: ';
+$lang['errorRoomNumber'] = 'N&uacute;mero de habitaci&oacute;n no disponible';
+$lang['errorRoomTypeName'] = 'Nombre de tipo de habitaci&oacute;n no disponible';
+$lang['errorAbrv'] = 'Abrev. no disponible';
+$lang['errorPaxStd_PaxMax'] = 'El Pax est&aacute;ndar debe ser menor o igual al Pax M&aacute;ximo';
+$lang['errorPaxMax_Beds'] = 'La Cantidad de camas debe ser menor o igual al Pax M&aacute;ximo';
 
+$lang['guestDeleted'] = 'Cliente Eliminadooo!';
 
 
 

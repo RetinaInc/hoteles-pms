@@ -40,6 +40,7 @@ class General_model extends Model
 			$this->db->join('GUEST', 'GUEST.id_guest = RESERVATION.fk_guest','left');
 		}
 		
+		
 		$query = $this->db->get($table, $lim1, $lim2);
 		return $query->result_array();
 	}
@@ -77,7 +78,7 @@ class General_model extends Model
 	}
 	
 	
-	function validationCheck($table, $field1, $value1, $field2, $value2)
+	function validationCheck($table, $field1, $value1, $field2, $value2, $disable)
 	{
 		if ($field1 != null and $value1 != null) {
 		
@@ -89,7 +90,11 @@ class General_model extends Model
   			$this->db->where($field2, $value2);
   		}
 		
-		$this->db->where('disable', 1); 
+		if ($disable != null) {
+		
+			$this->db->where('disable', 1); 
+		}
+		
 		$query = $this->db->get($table);
 		return $query->result_array();
 	}
@@ -107,7 +112,17 @@ class General_model extends Model
 		$this->db->update($table, $data);
 	}
 	
-	
+	function doubleUpdate($table, $field1, $value1, $field2, $value2, $data)
+	{
+		if ($field2 != null and $value2 != null) {
+		
+  			$this->db->where($field2, $value2);
+  		}
+		
+		$this->db->where($field1, $value1);
+		$this->db->update($table, $data);
+	}
+
 	function disable($table, $field, $value)
 	{
 		$this->db->set('disable', 0); 

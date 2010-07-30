@@ -6,7 +6,7 @@ class Rooms extends Controller
 	{
 		parent::Controller();
 		$this->load->model('general_model','GM');
-		$this->load->model('rooms_model','RM');
+		$this->load->model('rooms_reservations_model','RM');
 		$this->lang->load ('form_validation','spanish');
 		$this->load->library('pagination');
 		$this->load->library('form_validation');
@@ -114,12 +114,14 @@ class Rooms extends Controller
 			
 		} else {
 		
-			$hotel = $this->GM->getInfo('HOTEL', null, null, null, null, null, 1);
+			//$hotel = $this->GM->getInfo('HOTEL', null, null, null, null, null, 1);
 			
-			foreach ($hotel as $row) {
+			//foreach ($hotel as $row) {
 			
-				$hotelId = $row['id_hotel'];
-			}
+				//$hotelId = $row['id_hotel'];
+			//}
+			
+			$hotelId = 1;
 			
 			$roomNumber   = set_value('room_number');
 			$roomName     = set_value('room_name');
@@ -163,18 +165,33 @@ class Rooms extends Controller
 			$roomTypeBeds        = set_value('room_type_beds');
 			$roomTypeDescription = set_value('room_type_description');
 			
-			$data = array(
-				'name'        => ucwords(strtolower($roomTypeName)),
-				'abrv'        => strtoupper($roomTypeAbrv),
-				'paxStd'      => $roomTypePaxStd,
-				'paxMax'      => $roomTypePaxMax,
-				'beds'        => $roomTypeBeds,
-				'description' => $roomTypeDescription,
-				);
+			if ($roomTypePaxStd > $roomTypePaxMax) {
 			
-			$this->GM->insert('ROOM_TYPE', $data);  
+			    $error = lang(errorPaxStd_PaxMax);
+			    $data['error'] = $error;
+			    $this->load->view('pms/rooms/room_type_add_view', $data);
+			
+			} else if ($roomTypePaxMax < $roomTypeBeds) {
+			
+			    $error = lang(errorPaxMax_Beds);
+			    $data['error'] = $error;
+			    $this->load->view('pms/rooms/room_type_add_view', $data);
+			
+			} else {
+			
+			    $data = array(
+				    'name'        => ucwords(strtolower($roomTypeName)),
+				    'abrv'        => strtoupper($roomTypeAbrv),
+				    'paxStd'      => $roomTypePaxStd,
+				    'paxMax'      => $roomTypePaxMax,
+				    'beds'        => $roomTypeBeds,
+				    'description' => $roomTypeDescription,
+				    );
+			
+			    $this->GM->insert('ROOM_TYPE', $data);  
 				
-			$this->viewRoomTypes(); 
+			    $this->viewRoomTypes(); 
+			}
 		}
 	}
 	
@@ -243,7 +260,29 @@ class Rooms extends Controller
 			$roomTypeBeds        = set_value('room_type_beds');
 			$roomTypeDescription = set_value('room_type_description');
 			
-			$data = array(
+			if ($roomTypePaxStd > $roomTypePaxMax) {
+			
+			    $error = lang(errorPaxStd_PaxMax);
+			    $roomType = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+
+			    $data['roomType'] = $roomType;
+			    $data['error'] = $error;
+			
+			    $this->load->view('pms/rooms/room_type_edit_view', $data);
+			
+			} else if ($roomTypePaxMax < $roomTypeBeds) {
+			
+			    $error = lang(errorPaxStd_PaxMax);
+			    $roomType = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+
+			    $data['roomType'] = $roomType;
+			    $data['error'] = $error;
+			
+			    $this->load->view('pms/rooms/room_type_edit_view', $data);
+			
+			} else {
+			
+			    $data = array(
 				    'name'        => ucwords(strtolower($roomTypeName)),
 				    'abrv'        => strtoupper($roomTypeAbrv),
 					'paxStd'      => $roomTypePaxStd,
@@ -252,9 +291,10 @@ class Rooms extends Controller
 				    'description' => $roomTypeDescription
 				    );
 			
-			$this->GM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data);  
+			    $this->GM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data);  
 				
-			$this->infoRoomType($roomTypeId); 
+			    $this->infoRoomType($roomTypeId); 
+			}
 		}
 	}
 	
@@ -289,7 +329,7 @@ class Rooms extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo 'No se puede eliminar porque tiene reservaciones pendientes: '."<br>";
+			echo lang(errorPendingReservation)."<br>";
 			foreach ($resultado as $actual)
     		echo '# ', $actual . "<br>";
 			$this->infoRoom($roomId);
@@ -332,7 +372,7 @@ class Rooms extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo 'No se puede eliminar porque tiene reservaciones pendientes: '."<br>";
+			echo lang(errorPendingReservation)."<br>";
 			foreach ($resultado as $actual)
     		echo '# ', $actual . "<br>"; 
 			$this->infoRoomType($roomTypeId);
@@ -350,11 +390,11 @@ class Rooms extends Controller
 	{
 		$roomId = $this->uri->segment(3);
 		
-		$rooms = $this->GM->validationCheck('ROOM', 'number', $str, 'id_room !=', $roomId);
+		$rooms = $this->GM->validationCheck('ROOM', 'number', $str, 'id_room !=', $roomId, 1);
 
 		if ($rooms) {
 		
-			$this->form_validation->set_message('checkRoomNumber', 'Número de habitación no disponible');
+			$this->form_validation->set_message('checkRoomNumber', lang(errorRoomNumber));
 			return FALSE;
 			
 		} else {
@@ -367,11 +407,11 @@ class Rooms extends Controller
 	{
 		$roomTypeId = $this->uri->segment(3);
 		
-		$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'name', $str, 'id_room_type !=', $roomTypeId);
+		$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'name', $str, 'id_room_type !=', $roomTypeId, 1);
 
 		if ($roomTypes) {
 		
-			$this->form_validation->set_message('checkRoomTypeName', 'Nombre de tipo de habitación no disponible');
+			$this->form_validation->set_message('checkRoomTypeName', lang(errorRoomTypeName));
 			return FALSE;
 			
 		} else {
@@ -390,11 +430,11 @@ class Rooms extends Controller
 		
 			$roomTypeId = $this->uri->segment(3);
 		
-			$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'abrv', $str, 'id_room_type !=', $roomTypeId);
+			$roomTypes = $this->GM->validationCheck('ROOM_TYPE', 'abrv', $str, 'id_room_type !=', $roomTypeId, 1);
 
 			if ($roomTypes) {
 			
-				$this->form_validation->set_message('checkRoomTypeAbrv', 'Abrev. no disponible');
+				$this->form_validation->set_message('checkRoomTypeAbrv', lang(errorAbrv));
 				return FALSE;
 				
 			} else {
