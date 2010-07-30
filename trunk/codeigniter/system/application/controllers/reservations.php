@@ -6,7 +6,7 @@ class Reservations extends Controller
 	{
         parent::Controller();
         $this->load->model('general_model','GM');
-        $this->load->model('reservations_model','REM');
+        $this->load->model('rooms_reservations_model','RM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
         $this->load->helper('hoteles');
@@ -35,7 +35,7 @@ class Reservations extends Controller
 	
 		$order = 'checkIn DESC';
 		
-		$rooms        = $this->REM->getReservationRoom(null, null, null);
+		$rooms        = $this->RM->getReservationRoom(null, null, null);
 		$guests       = $this->GM->getInfo('GUEST',       null, null, null,   null, null, null);
 		$reservations = $this->GM->getInfo('RESERVATION', null, null, $order, null, null, 1);
 		
@@ -57,7 +57,7 @@ class Reservations extends Controller
 		$time       = time();
 		$date       = mdate($datestring, $time);
 		
-		$rooms        = $this->REM->getReservationRoom(null, null, null);
+		$rooms        = $this->RM->getReservationRoom(null, null, null);
 		$guests       = $this->GM->getInfo('GUEST',      null,          null,  null,   null, null, null);
 		$reservations = $this->GM->getInfo('RESERVATION','checkIn >=', $date, $order, null, null, 1);
 		
@@ -72,7 +72,7 @@ class Reservations extends Controller
 	
 	function infoReservation($reservationId)
 	{
-		$room                  = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
+		$room                  = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
 		$reservationRoomsCount = $this->GM->getCount('ROOM_RESERVATION', 'fk_reservation', $reservationId, null, null, null);
 		$reservation           = $this->GM->getInfo('RESERVATION',       'id_reservation', $reservationId, null, null, null, 1);
         $reservationRoomInfo   = $this->GM->getInfo('ROOM_RESERVATION',  'fk_reservation', $reservationId, null, null, null, null);
@@ -135,7 +135,7 @@ class Reservations extends Controller
 		if ($this->form_validation->run() == FALSE) {
 		
 			$rates     = $this->GM->getInfo('RATE',      null, null, null, null, null, 1);
-			$roomTypes = $this->REM->getWhereInRoom();
+			$roomTypes = $this->RM->getWhereInRoom();
 		
 			$data['rates'] = $rates;
 			$data['roomTypes'] = $roomTypes;
@@ -148,28 +148,43 @@ class Reservations extends Controller
 			$reservationCheckIn  = set_value('reservation_check_in');
 			$reservationCheckOut = set_value('reservation_check_out');
 			
-			$ci_array = explode ('-',$reservationCheckIn);
-			$day      = $ci_array[0];
-			$month    = $ci_array[1];
-			$year     = $ci_array[2];
-			$checkIn  = $year.'-'.$month.'-'.$day.' 12:00:00';
+			if ($reservationCheckOut < $reservationCheckIn) {
+				
+				$error = 'La fecha de salida debe ser mayor o igual a la fecha de llegada';
+				$rates     = $this->GM->getInfo('RATE',      null, null, null, null, null, 1);
+				$roomTypes = $this->RM->getWhereInRoom();
 		
-			$co_array = explode ('-',$reservationCheckOut);
-			$day      = $co_array[0];
-			$month    = $co_array[1];
-			$year     = $co_array[2];
-			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
+				$data['error'] = $error;
+				$data['rates'] = $rates;
+				$data['roomTypes'] = $roomTypes;
 		
-			$available    = $this->REM->getAvailability($reservationRoomType, $checkIn, $checkOut);
-			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
+				$this->load->view('pms/reservations/reservation_create_1_view', $data);
+				
+			} else {
 			
-			$data['available']           = $available; 
-			$data['roomTypeInfo']        = $roomTypeInfo; 
-			$data['reservationRoomType'] = $reservationRoomType; 
-			$data['reservationCheckIn']  = $reservationCheckIn; 
-			$data['reservationCheckOut'] = $reservationCheckOut; 
+			    $ci_array = explode ('-',$reservationCheckIn);
+			    $day      = $ci_array[0];
+			    $month    = $ci_array[1];
+			    $year     = $ci_array[2];
+			    $checkIn  = $year.'-'.$month.'-'.$day.' 12:00:00';
+		
+			    $co_array = explode ('-',$reservationCheckOut);
+			    $day      = $co_array[0];
+			    $month    = $co_array[1];
+			    $year     = $co_array[2];
+			    $checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
+		
+			    $available    = $this->RM->getAvailability($reservationRoomType, $checkIn, $checkOut);
+			    $roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
 			
-			$this->load->view('pms/reservations/reservation_create_2_view', $data);
+			    $data['available']           = $available; 
+			    $data['roomTypeInfo']        = $roomTypeInfo; 
+			    $data['reservationRoomType'] = $reservationRoomType; 
+			    $data['reservationCheckIn']  = $reservationCheckIn; 
+			    $data['reservationCheckOut'] = $reservationCheckOut; 
+			
+			    $this->load->view('pms/reservations/reservation_create_2_view', $data);
+			}
 		}
 	}
 	
@@ -274,7 +289,7 @@ class Reservations extends Controller
 	
 	function modifyReservationRooms($reservationId, $roomId)
 	{
-		$reservationRooms = $this->REM->getReservationRoom('id_room', $roomId, null);
+		$reservationRooms = $this->RM->getReservationRoom('id_room', $roomId, null);
 		$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
 		
 		foreach ($reservationRooms as $row) {
@@ -288,8 +303,8 @@ class Reservations extends Controller
 			}
 		}
 		
-		$availableType  = $this->REM->getAvailability ($roomType, $checkIn, $checkOut);
-		$availableOther = $this->REM->getAvailability_other($checkIn, $checkOut, $totalPer);
+		$availableType  = $this->RM->getAvailability ($roomType, $checkIn, $checkOut);
+		$availableOther = $this->RM->getAvailability_other($checkIn, $checkOut, $totalPer);
 		
 		$data['availableType']    = $availableType;  	
 		$data['availableOther']   = $availableOther;  
@@ -307,7 +322,7 @@ class Reservations extends Controller
 				'fk_room' => $newRoomNum
 				);
 				
-		$this->REM->doubleUpdate('ROOM_RESERVATION', 'fk_reservation', $reservationId, 'fk_room', $oldRoomNum, $data); 
+		$this->GM->doubleUpdate('ROOM_RESERVATION', 'fk_reservation', $reservationId, 'fk_room', $oldRoomNum, $data); 
 		
 		echo 'Habitacion cambiada!'; 
 		
@@ -322,7 +337,7 @@ class Reservations extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$reservationRooms = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
+			$reservationRooms = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
 			
 			$data['reservationRooms'] = $reservationRooms; 
 			
@@ -345,7 +360,7 @@ class Reservations extends Controller
 			$year     = $co_array[2];
 			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
 			
-			$reservationRooms = $this->REM->getReservationRoom('id_reservation', $reservationId, null);
+			$reservationRooms = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
 			$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
 	
 			foreach ($reservationRooms as $row) {
@@ -354,8 +369,8 @@ class Reservations extends Controller
 				$totalPer = $row['adults'] + $row['children'];
 			}
 		
-			$availableType  = $this->REM->getAvailability ($roomType, $checkIn, $checkOut);
-			$availableOther = $this->REM->getAvailabilityOther($checkIn, $checkOut, $totalPer);
+			$availableType  = $this->RM->getAvailability ($roomType, $checkIn, $checkOut);
+			$availableOther = $this->RM->getAvailabilityOther($checkIn, $checkOut, $totalPer);
 		
 			$data['availableType']       = $availableType;  	
 			$data['availableOther']      = $availableOther; 
@@ -381,7 +396,7 @@ class Reservations extends Controller
 			$room_type = $row['ID_ROOM_TYPE'];
 		}
 		
-		$available = $this->REM->get_availability($room_type, $check_in, $check_out);
+		$available = $this->RM->get_availability($room_type, $check_in, $check_out);
 		
 		$data['available'] = $available;  
 		
@@ -389,7 +404,7 @@ class Reservations extends Controller
 				'FK_ID_ROOM' => $new_room_num
 				);
 				
-		$this->REM->double_update('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservation_id, 'FK_ID_ROOM', $old_room_num, $data); 
+		$this->GM->double_update('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservation_id, 'FK_ID_ROOM', $old_room_num, $data); 
 		
 		echo 'Habitacion cambiada!'; 
 		
@@ -405,7 +420,7 @@ class Reservations extends Controller
 				'FK_ID_ROOM' => $new_room_num
 				);
 				
-		$this->REM->double_update('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservation_id, 'FK_ID_ROOM', $old_room_num, $data); 
+		$this->GM->double_update('ROOM_RESERVATION', 'FK_ID_RESERVATION', $reservation_id, 'FK_ID_ROOM', $old_room_num, $data); 
 		
 		echo 'Habitacion cambiada!'; 
 		
