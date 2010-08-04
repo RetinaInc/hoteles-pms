@@ -70,7 +70,8 @@ echo 'RESERVACIONES CLIENTE'."<br><br>";
  <?php 
  foreach ($reservations as $row) {
  
-     $reservationRooms = getCount('ROOM_RESERVATION', 'fk_reservation', $row['id_reservation'], null, null, null);
+     $hotel = $this->session->userdata('hotelid');
+	 $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
   ?>
   <tr>
     <td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
@@ -97,8 +98,8 @@ echo 'RESERVACIONES CLIENTE'."<br><br>";
 		$day            = $date_array[2];
 		echo $day.'-'.$month.'-'.$year;
 	?>    </td>
-    <td><?php echo $row['status'];?></td>
-    <td><?php echo $reservationRooms;?></td>
+    <td><?php echo $row['restatus'];?></td>
+    <td><?php echo $reservationRoomsCount;?></td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
   </tr>

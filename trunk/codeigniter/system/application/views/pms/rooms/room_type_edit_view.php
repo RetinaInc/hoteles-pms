@@ -1,3 +1,4 @@
+
 <head>
 <SCRIPT TYPE="text/javascript">
 <!--
@@ -48,8 +49,7 @@ foreach ($roomType as $row) {
 	$roomTypeName = $row['name'];
 }
 
-echo 'EDITAR HABITACIÓN TIPO "'.$roomTypeName.'"';?>
-<br /><br /><?php
+echo 'EDITAR HABITACIÓN TIPO "'.$roomTypeName.'"';?><br /><br /><?php
 
 echo validation_errors();
 
