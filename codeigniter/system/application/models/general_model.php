@@ -7,7 +7,8 @@ class General_model extends Model
 		parent::Model();
 	}
 	
-	function getInfo($table, $field, $value, $order, $lim1, $lim2, $disable)
+	
+	function getInfo($hotel, $table, $field, $value, $order, $lim1, $lim2, $disable)
 	{
 		if ($field != null and $value != null) {
 		
@@ -24,29 +25,17 @@ class General_model extends Model
 			$this->db->where($table.'.'.'disable', 1); 
 		}
 		
-		if ($table == 'ROOM') {
+		if ($hotel != null) {
 		
-			$this->db->select('ROOM.*');
-			$this->db->select('ROOM_TYPE.abrv as rtabrv');
-			$this->db->select('ROOM_TYPE.description as rtdescription');
-			$this->db->join('ROOM_TYPE', 'ROOM_TYPE.id_room_type = ROOM.fk_room_type','left');
-		}
-		
-		if ($table == 'RESERVATION') {
-		
-			$this->db->select('RESERVATION.*');
-			$this->db->select('GUEST.name as gname');
-			$this->db->select('GUEST.lastName as gLname');
-			$this->db->join('GUEST', 'GUEST.id_guest = RESERVATION.fk_guest','left');
-		}
-		
+  			$this->db->where('fk_hotel', $hotel);
+  		}
 		
 		$query = $this->db->get($table, $lim1, $lim2);
 		return $query->result_array();
 	}
 	
 	
-	function getCount($table, $field1, $value1, $field2, $value2, $disable)
+	function getCount($hotel, $table, $field1, $value1, $field2, $value2, $disable)
 	{
 		if ($field1 != null and $value1 != null) {
 		
@@ -63,22 +52,39 @@ class General_model extends Model
 			$this->db->where($table.'.'.'disable', 1); 
 		}
 		
+		if ($hotel != null) {
+		
+  			$this->db->where('fk_hotel', $hotel);
+  		}
+		
 		$this->db->from($table);
 		$query = $this->db->count_all_results();
 		return $query;
 	}
 	
 	
-	function getMax($table, $field)
+	function insert($table, $data)
 	{
-		$this->db->select_max($field);
-		$this->db->where('disable', 1); 
-		$query = $this->db->get($table);
-		return $query->result_array();
+		$this->db->insert($table, $data);
 	}
 	
 	
-	function validationCheck($table, $field1, $value1, $field2, $value2, $disable)
+	function update($table, $field, $value, $data)
+	{
+		$this->db->where($field, $value);
+		$this->db->update($table, $data);
+	}
+	
+	
+	function disable($table, $field, $value)
+	{
+		$this->db->set('disable', 0); 
+		$this->db->where($field, $value); 
+		$this->db->update($table); 
+	}
+	
+	
+	function validationCheck($hotel, $table, $field1, $value1, $field2, $value2, $disable)
 	{
 		if ($field1 != null and $value1 != null) {
 		
@@ -95,22 +101,16 @@ class General_model extends Model
 			$this->db->where('disable', 1); 
 		}
 		
+		if ($hotel != null) {
+		
+  			$this->db->where('fk_hotel', $hotel);
+  		}
+		
 		$query = $this->db->get($table);
 		return $query->result_array();
 	}
 	
-	
-	function insert($table, $data)
-	{
-		$this->db->insert($table, $data);
-	}
-	
-	
-	function update($table, $field, $value, $data)
-	{
-		$this->db->where($field, $value);
-		$this->db->update($table, $data);
-	}
+	/*
 	
 	function doubleUpdate($table, $field1, $value1, $field2, $value2, $data)
 	{
@@ -123,13 +123,8 @@ class General_model extends Model
 		$this->db->update($table, $data);
 	}
 
-	function disable($table, $field, $value)
-	{
-		$this->db->set('disable', 0); 
-		$this->db->where($field, $value); 
-		$this->db->update($table); 
-	}
 	
+	*/
 	
 }
 ?>

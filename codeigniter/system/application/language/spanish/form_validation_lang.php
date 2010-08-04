@@ -25,6 +25,8 @@ $lang['children'] = 'Cantidad de ni&ntilde;o';
 $lang['dateStart'] = 'Fecha inicio';
 $lang['dateEnd'] = 'Fecha fin';
 $lang['season'] = 'Temporada a la que pertenece';
+$lang['username'] = 'Usuario';
+$lang['password'] = 'Contrase&ntilde;a';
 
 $lang['errorPendingReservation'] = 'No se puede eliminar porque tiene reservaciones pendientes: ';
 $lang['errorRoomNumber'] = 'N&uacute;mero de habitaci&oacute;n no disponible';

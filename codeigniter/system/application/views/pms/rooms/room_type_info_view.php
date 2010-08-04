@@ -10,7 +10,7 @@ foreach ($roomType as $row) {
 	$roomTypeName = $row['name'];
 }
 
-echo 'INFO HABITACIÓN "'.$roomTypeName.'"'."<br><br>";
+echo 'INFO HABITACIONES TIPO "'.$roomTypeName.'"'."<br><br>";
 
 foreach ($roomType as $row) {
 
@@ -21,7 +21,7 @@ foreach ($roomType as $row) {
 		echo 'Abrv: ', $row['abrv']."<br>";
 	}
 
-	echo 'Pax estándar: ', $row['paxStn']."<br>";
+	echo 'Pax estándar: ', $row['paxStd']."<br>";
 	
 	echo 'Pax máximo: ', $row['paxMax']."<br>";
 	
@@ -29,7 +29,7 @@ foreach ($roomType as $row) {
 	
 	if ($row['description'] != NULL) {
 	
-		echo "<br>".'Descripción: ', $row['description']."<br>";
+		echo 'Descripción: ', $row['description']."<br>";
 	}
 	
 	?>
@@ -41,9 +41,9 @@ foreach ($roomType as $row) {
 ?>
 <p>
 <?php 
-echo 'Total habitaciones '.$roomTypeName.': ', $roomTypeCount."<br>";
-echo 'Total habitaciones en funcionamiento: ', $roomTypeCountRunning."<br>";
-echo 'Total habitaciones fuera de servicio: ', $roomTypeCountOos."<br><br>";
+echo 'Total habitaciones tipo '.$roomTypeName.': ', $roomTypeRoomCount."<br>";
+echo 'Total habitaciones en funcionamiento: ', $roomTypeRoomCountRunning."<br>";
+echo 'Total habitaciones fuera de servicio: ', $roomTypeRoomCountOos."<br><br>";
 echo 'RESERVACIONES';
 ?>
 </p>
@@ -136,17 +136,10 @@ if ($roomTypeReservations) { ?>
 	?>
     </td>
     <td>
-	<?php 
-	foreach ($guest as $row1) {
-	
-	    if ($row1['id_guest'] == $row['fk_guest']) {
-		    
-			echo anchor(base_url().'guests/infoGuestReservations/'.$row1['id_guest'],$row1['lastName'].', '.$row1['name']);
-		}
-	}
+	<?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['fk_guest'],$row['lastName'].', '.$row['name']);
 	?>    
     </td>
-    <td><?php echo lang($row['status']);?></td>
+    <td><?php echo lang($row['restatus']);?></td>
     <td><?php echo $row['adults'];?></td>
     <td><?php echo $row['children'];?></td>
     <td>&nbsp;</td>

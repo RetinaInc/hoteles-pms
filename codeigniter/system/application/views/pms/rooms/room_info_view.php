@@ -23,7 +23,7 @@ foreach ($room as $row) {
 	
 	echo 'Estado: ', lang($row['status']);?><br /><?php
 	
-	echo 'Tipo de habitación: ', $row['rtname'];?><br /><?php
+	echo 'Tipo de habitación: ', $row['rtabrv'];?><br /><?php
 	
 	if ($row['rtdescription'] != NULL) {
 	
@@ -118,18 +118,8 @@ if ($roomReservations) {?>
 	echo $day.'-'.$month.'-'.$year;
 	?>
     </td>
-    <td>
-	<?php 
-	foreach ($guest as $row1) {
-	
-	   if ($row1['id_guest'] == $row['fk_guest']) {
-	   
-	       echo anchor(base_url().'guests/infoGuestReservations/'.$row1['id_guest'],$row1['lastName'].', '.$row1['name']);
-		}
-	}
-	?>    
-    </td>
-    <td><?php echo lang($row['status']);?></td>
+    <td><?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['fk_guest'],$row['lastName'].', '.$row['name']);?></td>
+    <td><?php echo lang($row['restatus']);?></td>
     <td><?php echo $row['adults'];?></td>
     <td><?php echo $row['children'];?></td>
     <td>&nbsp;</td>

@@ -5,9 +5,12 @@ class Guests extends Controller
 	function Guests()
 	{
 		parent::Controller();
-		$this->load->model('general_model','GM');
+		$this->load->model('guests_model','GSM');
+		$this->load->model('rooms_model','ROM');
+		$this->load->model('general_model','GNM');
 		$this->lang->load('form_validation','spanish');
 		$this->load->library('form_validation');
+		$this->load->library('session');
 		$this->load->helper('language');
 		$this->load->helper('hoteles');
 		$this->load->helper('form');
@@ -23,7 +26,9 @@ class Guests extends Controller
 	
 	function viewGuests()
 	{
-		$guests = $this->GM->getInfo('GUEST', null, null, 'lastName', null, null, 1);
+		$hotel = $this->session->userdata('hotelid');
+		
+		$guests = $this->GSM->getGuestInfo($hotel, null, null, 'lastName', null, null, 1);
 		
 		$data['guests'] = $guests;
 		
@@ -35,9 +40,10 @@ class Guests extends Controller
 	{
 		//$order = $_POST["order"];
 		$order = 'checkIn DESC';
+		$hotel = $this->session->userdata('hotelid');
 		
-		$guest        = $this->GM->getInfo('GUEST',       'id_guest', $guestId, null,   null, null, 1);
-		$reservations = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, $order, null, null, 1);
+		$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
+		$reservations = $this->ROM->getRoomReservationsGuest($hotel, 'RE.fk_guest', $guestId, $order);
 		
 		$data['guest']        = $guest;
 		$data['reservations'] = $reservations;
