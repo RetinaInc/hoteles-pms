@@ -42,7 +42,7 @@ echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
 
-<p><a href="<?php echo base_url().'guests/deleteGuest/'.$guestId ?>" onclick="return confirm('Seguro que desea eliminar?')">  Eliminar Cliente</a></p>
+<p><a href="<?php echo base_url().'guests/disableGuest/'.$guestId ?>" onclick="return confirm('Seguro que desea deshabilitar?')">  Deshabilitar Cliente</a></p>
 
 <?php
 $referer = $_SERVER['HTTP_REFERER'];

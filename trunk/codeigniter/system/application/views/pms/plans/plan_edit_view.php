@@ -1,7 +1,3 @@
-<head>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/"?>popcalendar.js"></script>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/images"?>"></script>
-</head>
 
 <?php 
 
@@ -16,9 +12,7 @@ echo 'EDITAR PLAN'."<br><br>";
 
 echo validation_errors();
 
-$attributes = array('name' => 'form1', 'id' => 'form1');
-
-echo form_open(base_url().'plans/editPlan/'.$planId, $attributes);
+echo form_open(base_url().'plans/editPlan/'.$planId);
 
 foreach ($plan as $row) {
 ?>

@@ -1,4 +1,3 @@
-
 <head>
 <SCRIPT TYPE="text/javascript">
 <!--
@@ -49,9 +48,14 @@ foreach ($roomType as $row) {
 	$roomTypeName = $row['name'];
 }
 
-echo 'EDITAR HABITACIÓN TIPO "'.$roomTypeName.'"';?><br /><br /><?php
+echo 'EDITAR HABITACIÓN TIPO "'.$roomTypeName.'"'."<br><br>";
 
 echo validation_errors();
+
+if ($error != NULL)
+{
+	echo $error; 
+}
 
 echo form_open(base_url().'rooms/editRoomType/'.$roomTypeId.'/'.$roomTypeName);
 

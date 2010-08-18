@@ -3,14 +3,13 @@
 $this->load->view('pms/header'); 
 ?>
 
-<h3>Tipos de Habitaciones</h3>
+<h3>Tipos de Habitaciones Deshabilitadas</h3>
 
 <?php
-echo anchor(base_url().'rooms/addRoomType/','Agregar Nuevo Tipo de Habitación')."<br>";
 
 if ($roomTypes) {
 
-	echo "<br><br>".'Total tipos de habitaciones: ', $roomTypesCount."<br><br>";
+	echo "<br><br>".'Total tipos de habitaciones deshabilitadas: ', $roomTypesCount."<br><br>";
 	?>
 
 	<table width="499" border="1">
@@ -71,13 +70,8 @@ if ($roomTypes) {
 <?php
 } else {
 	
-	echo "<br><br>".'No existen tipos de habitaciones!';
-}
-
-if ($roomTypesDis) {
-?>
-	<p><a href="<?php echo base_url().'rooms/viewDisabledRoomTypes/'?>">Ver Tipos de Habitaciones Deshabilitados</a></p>
-<?php	
+	echo "<br><br>".'No existen tipos de habitaciones deshabilitadas!';
 }
 ?>
 
+<p><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver a Tipos de Habitaciones</a></p>

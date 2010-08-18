@@ -8,7 +8,7 @@ class Plans_model extends Model
 	}
 	
 	
-	function getPlanInfo($hotel, $field, $value)
+/*	function getPlanInfo($hotel, $field, $value)
 	{
 		if ($field != null and $value != null) {
 		
@@ -22,7 +22,7 @@ class Plans_model extends Model
 		$query = $this->db->get('PLAN P, HOTEL_PLAN HP');
 		return $query->result_array();
 	}
-	
+	*/
 	
 	
 	

@@ -9,9 +9,16 @@ foreach ($guest as $row) {
 
 	$guestId = $row['id_guest'];
 	
-	echo anchor(base_url().'guests/editGuest/'.$row['id_guest'],'Editar')."<br><br>"; 
+	if ($row['disable'] == 1) {
 	
-	echo 'Nombre: ',   $row['name'].', '.$row['lastName']."<br>";
+	    echo anchor(base_url().'guests/editGuest/'.$row['id_guest'],'Editar')."<br><br>"; 
+	
+	} else if ($row['disable'] == 0){
+		
+		 echo anchor(base_url().'guests/enableGuest/'.$row['id_guest'],'Habilitar')."<br><br>"; 
+	}
+	
+	echo 'Nombre: ',   $row['name'].' '.$row['lastName']."<br>";
 	echo 'Teléfono: ', $row['telephone']."<br>";
 	
 	if ($row['email'] != NULL) {

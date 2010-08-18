@@ -110,7 +110,6 @@ class General_model extends Model
 		return $query->result_array();
 	}
 	
-	/*
 	
 	function doubleUpdate($table, $field1, $value1, $field2, $value2, $data)
 	{
@@ -122,9 +121,9 @@ class General_model extends Model
 		$this->db->where($field1, $value1);
 		$this->db->update($table, $data);
 	}
-
 	
-	*/
+	
+	
 	
 }
 ?>

@@ -5,10 +5,13 @@ class Reservations extends Controller
     function Reservations()
 	{
         parent::Controller();
-        $this->load->model('general_model','GM');
-        $this->load->model('rooms_reservations_model','RM');
+		$this->load->model('rooms_model','ROM');
+	    $this->load->model('guests_model','GSM');
+        $this->load->model('reservations_model','REM');
+		$this->load->model('general_model','GNM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
+		$this->load->library('session');
         $this->load->helper('hoteles');
         $this->load->helper('language');
         $this->load->helper('form');
@@ -34,10 +37,11 @@ class Reservations extends Controller
 		*/
 	
 		$order = 'checkIn DESC';
+		$hotel = $this->session->userdata('hotelid');
 		
-		$rooms        = $this->RM->getReservationRoom(null, null, null);
-		$guests       = $this->GM->getInfo('GUEST',       null, null, null,   null, null, null);
-		$reservations = $this->GM->getInfo('RESERVATION', null, null, $order, null, null, 1);
+		$rooms        = $this->ROM->getRoomReservationsGuest($hotel, null, null, null);
+		$guests       = $this->GSM->getGuestInfo($hotel, null, null, null, null, null, null);
+		$reservations = $this->REM->getReservationInfo($hotel, null, null, $order, null, null, 1);
 		
 		$data['rooms']        = $rooms;
 		$data['guests']       = $guests;
@@ -52,18 +56,23 @@ class Reservations extends Controller
 		//$order = $_POST["order"];
 		
 		$order = 'id_reservation';
+		$hotel = $this->session->userdata('hotelid');
 		
 		$datestring = "%Y-%m-%d";
 		$time       = time();
 		$date       = mdate($datestring, $time);
 		
-		$rooms        = $this->RM->getReservationRoom(null, null, null);
-		$guests       = $this->GM->getInfo('GUEST',      null,          null,  null,   null, null, null);
-		$reservations = $this->GM->getInfo('RESERVATION','checkIn >=', $date, $order, null, null, 1);
+		$exRooms         = $this->ROM->getRoomInfo($hotel, null, null, null, null, null, 1);
+		$rooms           = $this->ROM->getRoomReservationsGuest($hotel, null, null, null);
+		$guests          = $this->GSM->getGuestInfo($hotel, null, null, null, null, null, null);
+		$reservations    = $this->REM->getReservationInfo($hotel, 'checkIn >=', $date, $order, null, null, 1);
+		$allReservations = $this->REM->getReservationInfo($hotel, null, null, $order, null, null, 1);
 		
-		$data['rooms']        = $rooms;
-		$data['guests']       = $guests;
-		$data['reservations'] = $reservations;
+		$data['exRooms']         = $exRooms;
+		$data['rooms']           = $rooms;
+		$data['guests']          = $guests;
+		$data['reservations']    = $reservations;
+		$data['allReservations'] = $allReservations;
 		
 		$this->load->view('pms/reservations/reservations_pending_view', $data);
 		
@@ -72,11 +81,12 @@ class Reservations extends Controller
 	
 	function infoReservation($reservationId)
 	{
-		$room                  = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
-		$reservationRoomsCount = $this->GM->getCount('ROOM_RESERVATION', 'fk_reservation', $reservationId, null, null, null);
-		$reservation           = $this->GM->getInfo('RESERVATION',       'id_reservation', $reservationId, null, null, null, 1);
-        $reservationRoomInfo   = $this->GM->getInfo('ROOM_RESERVATION',  'fk_reservation', $reservationId, null, null, null, null);
+		$hotel = $this->session->userdata('hotelid');
 		
+		$reservation           = $this->REM->getReservationInfo($hotel, 'id_reservation', $reservationId, null, null, null, 1);
+		$room                  = $this->ROM->getRoomReservationsGuest($hotel, 'id_reservation', $reservationId, null);
+		$reservationRoomsCount = $this->ROM->getRRCount($hotel, 'fk_reservation', $reservationId, null, null);
+        $reservationRoomInfo   = $this->ROM->getRRInfo($hotel, 'fk_reservation', $reservationId);
 		
 		foreach ($reservation as $row) {
 		
@@ -93,7 +103,7 @@ class Reservations extends Controller
 			$nights = (strtotime($coDate) - strtotime($ciDate)) / (60 * 60 * 24);
 		}
 		
-		$guest = $this->GM->getInfo('GUEST', 'id_guest', $guestId, null, null, null, null);
+		$guest = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, null);
 		
 		$data['room']                  = $room;
 		$data['reservationRoomsCount'] = $reservationRoomsCount;
@@ -108,16 +118,18 @@ class Reservations extends Controller
 	
 	function cancelReservation($reservationId, $guestId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$data = array(
 				'status' => 'Canceled'
 				);
 				
-		$this->GM->update('RESERVATION', 'id_reservation', $reservationId, $data);  
+		$this->GNM->update('RESERVATION', 'id_reservation', $reservationId, $data);  
 				
 		$order = 'checkIn DESC';
 		
-		$guest        = $this->GM->getInfo('GUEST',       'id_guest', $guestId, null,   null, null, 1);
-		$reservations = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, $order, null, null, 1);
+		$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
+		$reservations = $this->ROM->getRoomReservationsGuest($hotel, 'RE.fk_guest', $guestId, $order);
 		
 		$data['guest']        = $guest;
 		$data['reservations'] = $reservations;
@@ -128,17 +140,21 @@ class Reservations extends Controller
 	
 	function createReservation1()
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('reservation_room_type','lang:room_type','required');
 		$this->form_validation->set_rules('reservation_check_in','lang:check_in','required|max_length[15]');
 		$this->form_validation->set_rules('reservation_check_out','lang:check_out','required|max_length[15]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$rates     = $this->GM->getInfo('RATE',      null, null, null, null, null, 1);
-			$roomTypes = $this->RM->getWhereInRoom();
+			$rates     = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+			$roomTypes = $this->ROM->getWhereInRoom($hotel);
+			$error = 1;
 		
 			$data['rates'] = $rates;
 			$data['roomTypes'] = $roomTypes;
+			$data['error'] = $error;
 		
 			$this->load->view('pms/reservations/reservation_create_1_view', $data);
 		
@@ -151,8 +167,8 @@ class Reservations extends Controller
 			if ($reservationCheckOut < $reservationCheckIn) {
 				
 				$error = 'La fecha de salida debe ser mayor o igual a la fecha de llegada';
-				$rates     = $this->GM->getInfo('RATE',      null, null, null, null, null, 1);
-				$roomTypes = $this->RM->getWhereInRoom();
+				$rates     = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+				$roomTypes = $this->ROM->getWhereInRoom($hotel);
 		
 				$data['error'] = $error;
 				$data['rates'] = $rates;
@@ -174,8 +190,8 @@ class Reservations extends Controller
 			    $year     = $co_array[2];
 			    $checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
 		
-			    $available    = $this->RM->getAvailability($reservationRoomType, $checkIn, $checkOut);
-			    $roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
+			    $available    = $this->ROM->getAvailability($hotel, $reservationRoomType, $checkIn, $checkOut);
+			    $roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
 			
 			    $data['available']           = $available; 
 			    $data['roomTypeInfo']        = $roomTypeInfo; 
@@ -191,12 +207,14 @@ class Reservations extends Controller
 	
 	function createReservation2($roomId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+
 		$roomType            = $_POST["room_type"];
 		$reservationCheckIn  = $_POST["check_in"];
 		$reservationCheckOut = $_POST["check_out"];
 		
-		$roomInfo     = $this->GM->getInfo('ROOM',      'id_room',      $roomId,   null, null, null, 1);
-		$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
+		$roomInfo     = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
+		$roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
 		
 		$ci_array = explode ('-',$reservationCheckIn);
 		$day      = $ci_array[0];
@@ -224,6 +242,8 @@ class Reservations extends Controller
 	
 	function createReservation3()
 	{
+		$hotel = $this->session->userdata('hotelid');
+
 		$roomId   = $_POST["room_number"];
 		$roomType = $_POST["room_type"];
 		$checkIn  = $_POST["check_in"];
@@ -242,8 +262,8 @@ class Reservations extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$roomInfo     = $this->GM->getInfo('ROOM',      'id_room',      $roomId,   null, null, null, 1);
-			$roomTypeInfo = $this->GM->getInfo('ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
+			$roomInfo     = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
+			$roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
 			
 			$checkIn_array  = explode (' ',$checkIn);
 			$ciDate         = $checkIn_array[0];
@@ -289,8 +309,10 @@ class Reservations extends Controller
 	
 	function modifyReservationRooms($reservationId, $roomId)
 	{
-		$reservationRooms = $this->RM->getReservationRoom('id_room', $roomId, null);
-		$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
+		$hotel = $this->session->userdata('hotelid');
+		
+		$reservationRooms = $this->ROM->getRoomReservationsGuest($hotel, 'id_room', $roomId, null);
+		$roomTypes        = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
 		
 		foreach ($reservationRooms as $row) {
 		
@@ -303,8 +325,8 @@ class Reservations extends Controller
 			}
 		}
 		
-		$availableType  = $this->RM->getAvailability ($roomType, $checkIn, $checkOut);
-		$availableOther = $this->RM->getAvailability_other($checkIn, $checkOut, $totalPer);
+		$availableType  = $this->ROM->getAvailability ($hotel, $roomType, $checkIn, $checkOut);
+		$availableOther = $this->ROM->getAvailabilityOther($hotel, $checkIn, $checkOut, $totalPer);
 		
 		$data['availableType']    = $availableType;  	
 		$data['availableOther']   = $availableOther;  
@@ -317,12 +339,12 @@ class Reservations extends Controller
 	
 	
 	function modifyReservationRooms2($reservationId, $oldRoomNum, $newRoomNum)
-	{
+	{	
 		$data = array(
 				'fk_room' => $newRoomNum
 				);
 				
-		$this->GM->doubleUpdate('ROOM_RESERVATION', 'fk_reservation', $reservationId, 'fk_room', $oldRoomNum, $data); 
+		$this->GNM->doubleUpdate('ROOM_RESERVATION', 'fk_reservation', $reservationId, 'fk_room', $oldRoomNum, $data); 
 		
 		echo 'Habitacion cambiada!'; 
 		
@@ -332,12 +354,14 @@ class Reservations extends Controller
 	
 	function modifyReservationDates($reservationId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('reservation_check_in','lang:check_in','required|max_length[15]');
 		$this->form_validation->set_rules('reservation_check_out','lang:check_out','required|max_length[15]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$reservationRooms = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
+			$reservationRooms = $this->ROM->getRoomReservationsGuest($hotel, 'id_reservation', $reservationId, null);
 			
 			$data['reservationRooms'] = $reservationRooms; 
 			
@@ -360,26 +384,47 @@ class Reservations extends Controller
 			$year     = $co_array[2];
 			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
 			
-			$reservationRooms = $this->RM->getReservationRoom('id_reservation', $reservationId, null);
-			$roomTypes        = $this->GM->getInfo('ROOM_TYPE', null, null, null, null, null, 1);
+			$reservationRooms = $this->ROM->getRoomReservationsGuest($hotel, 'id_reservation', $reservationId, null);
+			$roomTypes        = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
 	
 			foreach ($reservationRooms as $row) {
 			
+				$room = $row['id_room'];
 				$roomType = $row['id_room_type'];
 				$totalPer = $row['adults'] + $row['children'];
 			}
-		
-			$availableType  = $this->RM->getAvailability ($roomType, $checkIn, $checkOut);
-			$availableOther = $this->RM->getAvailabilityOther($checkIn, $checkOut, $totalPer);
-		
-			$data['availableType']       = $availableType;  	
-			$data['availableOther']      = $availableOther; 
-			$data['roomTypes']           = $roomTypes;  
-			$data['reservationRooms']    = $reservationRooms; 
-			$data['reservationCheckIn']  = $reservationCheckIn; 
-			$data['reservationCheckOut'] = $reservationCheckOut; 
 			
-			$this->load->view('pms/reservations/reservation_modify_dates_2_view', $data);
+			$availableRoom  = $this->ROM->getRoomAvailability ($hotel, $room, $reservationId, $checkIn, $checkOut);
+			
+			if (!$availableRoom) {
+				
+				$data = array(
+					'checkIn'  => $reservationCheckIn,
+					'checkOut' => $reservationCheckOut
+				);
+				
+				$this->GNM->update('RESERVATION', 'id_reservation', $reservationId, $data);  
+				
+				echo 'Fechas cambiadas!'; 
+		
+				$this->infoReservation($reservationId);
+		
+			} else {
+			
+				/*$availableType  = $this->ROM->getAvailability ($hotel, $roomType, $checkIn, $checkOut);
+				$availableOther = $this->ROM->getAvailabilityOther($hotel, $checkIn, $checkOut, $totalPer);
+		 
+				$data['availableType']       = $availableType;  	
+				$data['availableOther']      = $availableOther; 
+				$data['roomTypes']           = $roomTypes;  
+				$data['reservationRooms']    = $reservationRooms; 
+				$data['reservationCheckIn']  = $reservationCheckIn; 
+				$data['reservationCheckOut'] = $reservationCheckOut; 
+			
+				$this->load->view('pms/reservations/reservation_modify_dates_2_view', $data);
+				*/
+				echo 'Esa hab no disp.';
+			}
 		}
 	}
 	

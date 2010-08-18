@@ -42,11 +42,14 @@ else
 
 $this->load->view('pms/header'); 
 
-echo 'CREAR TIPO DE HABITACIÓN';?>
-<br /><br /><?php
+echo 'CREAR TIPO DE HABITACIÓN'."<br><br>";
 
 echo validation_errors();
-echo $error;
+
+if ($error != NULL)
+{
+	echo $error; 
+}
 
 echo form_open(base_url().'rooms/addRoomType/');?>
 

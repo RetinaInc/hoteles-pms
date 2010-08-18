@@ -7,6 +7,7 @@ class Guests extends Controller
 		parent::Controller();
 		$this->load->model('guests_model','GSM');
 		$this->load->model('rooms_model','ROM');
+		$this->load->model('reservations_model','REM');
 		$this->load->model('general_model','GNM');
 		$this->lang->load('form_validation','spanish');
 		$this->load->library('form_validation');
@@ -36,13 +37,25 @@ class Guests extends Controller
 	}
 	
 	
+	function viewDisableGuests()
+	{
+		$hotel = $this->session->userdata('hotelid');
+		
+		$guests = $this->GSM->getGuestInfo($hotel, 'G.disable', '0', 'lastName', null, null, null);
+		
+		$data['guests'] = $guests;
+		
+		$this->load->view('pms/guests/guests_disable_view', $data);
+	}
+	
+	
 	function infoGuestReservations($guestId)
 	{
 		//$order = $_POST["order"];
 		$order = 'checkIn DESC';
 		$hotel = $this->session->userdata('hotelid');
 		
-		$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
+		$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, null);
 		$reservations = $this->ROM->getRoomReservationsGuest($hotel, 'RE.fk_guest', $guestId, $order);
 		
 		$data['guest']        = $guest;
@@ -54,6 +67,8 @@ class Guests extends Controller
 	
 	function editGuest($guestId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('guest_name','lang:name','required|max_length[30]');
 		$this->form_validation->set_rules('guest_last_name','lang:last_name','required|max_length[30]');
 		$this->form_validation->set_rules('guest_telephone','lang:telephone','required|numeric|max_length[20]');
@@ -62,7 +77,7 @@ class Guests extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$guest = $this->GM->getInfo('GUEST', 'id_guest', $guestId, null, null, null, 1);
+			$guest = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
 			
 			$data['guest'] = $guest;
 
@@ -84,16 +99,18 @@ class Guests extends Controller
 				'address'   => $guestAddress
 				);
 			
-			$this->GM->update('GUEST', 'id_guest', $guestId, $data);  
+			$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
 				
 			$this->infoGuestReservations($guestId); 
 		}
 	}
 	
 	
-	function deleteGuest($guestId)
+	function disableGuest($guestId)
 	{
-		$guestReservation = $this->GM->getInfo('RESERVATION', 'fk_guest', $guestId, null, null, null, 1);
+		$hotel = $this->session->userdata('hotelid');
+		
+		$guestReservation = $this->REM->getReservationInfo($hotel, 'RE.fk_guest', $guestId, null, null, null, 1);
 		
 		$datestring = "%Y-%m-%d  %h:%i %a";
 		$time       = time();
@@ -127,7 +144,7 @@ class Guests extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo lang(errorPendingReservation)."<br>";
+			echo lang("errorPendingReservation")."<br>";
 			foreach ($resultado as $actual)
     		echo '# ',$actual . "<br>"; 
 			
@@ -135,14 +152,24 @@ class Guests extends Controller
 			
 		} else {
 		
-			$this->GM->disable('GUEST', 'id_guest', $guestId);
-			echo lang(guestDeleted);
+			$this->GNM->disable('GUEST', 'id_guest', $guestId);
+			echo lang("guestDisabled");
 			$this->viewGuests(); 
 		}	
 	}
 	
 	
-	
+	function enableGuest($guestId)
+	{
+		$data = array(
+				'disable' => 1
+				);
+			
+		$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
+			
+		echo lang("guestEnabled");	
+		$this->infoGuestReservations($guestId);		
+	}
 
 
 

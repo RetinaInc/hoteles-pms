@@ -1,14 +1,13 @@
 
 <?php 
-
 $this->load->view('pms/header');
-
-echo anchor(base_url().'reservations/addReservation/','Crear Nueva Reservación');?><br /><br /><?php
-
-echo 'RESERVACIONES';
-
 ?>
-<br /><br />
+
+<h3>RESERVACIONES</h3>
+
+<?php
+echo anchor(base_url().'reservations/addReservation/','Crear Nueva Reservación')."<br><br>";
+?>
 
 <table width="1057" border="1">
 

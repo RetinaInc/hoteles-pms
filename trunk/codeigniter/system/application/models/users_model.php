@@ -9,8 +9,8 @@ class Users_model extends Model
 	
 	
 	function getConfirmHotelUser($userId, $username, $password)
-	{
-		if ($userId != NULL)
+	{	
+		if ($userId != null)
 		{
 			$this->db->where('id_user', $userId);
 		}

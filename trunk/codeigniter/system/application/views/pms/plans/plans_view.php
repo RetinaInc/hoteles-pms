@@ -1,22 +1,30 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
-echo 'PLANES'."<br><br>";
+<h3>Planes</h3>
 
+<?php
 echo anchor(base_url().'plans/addPlan/','Agregar Nuevo Plan')."<br><br>";
 
+if ($plans) {
 
-foreach ($plans as $row) { 
+	foreach ($plans as $row) { 
 
-echo 'Plan: ',$row['name']."<br>";
+		echo 'Plan: ',$row['name']."<br>";
 
-if ($row['description'] != NULL) {
-    echo 'Descripcion: ', $row['description']."<br>";
-}
+		if ($row['description'] != NULL) {
+		
+    		echo 'Descripcion: ', $row['description']."<br>";
+		}
 
-echo anchor(base_url().'plans/editPlan/'.$row['id_plan'],'Editar')."<br><br>";
+		echo anchor(base_url().'plans/editPlan/'.$row['id_plan'],'Editar')."<br><br>";
+	}
+	
+} else {
+	
+	echo 'No existen planes!';
 
-}
+} 
 ?>

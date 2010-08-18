@@ -3,12 +3,10 @@
 $this->load->view('pms/header'); 
 ?>
 
-<h3>Temporadas</h3>
+<h3>Temporadas Deshabilitadas</h3>
 
 <?php
-echo anchor(base_url().'seasons/addSeason/','Agregar Nueva Temporada')."<br><br>";
-
-if ($seasons) {
+if ($seasonsDis) {
 ?>
 
 	<table width="575" border="1">
@@ -19,11 +17,10 @@ if ($seasons) {
       </tr>
 	
 	  <?php
-      foreach ($seasons as $row) { 
+      foreach ($seasonsDis as $row) { 
       ?>    
       <tr>
-		<td height="35">
-        <?php echo anchor(base_url().'seasons/infoSeason/'.$row['id_season'], $row['name']);?></td> 
+		<td height="35"><a href="<?php echo base_url().'seasons/infoSeason/'.$row['id_season'] ?>"><?php echo $row['name']?></a></td> 
         
 	    <td>
 		<?php 
@@ -55,12 +52,11 @@ if ($seasons) {
 <?php
 } else {
 
-	echo 'No existen temporadas!';	
+	echo 'No existen temporadas deshabilitadas!';	
 }
 
-if ($seasonsDis) {
-
-	echo "<br>".anchor(base_url().'seasons/viewDisabledSeasons/', 'Ver Temporadas Deshabilitadas');
-}
 ?>
+
+<p><a href="<?php echo base_url().'seasons/viewSeasons/'?>">Volver a Temporadas</a></p>
+
 
