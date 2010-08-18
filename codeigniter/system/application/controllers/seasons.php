@@ -5,10 +5,15 @@ class Seasons extends Controller
     function Seasons()
 	{
         parent::Controller();
-        $this->load->model('general_model','GM');
+        $this->load->model('general_model','GNM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
+		$this->load->library('session');
+		$this->load->helper('hoteles');
+		$this->load->helper('language');
+		$this->load->helper('date');
         $this->load->helper('form');
+		$this->load->helper('url');
 	}
 	
 	
@@ -17,17 +22,49 @@ class Seasons extends Controller
 		//$order = $_POST["order"];
 		
 		$order = 'dateStart';
+	    $hotel = $this->session->userdata('hotelid');
 	
-		$seasons = $this->GM->getInfo('SEASON', null, null, $order, null, null, null);
+		$seasons    = $this->GNM->getInfo($hotel, 'SEASON', null, null, $order, null, null, 1);
+		$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
 		
-		$data['seasons'] = $seasons;
+		$data['seasons']    = $seasons;
+		$data['seasonsDis'] = $seasonsDis;
 		
 		$this->load->view('pms/seasons/seasons_view', $data);
 	}
 	
 	
+	function viewDisabledSeasons()
+	{
+		//$order = $_POST["order"];
+		
+		$order = 'dateStart';
+	    $hotel = $this->session->userdata('hotelid');
+	
+		$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
+		
+		$data['seasonsDis']    = $seasonsDis;
+		
+		$this->load->view('pms/seasons/seasons_disabled_view', $data);
+	}
+	
+	
+	function infoSeason($seasonId)
+	{	
+	    $hotel = $this->session->userdata('hotelid');
+	
+		$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+		
+		$data['season'] = $season;
+		
+		$this->load->view('pms/seasons/season_info_view', $data);
+	}
+	
+	
 	function addSeason()
 	{
+		$hotel = $this->session->userdata('hotelid');
+		 
 		$this->form_validation->set_rules('season_name', 'lang:name', 'required|max_length[300]|callback_checkSeasonName');
 		$this->form_validation->set_rules('season_dateStart', 'lang:dateStart', 'required|max_length[10]');
 		$this->form_validation->set_rules('season_dateEnd', 'lang:dateEnd', 'required|max_length[10]');
@@ -35,7 +72,7 @@ class Seasons extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$seasons = $this->GM->getInfo('SEASON', $field = null, $value = null, $order = null, $lim1 = null, $lim2 = null, $disable = null);
+			$seasons = $this->GNM->getInfo($hotel, 'SEASON', null, null, null, null, null, null);
 		
 			$data['seasons'] = $seasons;
 		
@@ -69,10 +106,11 @@ class Seasons extends Controller
 				'name'      => ucwords(strtolower($seasonName)),
 				'dateStart' => $dateStart,
 				'dateEnd'   => $dateEnd,
-				'fk_season' => $seasonSeason
+				'fk_season' => $seasonSeason,
+				'fk_hotel'  => $hotel
 				);
 			
-			$this->GM->insert('SEASON', $data);  
+			$this->GNM->insert('SEASON', $data);  
 				
 			$this->viewSeasons(); 
 		}	
@@ -81,6 +119,8 @@ class Seasons extends Controller
 	
 	function editSeason($seasonId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('season_name', 'lang:name', 'required|max_length[300]|callback_checkSeasonName');
 		$this->form_validation->set_rules('season_dateStart', 'lang:dateStart', 'required|max_length[10]');
 		$this->form_validation->set_rules('season_dateEnd', 'lang:dateEnd', 'required|max_length[10]');
@@ -88,8 +128,8 @@ class Seasons extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$season  = $this->GM->getInfo('SEASON', 'id_season', $seasonId, null, null, null, null);
-			$seasons = $this->GM->getInfo('SEASON', null,        null,      null, null, null, null);
+			$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+			$seasons = $this->GNM->getInfo($hotel, 'SEASON', null,        null,      null, null, null, null);
 		
 			$data['season'] = $season;
 			$data['seasons'] = $seasons;
@@ -127,18 +167,70 @@ class Seasons extends Controller
 				'fk_season' => $seasonSeason
 				);
 			
-			$this->GM->update('SEASON', 'id_season', $seasonId, $data);  
+			$this->GNM->update('SEASON', 'id_season', $seasonId, $data);  
 				
 			$this->viewSeasons(); 
 		}	
 	}
 	
 	
+	function disableSeason($seasonId)
+	{
+		$hotel  = $this->session->userdata('hotelid');
+		
+		$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+		
+		$datestring = "%Y-%m-%d  %h:%i %a";
+		$time       = time();
+		$date       = mdate($datestring, $time);
+		
+		$delete    = 'Yes';
+		
+		foreach ($season as $row) {
+		
+			$dateStart  = $row['dateStart'];
+			$dateEnd    = $row['dateEnd'];
+			
+			if (($dateStart < $date) && ($date < $dateEnd)) {
+				
+				$delete = 'No';
+			}
+		}
+		
+		if ($delete == 'No') {
+		
+			echo lang("errorCurrentSeason")."<br>";
+		
+			$this->infoSeason($seasonId);
+			
+		} else {
+		
+			$this->GNM->disable('SEASON', 'id_season', $seasonId); 
+			$this->GNM->disable('SEASON', 'fk_season', $seasonId);   
+			$this->viewSeasons(); 
+		}	
+	}
+	
+	
+	function enableSeason($seasonId)
+	{
+		$data = array(
+				'disable' => 1
+				);
+			
+		$this->GNM->update('SEASON', 'id_season', $seasonId, $data); 
+		$this->GNM->update('SEASON', 'fk_season', $seasonId, $data);   
+		
+		$this->viewSeasons(); 	
+	}
+	
+	
 	function checkSeasonName($str)
 	{
 		$seasonId = $this->uri->segment(3);
-		
-		$seasons = $this->GM->validationCheck('SEASON', 'name', $str, 'id_season !=', $seasonId, null);
+		$hotel = $this->session->userdata('hotelid');
+		 
+		$seasons = $this->GNM->validationCheck($hotel, 'SEASON', 'name', $str, 'id_season !=', $seasonId, null);
 
 		if ($seasons) {
 		

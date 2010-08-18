@@ -11,6 +11,7 @@ class Rooms extends Controller
 		$this->load->library('pagination');
 		$this->load->library('form_validation');
 		$this->load->library('session');
+		$this->load->helper('hoteles');
 		$this->load->helper('language');
 		$this->load->helper('form');
 		$this->load->helper('date');
@@ -34,11 +35,13 @@ class Rooms extends Controller
 		$roomsCount        = $this->ROM->getRoomCount($hotel, null,     null,             null, null, 1);
 		$roomsCountRunning = $this->ROM->getRoomCount($hotel, 'status', 'Running',        null, null, 1);
 		$roomsCountOos     = $this->ROM->getRoomCount($hotel, 'status', 'Out of service', null, null, 1);
+		$roomTypes         = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
 		
 		$data['rooms']             = $rooms;
 		$data['roomsCount']        = $roomsCount;
 		$data['roomsCountOos']     = $roomsCountOos;
 		$data['roomsCountRunning'] = $roomsCountRunning;
+		$data['roomTypes']         = $roomTypes;
 		
 		$this->load->view('pms/rooms/rooms_view', $data);
 	}
@@ -48,16 +51,35 @@ class Rooms extends Controller
 	{
 		//$order = $_POST["order"];
 		
-		$order = NULL;
+		$order = null;
 		$hotel = $this->session->userdata('hotelid');
 		
 		$roomTypes      = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, $order, null, null, 1);
 		$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', null, null, null, null, 1);
+		$roomTypesDis   = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
+		
+		$data['roomTypes']      = $roomTypes;
+		$data['roomTypesCount'] = $roomTypesCount;
+		$data['roomTypesDis']   = $roomTypesDis;
+		
+		$this->load->view('pms/rooms/room_types_view', $data);
+	}
+	
+	
+	function viewDisabledRoomTypes()
+	{
+		//$order = $_POST["order"];
+		
+		$order = null;
+		$hotel = $this->session->userdata('hotelid');
+		
+		$roomTypes      = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
+		$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', 'disable', '0', null, null, null);
 		
 		$data['roomTypes']      = $roomTypes;
 		$data['roomTypesCount'] = $roomTypesCount;
 		
-		$this->load->view('pms/rooms/room_types_view', $data);
+		$this->load->view('pms/rooms/room_types_disabled_view', $data);
 	}
 	
 	
@@ -82,10 +104,10 @@ class Rooms extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 			
-		$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
-		$roomTypeRoomCount        = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId,  null,     null,            1);
-		$roomTypeRoomCountRunning = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Running',        1);
-		$roomTypeRoomCountOos     = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Out of service', 1);
+		$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
+		$roomTypeRoomCount        = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId,  null,  null, null);
+		$roomTypeRoomCountRunning = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Running', null);
+		$roomTypeRoomCountOos     = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Out of service', null);
 		$roomTypeReservations     = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, 'RE.checkIn DESC');
 	
 		$data['roomType'] = $roomType;
@@ -151,7 +173,10 @@ class Rooms extends Controller
 			
 		if ($this->form_validation->run() == FALSE) {
 		
-			$this->load->view('pms/rooms/room_type_add_view');
+			$error = NULL;
+			$data['error'] = $error;
+			
+			$this->load->view('pms/rooms/room_type_add_view', $data);
 			
 		} else {
 		
@@ -164,14 +189,16 @@ class Rooms extends Controller
 			
 			if ($roomTypePaxStd > $roomTypePaxMax) {
 			
-			    $error = lang(errorPaxStd_PaxMax);
+			    $error = lang("errorPaxStd_PaxMax");
 			    $data['error'] = $error;
+				
 			    $this->load->view('pms/rooms/room_type_add_view', $data);
 			
 			} else if ($roomTypePaxMax < $roomTypeBeds) {
 			
-			    $error = lang(errorPaxMax_Beds);
+			    $error = lang("errorPaxMax_Beds");
 			    $data['error'] = $error;
+				
 			    $this->load->view('pms/rooms/room_type_add_view', $data);
 			
 			} else {
@@ -248,7 +275,9 @@ class Rooms extends Controller
 		if ($this->form_validation->run() == FALSE) {
 		
 			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+			$error = NULL;
 			
+			$data['error'] = $error;
 			$data['roomType'] = $roomType;
 			
 			$this->load->view('pms/rooms/room_type_edit_view', $data);
@@ -264,7 +293,7 @@ class Rooms extends Controller
 			
 			if ($roomTypePaxStd > $roomTypePaxMax) {
 			
-			    $error = lang(errorPaxStd_PaxMax);
+			    $error = lang("errorPaxStd_PaxMax");
 			    $roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 
 			    $data['roomType'] = $roomType;
@@ -274,7 +303,7 @@ class Rooms extends Controller
 			
 			} else if ($roomTypePaxMax < $roomTypeBeds) {
 			
-			    $error = lang(errorPaxStd_PaxMax);
+			    $error = lang("errorPaxStd_PaxMax");
 			    $roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 
 			    $data['roomType'] = $roomType;
@@ -333,7 +362,7 @@ class Rooms extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo lang(errorPendingReservation)."<br>";
+			echo lang("errorPendingReservation")."<br>";
 			foreach ($resultado as $actual)
     		echo '# ', $actual . "<br>";
 			$this->infoRoom($roomId);
@@ -346,7 +375,7 @@ class Rooms extends Controller
 	}
 	
 	
-	function deleteRoomType($roomTypeId)
+	function disableRoomType($roomTypeId)
 	{
 		$hotel  = $this->session->userdata('hotelid');
 		
@@ -378,7 +407,7 @@ class Rooms extends Controller
 		
 		if ($delete == 'No') {
 		
-			echo lang(errorPendingReservation)."<br>";
+			echo lang("errorPendingReservation")."<br>";
 			foreach ($resultado as $actual)
     		echo '# ', $actual . "<br>"; 
 			$this->infoRoomType($roomTypeId);
@@ -392,6 +421,19 @@ class Rooms extends Controller
 	}
 	
 	
+	function enableRoomType($roomTypeId)
+	{
+		$data = array(
+				'disable' => 1
+				);
+			
+		$this->GNM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data); 
+		$this->GNM->update('ROOM',      'fk_room_type', $roomTypeId, $data);   
+		
+		$this->viewRoomTypes(); 	
+	}
+	
+	
 	function checkRoomNumber($str)
 	{
 		$roomId = $this->uri->segment(3);
@@ -401,7 +443,7 @@ class Rooms extends Controller
 
 		if ($rooms) {
 		
-			$this->form_validation->set_message('checkRoomNumber', lang(errorRoomNumber));
+			$this->form_validation->set_message('checkRoomNumber', lang("errorRoomNumber"));
 			return FALSE;
 			
 		} else {
@@ -419,7 +461,7 @@ class Rooms extends Controller
 
 		if ($roomTypes) {
 		
-			$this->form_validation->set_message('checkRoomTypeName', lang(errorRoomTypeName));
+			$this->form_validation->set_message('checkRoomTypeName', lang("errorRoomTypeName"));
 			return FALSE;
 			
 		} else {
@@ -443,7 +485,7 @@ class Rooms extends Controller
 
 			if ($roomTypes) {
 			
-				$this->form_validation->set_message('checkRoomTypeAbrv', lang(errorAbrv));
+				$this->form_validation->set_message('checkRoomTypeAbrv', lang("errorAbrv"));
 				return FALSE;
 				
 			} else {

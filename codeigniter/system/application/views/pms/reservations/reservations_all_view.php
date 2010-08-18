@@ -58,7 +58,8 @@ echo 'RESERVACIONES';
   <?php 
   foreach ($reservations as $row) {
   
-  $reservationRooms = getCount('ROOM_RESERVATION', 'fk_reservation', $row['id_reservation'], null, null, null);
+  $hotel = $this->session->userdata('hotelid');
+  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
   
   ?>  
   <tr>
@@ -107,7 +108,7 @@ echo 'RESERVACIONES';
     <td><?php echo lang($row['status']);?></td>
     <td>
     <?php 
-	echo $reservationRooms;
+	echo $reservationRoomsCount;
 	
     foreach($rooms as $row1) {
 	

@@ -1,32 +1,37 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
-
-echo 'TARIFAS'."<br><br>";
-
-echo anchor(base_url().'rates/addRate/','Agregar Nueva Tarifa')."<br><br>";
 ?>
 
+<h3>Tarifas</h3>
 
-<table width="570" border="1">
-  <tr>
-    <td width="125" height="45">NOMBRE</td>
-    <td width="358">DESCRIPCIÓN</td>
-    <td width="65">EDITAR</td>
-  </tr>
+<?php
+echo anchor(base_url().'rates/addRate/','Agregar Nueva Tarifa')."<br><br>";
+
+if ($rates) {
+
+	foreach ($rates as $row) { 
+		
+		echo $row['name']."<br>";
+		
+	  	if ($row['description'] != NULL) {
+	    	
+			echo 'Descripción: '.$row['description']."<br>";
+		}
+		
+		echo anchor(base_url().'rates/editRate/'.$row['id_rate'], 'Editar')."<br>";
+		?>
+        <a href="<?php echo base_url().'rates/disableRate/'.$row['id_rate'] ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar</a><br /><br /><br />
+        <?php
+	}
+	  
+} else {
 	
-<?php
-foreach ($rates as $row) { 
-?>    
-  	<tr>
-      <td height="46"><?php echo $row['name'];?></td> 
-      <td><?php echo $row['description'];?></td>
-      <td><?php echo anchor(base_url().'rates/editRate/'.$row['id_rate'],'Editar');?></td>
-    </tr>
-  
-<?php
+	echo 'No existen tarifas!'."<br>";
+}
+
+if ($ratesDis) {
+
+	echo "<br>".anchor(base_url().'rates/viewDisabledRates/', 'Ver Tarifas Deshabilitadas');
 }
 ?>
-</table>
-

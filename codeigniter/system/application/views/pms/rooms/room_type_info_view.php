@@ -32,10 +32,17 @@ foreach ($roomType as $row) {
 		echo 'Descripción: ', $row['description']."<br>";
 	}
 	
+	if ($row['disable'] == 1) {
 	?>
-    <a href="<?php echo base_url().'rooms/editRoomType/'.$roomTypeId ?>">Editar Info</a><br />
-    <a href="<?php echo base_url().'rooms/deleteRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea eliminar?')">Eliminar tipo de habitación</a><br />
+    	<a href="<?php echo base_url().'rooms/editRoomType/'.$roomTypeId ?>">Editar Info</a><br />
+    	<a href="<?php echo base_url().'rooms/disableRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar tipo de habitación</a><br />
 	<?php
+	
+	} else if ($row['disable'] == 0) {
+	?>	
+		<a href="<?php echo base_url().'rooms/enableRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea habilitar?')">Habilitar tipo de habitación</a><br />
+    <?php
+	}
 }
 
 ?>

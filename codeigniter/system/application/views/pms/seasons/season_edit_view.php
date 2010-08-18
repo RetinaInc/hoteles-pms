@@ -83,4 +83,4 @@ echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
 
-<a href="<?php echo base_url().'seasons/viewSeasons'?>">Volver</a>
+<a href="<?php echo base_url().'seasons/infoSeason/'.$seasonId?>">Volver</a>

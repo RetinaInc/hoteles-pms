@@ -6,11 +6,13 @@ class Plans extends Controller
 	{
         parent::Controller();
         $this->load->model('general_model','GNM');
-		$this->load->model('plans_model','PLM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
 		$this->load->library('session');
+		$this->load->helper('hoteles');
+		$this->load->helper('language');
         $this->load->helper('form');
+		$this->load->helper('url');
 	}
 	
 	
@@ -18,7 +20,7 @@ class Plans extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 			
-		$plans = $this->PLM->getPlanInfo($hotel, null, null);
+		$plans = $this->GNM->getInfo($hotel, 'PLAN', null, null, null, null, null, 1);
 		
 		$data['plans'] = $plans;
 		
@@ -28,36 +30,43 @@ class Plans extends Controller
 	
 	function addPlan()
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('plan_name', 'lang:name', 'required|max_length[100]|callback_checkPlanName');
+		$this->form_validation->set_rules('plan_description', 'lang:description', 'max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$this->load->view('pms/plans/plan_add_view', $data);
+			$this->load->view('pms/plans/plan_add_view');
 			
 		} else {
 		
 			$planName = set_value('plan_name');
+			$planDescription = set_value('plan_description');
 			
 			$data = array(
-				  'name' => ucwords(strtolower($rateName))
+				  'name'        => ucwords(strtolower($planName)),
+				  'description' => $planDescription,
+				  'fk_hotel'    => $hotel
 				   );
 			
 			$this->GNM->insert('PLAN', $data);  
 				
-			$this->viewPlan(); 
+			$this->viewPlans(); 
 		}	
 	}
 	
 	
 	function editPlan($planId)
 	{
+		$hotel = $this->session->userdata('hotelid');
+		
 		$this->form_validation->set_rules('plan_name', 'lang:name', 'required|max_length[100]|callback_checkPlanName');
+		$this->form_validation->set_rules('plan_description', 'lang:description', 'max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
-		
-			$hotel = $this->session->userdata('hotelid');
 			
-		    $plan = $this->PLM->getPlanInfo($hotel, 'HP.fk_plan', $planId);
+		    $plan = $this->GNM->getInfo($hotel, 'PLAN','id_plan', $planId, null, null, null, 1);
 			
 			$data['plan'] = $plan;
 		
@@ -66,9 +75,11 @@ class Plans extends Controller
 		} else {
 		
 			$planName = set_value('plan_name');
+			$planDescription = set_value('plan_description');
 			
 			$data = array(
-				  'name' => ucwords(strtolower($planName))
+				  'name'        => ucwords(strtolower($planName)),
+				  'description' => $planDescription
 				   );
 			
 			$this->GNM->update('PLAN', 'id_plan', $planId, $data);  
@@ -87,7 +98,7 @@ class Plans extends Controller
 
 		if ($plans) {
 		
-			$this->form_validation->set_message('checkPlanName', 'Nombre de plan no disponible');
+			$this->form_validation->set_message('checkPlanName', lang("errorPlanName"));
 			return FALSE;
 			
 		} else {

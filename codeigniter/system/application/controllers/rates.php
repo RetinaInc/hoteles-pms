@@ -9,7 +9,9 @@ class Rates extends Controller
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
 		$this->load->library('session');
+		$this->load->helper('hoteles');
         $this->load->helper('form');
+		$this->load->helper('url');
 	}
 	
 	
@@ -17,11 +19,25 @@ class Rates extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$rates = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+		$rates    = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+		$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
 		
 		$data['rates'] = $rates;
+		$data['ratesDis'] = $ratesDis;
 		
 		$this->load->view('pms/rates/rates_view', $data);
+	}
+	
+	
+	function viewDisabledRates()
+	{
+	    $hotel = $this->session->userdata('hotelid');
+	
+		$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+		
+		$data['ratesDis'] = $ratesDis;
+		
+		$this->load->view('pms/rates/rates_disabled_view', $data);
 	}
 	
 	
@@ -34,7 +50,7 @@ class Rates extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$this->load->view('pms/rates/rate_add_view', $data);
+			$this->load->view('pms/rates/rate_add_view');
 			
 		} else {
 		
@@ -83,6 +99,26 @@ class Rates extends Controller
 				
 			$this->viewRates();  
 		}	
+	}
+	
+	
+	function disableRate($rateId)
+	{
+		$this->GNM->disable('RATE', 'id_rate', $rateId); 
+		
+		$this->viewRates(); 	
+	}
+	
+	
+	function enableRate($rateId)
+	{
+		$data = array(
+				'disable' => 1
+				);
+			
+		$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
+		
+		$this->viewRates(); 	
 	}
 	
 	

@@ -1,7 +1,3 @@
-<head>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/"?>popcalendar.js"></script>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/images"?>"></script>
-</head>
 
 <?php 
 
@@ -12,13 +8,12 @@ foreach ($rate as $row)
 	$rateId = $row['id_rate'];
 }
 
+
 echo 'EDITAR TARIFA'."<br><br>";
 
 echo validation_errors();
 
-$attributes = array('name' => 'form1', 'id' => 'form1');
-
-echo form_open(base_url().'rates/editRate/'.$rateId, $attributes);
+echo form_open(base_url().'rates/editRate/'.$rateId);
 
 foreach ($rate as $row) {
 ?>

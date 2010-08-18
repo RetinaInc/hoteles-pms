@@ -34,8 +34,11 @@ $lang['errorRoomTypeName'] = 'Nombre de tipo de habitaci&oacute;n no disponible'
 $lang['errorAbrv'] = 'Abrev. no disponible';
 $lang['errorPaxStd_PaxMax'] = 'El Pax est&aacute;ndar debe ser menor o igual al Pax M&aacute;ximo';
 $lang['errorPaxMax_Beds'] = 'La Cantidad de camas debe ser menor o igual al Pax M&aacute;ximo';
+$lang['errorPlanName'] = 'Nombre de plan no disponible';
+$lang['errorCurrentSeason'] = 'No se puede deshabilitar la temporada actual!';
 
-$lang['guestDeleted'] = 'Cliente Eliminadooo!';
+$lang['guestDisabled'] = 'Cliente Deshabilitado';
+
 
 
 

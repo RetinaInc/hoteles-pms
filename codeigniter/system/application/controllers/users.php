@@ -10,6 +10,9 @@ class Users extends Controller
 		$this->lang->load ('form_validation','spanish');
 		$this->load->library('form_validation');
 		$this->load->library('session');
+		$this->load->helper('hoteles');
+		$this->load->helper('form');
+		$this->load->helper('url');
 	}
 	
 	function index()
@@ -20,19 +23,22 @@ class Users extends Controller
 	
 	function userSignIn()
 	{
-		$this->form_validation->set_rules('hotel_username','lang:username','required');
-		$this->form_validation->set_rules('hotel_password','lang:password','required');
+		$this->form_validation->set_rules('hotel_username','lang:username','trim|required|xss_clean');
+		$this->form_validation->set_rules('hotel_password','lang:password','trim|required|xss_clean|md5');
 		
 		if ($this->form_validation->run() == FALSE) {
 			
-			$this->load->view('pms/users/user_sign_in');
+			$error = NULL;
+			$data['error'] = $error;
+			
+			$this->load->view('pms/users/user_sign_in', $data);
 		
 		} else {
 		
 			$username = set_value('hotel_username');
 			$password = set_value('hotel_password');
 			
-			$confirmHotelSignIn = $this->USM->getConfirmHotelUser(NULL, $username, $password);
+			$confirmHotelSignIn = $this->USM->getConfirmHotelUser(null, $username, $password);
 		
 			if(!$confirmHotelSignIn) {
 			
@@ -49,8 +55,8 @@ class Users extends Controller
 				}
 				
 				$newdata = array(
-                   'userid'        => $userId,
-				   'hotelid'       => $hotelId
+                   'userid'  => $userId,
+				   'hotelid' => $hotelId
                	);
 
 				$this->session->set_userdata($newdata);
@@ -71,12 +77,18 @@ class Users extends Controller
 
 			$this->session->unset_userdata($array_items);
 			$this->session->sess_destroy();
-	
-			$this->load->view('pms/users/user_sign_in');
+
+			$error = NULL;
+			$data['error'] = $error;
+			
+			$this->load->view('pms/users/user_sign_in', $data);
 		
 		} else {
 			
-			$this->load->view('pms/users/user_sign_in');
+			$error = NULL;
+			$data['error'] = $error;
+			
+			$this->load->view('pms/users/user_sign_in', $data);
 		}	
 	}
 

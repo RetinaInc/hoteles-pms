@@ -1,14 +1,17 @@
 
 <?php
 
-echo 'Iniciar Sesi&oacute;n'."<br><br>";
+echo 'Iniciar Sesi&oacute;n'."<br>";
 
 echo validation_errors()."<br>"; 
 
-echo $error."<br>"; 
+if ($error != NULL)
+{
+	echo $error."<br>"; 
+}
 
 
-echo form_open(base_url().'users/usersignIn/');
+echo form_open(base_url().'users/userSignIn');
 ?>
 
 	<p>* Usuario:

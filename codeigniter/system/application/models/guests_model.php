@@ -22,14 +22,14 @@ class Guests_model extends Model
 		
 		if ($disable != null) {
 		
-			$this->db->where('GUEST.disable', 1);
+			$this->db->where('G.disable', 1);
 		}
 
-	    $this->db->select('DISTINCT(GUEST.id_guest), GUEST.name, GUEST.lastName, GUEST.telephone, GUEST.email, GUEST.address');
-		$this->db->where('GUEST.id_guest = RESERVATION.fk_guest and RESERVATION.id_reservation = ROOM_RESERVATION.fk_reservation and ROOM_RESERVATION.fk_room = ROOM.id_room and ROOM.fk_room_type = ROOM_TYPE.id_room_type');
-		$this->db->where('ROOM_TYPE.fk_hotel', $hotel);
+	    $this->db->select('DISTINCT(G.id_guest), G.name, G.lastName, G.telephone, G.email, G.address, G.disable');
+		$this->db->where('G.id_guest = RE.fk_guest and RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.fk_hotel', $hotel);
 	
-		$query = $this->db->get('GUEST, RESERVATION, ROOM_RESERVATION, ROOM, ROOM_TYPE', $lim1, $lim2);
+		$query = $this->db->get('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT', $lim1, $lim2);
 		return $query->result_array();
 	}
 	

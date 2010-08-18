@@ -51,7 +51,11 @@ $this->load->view('pms/header');
 echo 'NUEVA RESERVACIÓN - CHEQUEAR DISPONIBILIDAD'."<br><br>";
 
 echo validation_errors();
-echo $error;
+
+if ($error != 1) {
+
+	echo $error;
+}
 
 $attributes = array('name' => 'form1', 'id' => 'form1');
 

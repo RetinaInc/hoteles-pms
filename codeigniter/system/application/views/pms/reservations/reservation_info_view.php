@@ -99,8 +99,8 @@ foreach ($reservation as $row) {
 		}
 	}
 	
-	echo 'Información de tarifa: ???'."<br>";
-	echo 'Politica de cancelacion: ???'."<br><br>";
+	echo 'Información de tarifa: '."<br>";
+	echo 'Politica de cancelacion: '."<br><br>";
 
 }
 
