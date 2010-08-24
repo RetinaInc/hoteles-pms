@@ -66,8 +66,9 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
     <td width="263" height="39"><?php
 	foreach ($roomInfo as $row) {
 	
-    	echo form_label('Habitaci&oacute;n # '.$row['number'], 'room_number');
+    	echo form_label('Habitaci&oacute;n # '.$row['number'], 'room_number').' ('.$row['rtabrv'].')';
 		echo form_hidden('room_number', $row['id_room']);	
+		echo form_hidden('room_type', $row['rtid']);
 	}
 	?></td>
     <td width="179">&nbsp;</td>
@@ -76,12 +77,11 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
     <td width="241"><input name="guest_name" type="text" id="guest_name" value="<?php echo set_value('guest_name'); ?>" size="30" maxlength="30" /></td>
   </tr>
   <tr>
-    <td height="41"><?php
-	foreach ($roomTypeInfo as $row) {
-	
-    	echo form_label('Tipo de habitaci&oacute;n: '.$row['name'], 'room_type');
-		echo form_hidden('room_type', $row['id_room_type']);
-	}
+    <td height="41">
+	<?php
+	$unixCi = human_to_unix($checkIn);
+	echo form_label('Check In: '.date ("D  j/m/Y  " , $unixCi), 'check_in');
+	echo form_hidden('check_in', $checkIn);
 	?>
     </td>
     <td>&nbsp;</td>
@@ -92,9 +92,9 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
   <tr>
     <td height="39">
 	<?php
-	$unixCi = human_to_unix($checkIn);
-	echo form_label('Check In: '.date ("D  j/m/Y  " , $unixCi), 'check_in');
-	echo form_hidden('check_in', $checkIn);
+	$unixCo = human_to_unix($checkOut);
+	echo form_label('Check Out: '.date ("D  j/m/Y  " , $unixCo), 'check_out');
+	echo form_hidden('check_out', $checkOut);
 	?>
     </td>
     <td>&nbsp;</td>
@@ -105,9 +105,7 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
   <tr>
     <td height="45">
 	<?php
-	$unixCo = human_to_unix($checkOut);
-	echo form_label('Check Out: '.date ("D  j/m/Y  " , $unixCo), 'check_out');
-	echo form_hidden('check_out', $checkOut);
+	echo form_label('Cantidad de noches: '.$nights, 'nights')
 	?>
     </td>
     <td>&nbsp;</td>
@@ -116,21 +114,39 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
     <td><input name="guest_email" type="text" id="guest_email" value="<?php echo set_value('guest_email'); ?>" size="30" maxlength="50" /></td>
   </tr>
   <tr>
+    <td>Tarifa</td>
     <td>
-	<?php
-	echo form_label('Cantidad de noches: '.$nights, 'nights')
-	?>
+     <select name="reservation_rate" id="reservation_rate">
+    	<option value='' selected>Tarifa</option>
+		<?php
+        foreach($rates as $row) {
+   		?>
+        	<option value="<?php echo $row['id_rate'];?>" <?php echo set_select('reservation_rate', $row['id_rate']); ?> ><?php echo $row['name']; ?></option>
+		<?php 
+		} 
+		?>
+    </select>
     </td>
     <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>Dirección</td>
-    <td><textarea name="guest_address" cols="30" rows="2" id="guest_address" value="<?php echo set_value('guest_address'); ?>"></textarea></td>
+    <td>
+    <textarea name="guest_address" cols="30" rows="2" id="guest_address" value="<?php echo set_value('guest_address'); ?>"></textarea>
+    </td>
   </tr>
   <tr>
-    <td height="37">Tarifa</td>
-    <td><select name="reservation_rate" id="reservation_rate">
-        <option value=""></option>
-    </select></td>
+    <td height="37">Plan</td>
+    <td>
+    <select name="reservation_plan" id="reservation_plan">
+    	<option value='' selected>Plan</option>
+		<?php
+        foreach($plans as $row) {
+   		?>
+        	<option value="<?php echo $row['id_plan'];?>" <?php echo set_select('reservation_plan', $row['id_plan']); ?> ><?php echo $row['name']; ?></option>
+		<?php 
+		} 
+		?>
+    </select>
+    </td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
@@ -191,7 +207,7 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 	
  
 
-<a href="<?php echo base_url().'reservations/createReservation1'?>" onclick="return confirm('Seguro que desea volver? Se perderá la información')">Volver</a>
+<a href="<?php echo base_url().'reservations/createReservation1'?>" onClick="return confirm('Seguro que desea volver? Se perderá la información')">Volver</a>
 
 
 

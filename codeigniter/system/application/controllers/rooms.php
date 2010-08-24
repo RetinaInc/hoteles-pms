@@ -105,18 +105,34 @@ class Rooms extends Controller
 		$hotel = $this->session->userdata('hotelid');
 			
 		$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
+		$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
 		$roomTypeRoomCount        = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId,  null,  null, null);
 		$roomTypeRoomCountRunning = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Running', null);
 		$roomTypeRoomCountOos     = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Out of service', null);
 		$roomTypeReservations     = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, 'RE.checkIn DESC');
 	
-		$data['roomType'] = $roomType;
+		$data['roomType']       = $roomType;
+		$data['roomTypeImages'] = $roomTypeImages;
 		$data['roomTypeRoomCount']        = $roomTypeRoomCount;
 		$data['roomTypeRoomCountRunning'] = $roomTypeRoomCountRunning;
 		$data['roomTypeRoomCountOos']     = $roomTypeRoomCountOos;
 		$data['roomTypeReservations']     = $roomTypeReservations;
 		
 		$this->load->view('pms/rooms/room_type_info_view', $data);
+	}
+	
+	
+	function imagesRoomType($roomTypeId)
+	{
+		$hotel = $this->session->userdata('hotelid');
+			
+		$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
+		$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
+		
+		$data['roomType']       = $roomType;
+		$data['roomTypeImages'] = $roomTypeImages;
+		
+		$this->load->view('pms/rooms/room_type_images_view', $data);
 	}
 	
 	
@@ -203,10 +219,10 @@ class Rooms extends Controller
 			
 			} else {
 			
-			    $data = array(
+				$data = array(
 				    'name'        => ucwords(strtolower($roomTypeName)),
 				    'abrv'        => strtoupper($roomTypeAbrv),
-				    'paxStd'      => $roomTypePaxStd,
+				   	'paxStd'      => $roomTypePaxStd,
 				    'paxMax'      => $roomTypePaxMax,
 				    'beds'        => $roomTypeBeds,
 				    'description' => $roomTypeDescription,
@@ -215,10 +231,95 @@ class Rooms extends Controller
 			
 			    $this->GNM->insert('ROOM_TYPE', $data);  
 				
-			    $this->viewRoomTypes(); 
+				$this->viewRoomTypes(); 
 			}
 		}
 	}
+	
+	
+	function addRoomTypeImage($roomTypeId)
+	{	
+		$hotel = $this->session->userdata('hotelid');
+		
+		$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+		$error = 1;
+			
+		$data['roomType'] = $roomType;
+		$data['error'] = $error;
+		
+		$this->load->view('pms/rooms/room_type_add_image_view', $data);
+	}
+	
+	function addRoomTypeImage2($roomTypeId)
+	{	
+		$hotel = $this->session->userdata('hotelid');
+		
+		$config['upload_path'] = './assets/images/';
+		$config['allowed_types'] = 'gif|jpg|png';
+		$config['max_size']	= '0';
+		$config['max_width']  = '0';
+		$config['max_height']  = '0';
+		
+		$this->load->library('upload', $config);
+		
+		if ( ! $this->upload->do_upload())
+		{
+			$hotel = $this->session->userdata('hotelid');
+		
+			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+			
+			$data = array('error' => $this->upload->display_errors());
+			$data['roomType'] = $roomType;
+
+			$this->load->view('pms/rooms/room_type_add_image_view', $data);
+		}	
+		else
+		{
+			$data = array('upload_data' => $this->upload->data());
+			
+			foreach ($data as $row) {
+			
+				$fullPath = $row['full_path'];
+				$fileName = $row['file_name'];
+				$fileExt = $row['file_ext'];
+			}
+			
+			$data = array(
+				'image'        => $fileName,
+				'fk_hotel'     => $hotel,
+				'fk_room_type' => $roomTypeId
+				);
+			
+			$this->GNM->insert('IMAGE', $data);  
+				
+			$this->infoRoomType($roomTypeId); 
+		}
+
+	}
+	
+	/*
+	function deleteRoomTypeImage($roomTypeId)
+	{
+		$category = $this->CM->get_categories('ID_CATEGORY', $category_id, 'CATEGORIES.NAME', null, null);
+		
+		$data = array(
+			'IMG_NAME' => NULL,
+			'IMG_EXT' => NULL, 
+			'IMG_LOCATION' => NULL
+		);
+			
+		$this->CM->update('CATEGORIES', 'ID_CATEGORY', $category_id, $data); 
+		
+		foreach ($category as $row)
+		{
+			unlink('./assets/images/site/uploads/categories/'.$row['IMG_NAME'].$row['IMG_EXT']); 
+		}
+		
+		$this->modify_category();
+	}
+	*/
+	
+	
 	
 	
 	function editRoom($roomId)

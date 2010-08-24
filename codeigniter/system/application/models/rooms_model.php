@@ -26,6 +26,7 @@ class Rooms_model extends Model
 		}
 
 		$this->db->select('ROOM.*');
+		$this->db->select('ROOM_TYPE.id_room_type as rtid');
 		$this->db->select('ROOM_TYPE.abrv as rtabrv');
 		$this->db->select('ROOM_TYPE.description as rtdescription');
 		$this->db->where('ROOM.fk_room_type = ROOM_TYPE.id_room_type');

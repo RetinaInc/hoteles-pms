@@ -53,9 +53,11 @@ class Seasons extends Controller
 	{	
 	    $hotel = $this->session->userdata('hotelid');
 	
-		$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+		$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+		$fSeason = $this->GNM->getInfo($hotel, 'SEASON', 'fk_season', $seasonId, null, null, null, null);
 		
 		$data['season'] = $season;
+		$data['fSeason'] = $fSeason;
 		
 		$this->load->view('pms/seasons/season_info_view', $data);
 	}
