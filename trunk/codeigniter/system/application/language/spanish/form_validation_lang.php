@@ -27,6 +27,10 @@ $lang['dateEnd'] = 'Fecha fin';
 $lang['season'] = 'Temporada a la que pertenece';
 $lang['username'] = 'Usuario';
 $lang['password'] = 'Contrase&ntilde;a';
+$lang['check_in'] = 'Fecha de llegada';
+$lang['check_out'] = 'Fecha de salida';
+$lang['rate'] = 'Tarifa';
+$lang['plan'] = 'Plan';
 
 $lang['errorPendingReservation'] = 'No se puede eliminar porque tiene reservaciones pendientes: ';
 $lang['errorRoomNumber'] = 'N&uacute;mero de habitaci&oacute;n no disponible';
@@ -36,6 +40,7 @@ $lang['errorPaxStd_PaxMax'] = 'El Pax est&aacute;ndar debe ser menor o igual al 
 $lang['errorPaxMax_Beds'] = 'La Cantidad de camas debe ser menor o igual al Pax M&aacute;ximo';
 $lang['errorPlanName'] = 'Nombre de plan no disponible';
 $lang['errorCurrentSeason'] = 'No se puede deshabilitar la temporada actual!';
+$lang['errorCheckInOutDates'] = 'La fecha de salida debe ser mayor a la fecha de llegada';
 
 $lang['guestDisabled'] = 'Cliente Deshabilitado';
 

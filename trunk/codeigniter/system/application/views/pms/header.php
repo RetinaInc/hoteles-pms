@@ -20,6 +20,7 @@ foreach ($hotelInfo as $row)
 <a href="<?php echo base_url().'seasons/viewSeasons/'; ?>">Temporadas</a> |
 <a href="<?php echo base_url().'rates/viewRates/'; ?>">Tarifas</a> |
 <a href="<?php echo base_url().'plans/viewPlans/'; ?>">Planes</a> |
+<a href="<?php echo base_url().'prices/selectViewPrices/'; ?>">Precios</a> |
 <a href="<?php echo base_url().'users/userSignOut/'; ?>" onclick="return confirm('Seguro que desea salir?')">Salir</a>
 </p>
 <br />

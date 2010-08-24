@@ -33,8 +33,15 @@ foreach ($roomType as $row) {
 	}
 	
 	if ($row['disable'] == 1) {
-	?>
-    	<a href="<?php echo base_url().'rooms/editRoomType/'.$roomTypeId ?>">Editar Info</a><br />
+	
+    	if ($roomTypeImages) {
+			?>
+			<a href="<?php echo base_url().'rooms/imagesRoomType/'.$roomTypeId ?>">Ver Imagenes</a><br />
+            <?php
+		}
+		?>
+        <a href="<?php echo base_url().'rooms/editRoomType/'.$roomTypeId ?>">Editar Info</a><br />
+        <a href="<?php echo base_url().'rooms/addRoomTypeImage/'.$roomTypeId ?>">Agregar Imagen</a><br />
     	<a href="<?php echo base_url().'rooms/disableRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar tipo de habitación</a><br />
 	<?php
 	
@@ -164,3 +171,6 @@ if ($roomTypeReservations) { ?>
 ?>
 
 <br /><br /><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver</a>
+
+<img src="<?php echo base_url() . "assets/images/habitacion_doble5.jpg" ?>"/><?php
+?><img src="<?php echo base_url() . "assets/images/"; ?>habitacion_doble5.jpg"/><?php

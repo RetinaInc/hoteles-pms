@@ -164,9 +164,9 @@ class Reservations extends Controller
 			$reservationCheckIn  = set_value('reservation_check_in');
 			$reservationCheckOut = set_value('reservation_check_out');
 			
-			if ($reservationCheckOut < $reservationCheckIn) {
+			if ($reservationCheckOut <= $reservationCheckIn) {
 				
-				$error = 'La fecha de salida debe ser mayor o igual a la fecha de llegada';
+				$error = lang("errorCheckInOutDates");
 				$rates     = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
 				$roomTypes = $this->ROM->getWhereInRoom($hotel);
 		
@@ -215,6 +215,8 @@ class Reservations extends Controller
 		
 		$roomInfo     = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
 		$roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
+		$rates        = $this->GNM->getInfo($hotel, 'RATE',       null,           null,     null, null, null, 1);
+		$plans        = $this->GNM->getInfo($hotel, 'PLAN',       null,           null,     null, null, null, 1);
 		
 		$ci_array = explode ('-',$reservationCheckIn);
 		$day      = $ci_array[0];
@@ -235,6 +237,8 @@ class Reservations extends Controller
 		$data['checkIn']      = $checkIn.' 12:00:00'; 
 		$data['checkOut']     = $checkOut.' 10:00:00'; 
 		$data['nights']       = $nights; 
+		$data['rates']        = $rates;
+		$data['plans']        = $plans;   
 			
 		$this->load->view('pms/reservations/reservation_create_3_view', $data);
 	}
@@ -249,7 +253,8 @@ class Reservations extends Controller
 		$checkIn  = $_POST["check_in"];
 		$checkOut = $_POST["check_out"];
 		
-		//$this->form_validation->set_rules('reservation_rate','lang:rate','required');
+		$this->form_validation->set_rules('reservation_rate','lang:rate','required');
+		$this->form_validation->set_rules('reservation_plan','lang:plan','required');
 		$this->form_validation->set_rules('reservation_adults','lang:adults','required|integer|max_length[5]');
 		$this->form_validation->set_rules('reservation_children','lang:children','required|integer|max_length[5]');
 		$this->form_validation->set_rules('reservation_details','lang:details','max_length[300]');
@@ -264,6 +269,8 @@ class Reservations extends Controller
 		
 			$roomInfo     = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
 			$roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
+			$rates        = $this->GNM->getInfo($hotel, 'RATE',       null,           null,     null, null, null, 1);
+			$plans        = $this->GNM->getInfo($hotel, 'PLAN',       null,           null,     null, null, null, 1);
 			
 			$checkIn_array  = explode (' ',$checkIn);
 			$ciDate         = $checkIn_array[0];
@@ -274,7 +281,9 @@ class Reservations extends Controller
 			$nights = (strtotime($coDate) - strtotime($ciDate)) / (60 * 60 * 24);
 		
 			$data['roomInfo']     = $roomInfo; 
-			$data['roomTypeInfo'] = $roomTypeInfo; 
+			$data['roomTypeInfo'] = $roomTypeInfo;
+			$data['rates']        = $rates; 
+			$data['plans']        = $plans;  
 			$data['checkIn']      = $checkIn; 
 			$data['checkOut']     = $checkOut; 
 			$data['nights']       = $nights; 
