@@ -26,9 +26,12 @@ class Rooms extends Controller
 	
 	function viewRooms()
 	{
-		//$order = $_POST["order"];
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'number';
+		}
 		
-		$order = 'number';
 		$hotel = $this->session->userdata('hotelid');
 	
 		$rooms             = $this->ROM->getRoomInfo($hotel, null, null, $order, null, null, 1);
@@ -49,9 +52,12 @@ class Rooms extends Controller
 	
 	function viewRoomTypes()
 	{
-		//$order = $_POST["order"];
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'paxStd';
+		}
 		
-		$order = null;
 		$hotel = $this->session->userdata('hotelid');
 		
 		$roomTypes      = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, $order, null, null, 1);
@@ -68,9 +74,12 @@ class Rooms extends Controller
 	
 	function viewDisabledRoomTypes()
 	{
-		//$order = $_POST["order"];
-		
-		$order = null;
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'paxStd';
+		}
+
 		$hotel = $this->session->userdata('hotelid');
 		
 		$roomTypes      = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
@@ -85,9 +94,12 @@ class Rooms extends Controller
 	
 	function infoRoom($roomId)
 	{
-		//$order = $_POST["order"];
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'checkIn';
+		}
 		
-		$order = 'RE.checkIn DESC';
 		$hotel = $this->session->userdata('hotelid');
 		
 		$room             = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
@@ -138,10 +150,10 @@ class Rooms extends Controller
 	
 	function addRoom()
 	{	
-		$this->form_validation->set_rules('room_number', 'lang:number', 'required|max_length[20]|callback_checkRoomNumber');
-		$this->form_validation->set_rules('room_name', 'lang:name', 'max_length[50]');
-		$this->form_validation->set_rules('room_status', 'lang:status', 'required|max_length[20]');
-		$this->form_validation->set_rules('room_room_type','lang:room_type','required|max_length[20]');
+		$this->form_validation->set_rules('room_number', 'lang:number', 'trim|xss_clean|required|max_length[20]|callback_checkRoomNumber');
+		$this->form_validation->set_rules('room_name', 'lang:name', 'trim|xss_clean|max_length[50]');
+		$this->form_validation->set_rules('room_status', 'lang:status', 'trim|xss_clean|required|max_length[20]');
+		$this->form_validation->set_rules('room_room_type','lang:room_type','trim|xss_clean|required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -180,12 +192,12 @@ class Rooms extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('room_type_name', 'lang:name','required|max_length[50]|callback_checkRoomTypeName');
-		$this->form_validation->set_rules('room_type_abrv', 'lang:abrv', 'max_length[5]|callback_checkRoomTypeAbrv');
-		$this->form_validation->set_rules('room_type_paxStd', 'lang:paxStd', 'required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_paxMax', 'lang:paxMax', 'required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_beds', 'lang:beds', 'required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_description', 'lang:description', 'max_length[300]');
+		$this->form_validation->set_rules('room_type_name', 'lang:name','trim|xss_clean|required|max_length[50]|callback_checkRoomTypeName');
+		$this->form_validation->set_rules('room_type_abrv', 'lang:abrv', 'trim|xss_clean|max_length[5]|callback_checkRoomTypeAbrv');
+		$this->form_validation->set_rules('room_type_paxStd', 'lang:paxStd', 'trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_paxMax', 'lang:paxMax', 'trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_beds', 'lang:beds', 'trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_description', 'lang:description', 'trim|xss_clean|max_length[300]');
 			
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -326,10 +338,10 @@ class Rooms extends Controller
 	{
 		$hotel  = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('room_number','lang:number','required|max_length[20]|callback_checkRoomNumber');
-		$this->form_validation->set_rules('room_name','lang:name','max_length[50]');
-		$this->form_validation->set_rules('room_status','lang:status','required|max_length[20]');
-		$this->form_validation->set_rules('room_room_type','lang:room_type','required|max_length[20]');
+		$this->form_validation->set_rules('room_number','lang:number','trim|xss_clean|required|max_length[20]|callback_checkRoomNumber');
+		$this->form_validation->set_rules('room_name','lang:name','trim|xss_clean|max_length[50]');
+		$this->form_validation->set_rules('room_status','lang:status','trim|xss_clean|required|max_length[20]');
+		$this->form_validation->set_rules('room_room_type','lang:room_type','trim|xss_clean|required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -366,12 +378,12 @@ class Rooms extends Controller
 	{
 		$hotel  = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('room_type_name','lang:name','required|max_length[50]|callback_checkRoomTypeName');
-		$this->form_validation->set_rules('room_type_abrv','lang:abrv','max_length[5]|callback_checkRoomTypeAbrv');
-		$this->form_validation->set_rules('room_type_paxStd','lang:paxStd','required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_paxMax','lang:paxMax','required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_beds','lang:beds','required|numeric|max_length[5]');
-		$this->form_validation->set_rules('room_type_description','lang:description','max_length[300]');
+		$this->form_validation->set_rules('room_type_name','lang:name','trim|xss_clean|required|max_length[50]|callback_checkRoomTypeName');
+		$this->form_validation->set_rules('room_type_abrv','lang:abrv','trim|xss_clean|max_length[5]|callback_checkRoomTypeAbrv');
+		$this->form_validation->set_rules('room_type_paxStd','lang:paxStd','trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_paxMax','lang:paxMax','trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_beds','lang:beds','trim|xss_clean|required|numeric|max_length[5]');
+		$this->form_validation->set_rules('room_type_description','lang:description','trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		

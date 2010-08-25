@@ -45,8 +45,8 @@ class Rates extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('rate_name', 'lang:name', 'required|max_length[100]|callback_checkRateName');
-		$this->form_validation->set_rules('rate_description', 'lang:description', 'max_length[300]');
+		$this->form_validation->set_rules('rate_name', 'lang:name', 'trim|xss_clean|required|max_length[100]|callback_checkRateName');
+		$this->form_validation->set_rules('rate_description', 'lang:description', 'trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -72,8 +72,8 @@ class Rates extends Controller
 	
 	function editRate($rateId)
 	{	
-		$this->form_validation->set_rules('rate_name', 'lang:name', 'required|max_length[100]|callback_checkRateName');
-		$this->form_validation->set_rules('rate_description', 'lang:description', 'max_length[300]');
+		$this->form_validation->set_rules('rate_name', 'lang:name', 'trim|xss_clean|required|max_length[100]|callback_checkRateName');
+		$this->form_validation->set_rules('rate_description', 'lang:description', 'trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		

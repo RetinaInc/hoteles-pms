@@ -11,12 +11,13 @@ echo anchor(base_url().'seasons/addSeason/','Agregar Nueva Temporada')."<br><br>
 if ($seasons) {
 ?>
 
-	<table width="575" border="1">
+	<table width="544" border="1">
   	  <tr>
-    	<td width="219" height="42">Temporada</td>
-        <td width="104">Fecha inicio</td>
-        <td width="104">Fecha fin</td>
-      </tr>
+    	<td width="153" height="23">Temporada</td>
+        <td width="110">Fecha inicio</td>
+        <td width="110">Fecha fin</td>
+        <td width="153">Sub Temporadas</td>
+  	  </tr>
 	
 	  <?php
       foreach ($seasons as $row) { 
@@ -33,8 +34,7 @@ if ($seasons) {
 		$month    = $dS_array[1];
 		$day      = $dS_array[2];
 		echo $day.'-'.$month.'-'.$year;
-		?>
-        </td>
+		?>        </td>
         
         <td>
 		<?php 
@@ -44,6 +44,19 @@ if ($seasons) {
 		$month    = $dE_array[1];
 		$day      = $dE_array[2];
 		echo $day.'-'.$month.'-'.$year;
+		?>        </td>
+        <td>
+        <?php 
+		foreach ($seasons as $row1) {
+			$fk = 'No';
+			if ($row1['fk_season'] == $row['id_season']) {
+				echo $row1['name']."<br>";
+				$fk = 'Yes';
+			}
+		}
+		if ($fk == 'No') {
+			echo "&nbsp;";
+		}
 		?>
         </td>
       </tr>

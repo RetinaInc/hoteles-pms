@@ -73,51 +73,49 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 	?></td>
     <td width="179">&nbsp;</td>
     <td width="77">&nbsp;</td>
-    <td width="100">Nombre</td>
-    <td width="241"><input name="guest_name" type="text" id="guest_name" value="<?php echo set_value('guest_name'); ?>" size="30" maxlength="30" /></td>
+    <td>CI</td>
+    <td width="241">V-
+      <input name="guest_ci" type="text" id="guest_ci" value="<?php echo set_value('guest_ci'); ?>" size="8" maxlength="8" onKeyPress="return numbersonly(this, event)"/></td>
   </tr>
   <tr>
     <td height="41">
 	<?php
 	$unixCi = human_to_unix($checkIn);
-	echo form_label('Check In: '.date ("D  j/m/Y  " , $unixCi), 'check_in');
+	echo form_label('Llegada: '.date ("D  j/m/Y  " , $unixCi), 'check_in');
 	echo form_hidden('check_in', $checkIn);
-	?>
-    </td>
+	?>    </td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td>Apellido</td>
-    <td><input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo set_value('guest_last_name'); ?>" size="30" maxlength="30" /></td>
+    <td>* Nombre</td>
+    <td><input name="guest_name" type="text" id="guest_name" value="<?php echo set_value('guest_name'); ?>" size="30" maxlength="30" /></td>
   </tr>
   <tr>
     <td height="39">
 	<?php
 	$unixCo = human_to_unix($checkOut);
-	echo form_label('Check Out: '.date ("D  j/m/Y  " , $unixCo), 'check_out');
+	echo form_label('Salida: '.date ("D  j/m/Y  " , $unixCo), 'check_out');
 	echo form_hidden('check_out', $checkOut);
-	?>
-    </td>
+	?>    </td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td>Teléfono</td>
-    <td><input name="guest_telephone" type="text" id="guest_telephone" value="<?php echo set_value('guest_telephone'); ?>" size="20" maxlength="20" /></td>
+    <td>Seg. Nombre</td>
+    <td><input name="guest_name2" type="text" id="guest_name2" value="<?php echo set_value('guest_name2'); ?>" size="30" maxlength="30" /></td>
   </tr>
   <tr>
     <td height="45">
 	<?php
 	echo form_label('Cantidad de noches: '.$nights, 'nights')
-	?>
-    </td>
+	?>    </td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
-    <td>Correo</td>
-    <td><input name="guest_email" type="text" id="guest_email" value="<?php echo set_value('guest_email'); ?>" size="30" maxlength="50" /></td>
+    <td>* Apellido</td>
+    <td><input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo set_value('guest_last_name'); ?>" size="30" maxlength="30" /></td>
   </tr>
   <tr>
-    <td>Tarifa</td>
+    <td height="40">* Tarifa</td>
     <td>
      <select name="reservation_rate" id="reservation_rate">
-    	<option value='' selected>Tarifa</option>
+    	<option value='' selected>Seleccione</option>
 		<?php
         foreach($rates as $row) {
    		?>
@@ -125,19 +123,16 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 		<?php 
 		} 
 		?>
-    </select>
-    </td>
+    </select>    </td>
     <td>&nbsp;</td>
-    <td>Dirección</td>
-    <td>
-    <textarea name="guest_address" cols="30" rows="2" id="guest_address" value="<?php echo set_value('guest_address'); ?>"></textarea>
-    </td>
+    <td>Seg. Apellido</td>
+    <td><input name="guest_last_name2" type="text" id="guest_last_name2" value="<?php echo set_value('guest_last_name2'); ?>" size="30" maxlength="30" /></td>
   </tr>
   <tr>
-    <td height="37">Plan</td>
+    <td height="37">* Plan</td>
     <td>
     <select name="reservation_plan" id="reservation_plan">
-    	<option value='' selected>Plan</option>
+    	<option value='' selected>Seleccione</option>
 		<?php
         foreach($plans as $row) {
    		?>
@@ -145,14 +140,13 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 		<?php 
 		} 
 		?>
-    </select>
-    </td>
+    </select>    </td>
     <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>* Tel&eacute;fono</td>
+    <td><input name="guest_telephone" type="text" id="guest_telephone" value="<?php echo set_value('guest_telephone'); ?>" size="20" maxlength="20" /></td>
   </tr>
   <tr>
-    <td height="40">Cantidad de adultos: </td>
+    <td height="40">* Cantidad de adultos: </td>
     <td>
     	<?php 
 		foreach ($roomTypeInfo as $row) {
@@ -161,7 +155,7 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 		}
 		?>
 		<select name="reservation_adults" id="reservation_adults" onChange="redirect(this.options.selectedIndex)">
-            <option value='' selected> adults </option>
+            <option value='' selected>Seleccione</option>
         <?php 
 		for ($i = 1; $i <= $maxPers; $i++) {
 			    
@@ -170,30 +164,28 @@ echo form_open(base_url().'reservations/createReservation3/', $attributes);?>
 		?>
   		</select>
 				
-    <!-- <input name="reservation_adults2" type="text" id="reservation_adults2" value="<?php echo set_value('reservation_adults'); ?>" size="4" maxlength="4" onkeypress="return numbersonly(this, event)" />-->
-    </td>
+    <!-- <input name="reservation_adults2" type="text" id="reservation_adults2" value="<?php echo set_value('reservation_adults'); ?>" size="4" maxlength="4" onkeypress="return numbersonly(this, event)" />-->    </td>
     <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>* Correo</td>
+    <td><input name="guest_email" type="text" id="guest_email" value="<?php echo set_value('guest_email'); ?>" size="30" maxlength="50" /></td>
   </tr>
   <tr>
-    <td height="41">Cantidad de ni&ntilde;os: </td>
+    <td height="41">* Cantidad de ni&ntilde;os: </td>
     <td>
     <select name="reservation_children" id="reservation_children">
-        <option value='' selected> children </option>
+        <option value='0' selected>0</option>
 	</select>
     <!--<select name="reservation_children" id="reservation_children">
     	<option value='' selected>''</option>
 	</select>   -->
-    <!-- <input name="reservation_children2" type="text" id="reservation_children2" value="<?php echo set_value('reservation_children'); ?>" size="4" maxlength="4" onKeyPress="return numbersonly(this, event)"/>-->
-    </td>
+    <!-- <input name="reservation_children2" type="text" id="reservation_children2" value="<?php echo set_value('reservation_children'); ?>" size="4" maxlength="4" onKeyPress="return numbersonly(this, event)"/>-->    </td>
     <td>&nbsp;</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td>Direcci&oacute;n</td>
+    <td><textarea name="guest_address" cols="30" rows="2" id="guest_address"> <?php echo set_value('guest_address'); ?></textarea></td>
   </tr>
   <tr>
     <td>Detalles: </td>
-    <td><textarea name="reservation_details" rows="2" id="reservation_details"><?php echo set_value('reservation_details');  ?></textarea></td>
+    <td><textarea name="reservation_details" rows="2" id="reservation_details"> <?php echo set_value('reservation_details');?></textarea></td>
     <td>&nbsp;</td>
     <td>
 	<?php
@@ -222,7 +214,7 @@ var k
 for (i=0; i<groups; i++)
 group[i]=new Array()
 
-group[0][0]=new Option("ninos","")
+group[0][0]=new Option("0","0")
 
 for (j=1; j <= maxp; j++) {
 

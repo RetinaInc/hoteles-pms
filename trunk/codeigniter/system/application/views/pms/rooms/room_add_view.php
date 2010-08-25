@@ -47,4 +47,4 @@ echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
 
-<a href="<?php echo base_url().'rooms/viewRooms'?>">Volver</a>
+<a href="<?php echo base_url().'rooms/viewRooms'?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a>

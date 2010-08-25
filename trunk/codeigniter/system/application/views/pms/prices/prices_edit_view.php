@@ -42,32 +42,52 @@ else
 
 $this->load->view('pms/header'); 
 
-echo 'AGREGAR PRECIOS'."<br><br>";
+echo 'EDITAR PRECIOS'."<br><br>";
 
 foreach ($season as $row) {
 	
-	$seasonId = $row['id_season'];
-	echo 'TEMPORADA: ', $row['name']."<br>";
-	echo 'Fecha Inicio: ', $row['dateStart']."<br>";
-	echo 'Fecha Fin: ', $row['dateEnd']."<br>";
+	$seasonId   = $row['id_season'];
+	$seasonName = $row['name'];
+	$dateStart  = $row['dateStart'];
+	$dateEnd    = $row['dateEnd'];
+	
+	$dS_array = explode ('-',$dateStart);
+	$year     = $dS_array[0];
+	$month    = $dS_array[1];
+	$day      = $dS_array[2];
+	$dateS    = $day.'-'.$month.'-'.$year;
+	
+	$dE_array = explode ('-',$dateEnd);
+	$year     = $dE_array[0];
+	$month    = $dE_array[1];
+	$day      = $dE_array[2];
+	$dateE    = $day.'-'.$month.'-'.$year;	
+	
+	echo $seasonName.' ('.$dateS.' al '.$dateE.') <br>';
 }
 
 foreach ($rate as $row) {
 	
 	$rateId = $row['id_rate'];
-	echo 'TARIFA: ', $row['name']."<br>";
+	echo 'Tarifa ', $row['name']."<br>";
 }
 
 foreach ($plan as $row) {
 	
 	$planId = $row['id_plan'];
-	echo 'PLAN: ', $row['name']."<br>";
+	echo 'Plan ', $row['name']."<br>";
+}
+
+foreach ($prices as $row) {
+
+	$unPrice = $row['pricePerNight'];
 }
 
 echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planId);
+
 ?>
 <p>Precio unico:
-	<input type="text" name="un_price" id="un_price" onKeyPress="return numbersonly(this, event)"/> 
+	<input name="un_price" type="text" id="un_price" onKeyPress="return numbersonly(this, event)" value="<?php echo $unPrice;?>" size="12" maxlength="12"/> 
 	Bs.F.
 </p>
  
@@ -87,12 +107,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Lunes</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['monPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['monPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="mon_price<?php echo $roomTypeId?>" id="mon_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" />
+    <input name="mon_price<?php echo $roomTypeId?>" type="text" id="mon_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>" />
     </td>
     <?php
+			}
+		}
 	}
 	?>
   	<td>Bs.F.</td>
@@ -101,12 +131,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Martes</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['tuePrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['tuePrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="tue_price<?php echo $roomTypeId?>" id="tue_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="tue_price<?php echo $roomTypeId?>" type="text" id="tue_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -115,12 +155,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Miércoles</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['wedPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['wedPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="wed_price<?php echo $roomTypeId?>" id="wed_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="wed_price<?php echo $roomTypeId?>" type="text" id="wed_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -129,12 +179,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Jueves</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['thuPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['thuPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="thu_price<?php echo $roomTypeId?>" id="thu_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="thu_price<?php echo $roomTypeId?>" type="text" id="thu_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -143,12 +203,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Viernes</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['friPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['friPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="fri_price<?php echo $roomTypeId?>" id="fri_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="fri_price<?php echo $roomTypeId?>" type="text" id="fri_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -157,12 +227,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Sábado</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['satPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['satPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="sat_price<?php echo $roomTypeId?>" id="sat_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="sat_price<?php echo $roomTypeId?>" type="text" id="sat_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -171,12 +251,22 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
     <td>Domingo</td>
     <?php 
 	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
+		foreach ($prices as $row1) {
+			$roomTypeId = $row['id_room_type'];
+			if ($row1['fk_room_type'] == $row['id_room_type']) {
+				$price = $row1['sunPrice'];
+				if ($price == $unPrice) {
+					$price = NULL;
+				} else {
+					$price = $row1['sunPrice'];
+				}
 	?>
 	<td>
-    <input type="text" name="sun_price<?php echo $roomTypeId?>" id="sun_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)"/>
+    <input name="sun_price<?php echo $roomTypeId?>" type="text" id="sun_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo $price; ?>"/>
     </td>
     <?php
+			}
+		}
 	}
 	?>
     <td>Bs.F.</td>
@@ -187,3 +277,5 @@ echo form_open(base_url().'prices/editPrices2/'.$seasonId.'/'.$rateId.'/'.$planI
 echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
+
+<a href="<?php echo base_url().'prices/checkPrices/'.$seasonId.'/'.$rateId.'/'.$planId?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a>

@@ -20,11 +20,25 @@ class Plans extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 			
-		$plans = $this->GNM->getInfo($hotel, 'PLAN', null, null, null, null, null, 1);
+		$plans    = $this->GNM->getInfo($hotel, 'PLAN', null,      null, null, null, null, 1);
+		$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
 		
 		$data['plans'] = $plans;
+		$data['plansDis'] = $plansDis;
 		
 		$this->load->view('pms/plans/plans_view', $data);
+	}
+	
+	
+	function viewDisabledPlans()
+	{
+	    $hotel = $this->session->userdata('hotelid');
+	
+		$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+		
+		$data['plansDis'] = $plansDis;
+		
+		$this->load->view('pms/plans/plans_disabled_view', $data);
 	}
 	
 	
@@ -32,8 +46,8 @@ class Plans extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('plan_name', 'lang:name', 'required|max_length[100]|callback_checkPlanName');
-		$this->form_validation->set_rules('plan_description', 'lang:description', 'max_length[300]');
+		$this->form_validation->set_rules('plan_name', 'lang:name', 'trim|xss_clean|required|max_length[100]|callback_checkPlanName');
+		$this->form_validation->set_rules('plan_description', 'lang:description', 'trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -61,8 +75,8 @@ class Plans extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('plan_name', 'lang:name', 'required|max_length[100]|callback_checkPlanName');
-		$this->form_validation->set_rules('plan_description', 'lang:description', 'max_length[300]');
+		$this->form_validation->set_rules('plan_name', 'lang:name', 'trim|xss_clean|required|max_length[100]|callback_checkPlanName');
+		$this->form_validation->set_rules('plan_description', 'lang:description', 'trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 			
@@ -86,6 +100,26 @@ class Plans extends Controller
 				
 			$this->viewPlans();  
 		}	
+	}
+	
+	
+	function disablePlan($planId)
+	{
+		$this->GNM->disable('PLAN', 'id_plan', $planId); 
+		
+		$this->viewPlans(); 	
+	}
+	
+	
+	function enablePlan($planId)
+	{
+		$data = array(
+				'disable' => 1
+				);
+			
+		$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
+		
+		$this->viewPlans(); 	
 	}
 	
 	

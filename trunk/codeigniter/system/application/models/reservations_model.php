@@ -25,11 +25,11 @@ class Reservations_model extends Model
 			$this->db->where('RE.disable', 1);
 		}
 
-		$this->db->select('DISTINCT(RE.id_reservation), RE.resDate, RE.status, RE.checkIn, RE.checkOut, RE.total, RE.details, RE.paymentStat, RE.billingStat, RE.fk_guest');
-		$this->db->where('RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+		$this->db->select('DISTINCT(RE.id_reservation), RE.resDate, RE.status, RE.checkIn, RE.checkOut, RE.total, RE.details, RE.paymentStat, RE.billingStat, RE.fk_guest, (G.lastName)gLname');
+		$this->db->where('RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type and RE.fk_guest = G.id_guest');
 		$this->db->where('RT.fk_hotel', $hotel);
 	
-		$query = $this->db->get('RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT', $lim1, $lim2);
+		$query = $this->db->get('RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT, GUEST G', $lim1, $lim2);
 		return $query->result_array();
 	}
 	
