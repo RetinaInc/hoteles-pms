@@ -23,21 +23,35 @@ foreach ($season as $row) {
         <?php 
 	}
 	
+	$dS        = $row['dateStart'];
+	$dS_array  = explode ('-',$dS);
+	$year      = $dS_array[0];
+	$month     = $dS_array[1];
+	$day       = $dS_array[2];
+	$dateStart = $day.'-'.$month.'-'.$year;
+		
+	$dE       = $row['dateEnd'];
+	$dE_array = explode ('-',$dE);
+	$year     = $dE_array[0];
+	$month    = $dE_array[1];
+	$day      = $dE_array[2];
+	$dateEnd  = $day.'-'.$month.'-'.$year;
+		            
 	echo 'Nombre: ',   $row['name']."<br>";
-	echo 'Fecha Inicio: ', $row['dateStart']."<br>";
-	echo 'Fecha Fin: ', $row['dateStart']."<br>";
+	echo 'Inicio: ', $dateStart."<br>";
+	echo 'Fin: ', $dateEnd."<br>";
 }
 
 if ($fSeason) {
 
-    echo "<br>".'Temporadas que incluye: '."<br><br>";
+    echo "<br>".'Sub Temporadas: '."<br><br>";
     
 	    ?>
-		<table width="575" border="1">
+		<table width="392" border="1">
   	  	  <tr>
-    		<td width="219" height="42">Temporada</td>
-        	<td width="104">Fecha inicio</td>
-        	<td width="104">Fecha fin</td>
+    		<td width="150" height="42">Temporada</td>
+        	<td width="110">Fecha inicio</td>
+        	<td width="110">Fecha fin</td>
       	  </tr>
 	
 	  	  <?php

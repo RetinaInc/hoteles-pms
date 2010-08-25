@@ -18,6 +18,7 @@ foreach ($rates as $row) {
 }
 ?>
 	
+<p><a href="<?php echo base_url().'prices/selectSeasonPrices'?>">Volver</a></p>
  
 
 

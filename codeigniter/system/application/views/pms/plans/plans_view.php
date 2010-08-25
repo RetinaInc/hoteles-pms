@@ -19,12 +19,21 @@ if ($plans) {
     		echo 'Descripcion: ', $row['description']."<br>";
 		}
 
-		echo anchor(base_url().'plans/editPlan/'.$row['id_plan'],'Editar')."<br><br>";
+		echo anchor(base_url().'plans/editPlan/'.$row['id_plan'],'Editar')."<br>";
+		?>
+        <a href="<?php echo base_url().'plans/disablePlan/'.$row['id_plan'] ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar</a><br /><br /><br />
+        <?php
 	}
 	
 } else {
 	
-	echo 'No existen planes!';
+	echo 'No existen planes!'."<br><br>";
 
 } 
+
+
+if ($plansDis) {
+
+	echo "<br>".anchor(base_url().'plans/viewDisabledPlans/', 'Ver Planes Deshabilitados');
+}
 ?>

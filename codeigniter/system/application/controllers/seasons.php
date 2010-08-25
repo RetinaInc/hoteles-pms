@@ -19,9 +19,12 @@ class Seasons extends Controller
 	
 	function viewSeasons()
 	{
-		//$order = $_POST["order"];
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'dateStart';
+		}
 		
-		$order = 'dateStart';
 	    $hotel = $this->session->userdata('hotelid');
 	
 		$seasons    = $this->GNM->getInfo($hotel, 'SEASON', null, null, $order, null, null, 1);
@@ -36,9 +39,12 @@ class Seasons extends Controller
 	
 	function viewDisabledSeasons()
 	{
-		//$order = $_POST["order"];
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'dateStart';
+		}
 		
-		$order = 'dateStart';
 	    $hotel = $this->session->userdata('hotelid');
 	
 		$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
@@ -67,10 +73,10 @@ class Seasons extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		 
-		$this->form_validation->set_rules('season_name', 'lang:name', 'required|max_length[300]|callback_checkSeasonName');
-		$this->form_validation->set_rules('season_dateStart', 'lang:dateStart', 'required|max_length[10]');
-		$this->form_validation->set_rules('season_dateEnd', 'lang:dateEnd', 'required|max_length[10]');
-		$this->form_validation->set_rules('season_season','lang:season','');
+        $this->form_validation->set_rules('season_name', 'lang:name', 'trim|xss_clean|required|max_length[300]|callback_checkSeasonName');
+		$this->form_validation->set_rules('season_dateStart', 'lang:dateStart', 'trim|xss_clean|required|max_length[10]');
+		$this->form_validation->set_rules('season_dateEnd', 'lang:dateEnd', 'trim|xss_clean|required|max_length[10]');
+		$this->form_validation->set_rules('season_season','lang:season','trim|xss_clean|');
 		
 		if ($this->form_validation->run() == FALSE) {
 		

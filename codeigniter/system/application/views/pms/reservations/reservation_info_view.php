@@ -62,8 +62,8 @@ foreach ($reservation as $row) {
 	echo '# Confirmación: ', $row['id_reservation']."<br>";
 	$unixCi = human_to_unix($row['checkIn']);
 	$unixCo = human_to_unix($row['checkOut']);
-	echo 'Check In: ', date ("D  j/m/Y  g:i a" , $unixCi)."<br>";
-	echo 'Check Out: ', date ("D  j/m/Y  g:i a" , $unixCo)."<br>";
+	echo 'Llegada: ', date ("D  j/m/Y  g:i a" , $unixCi)."<br>";
+	echo 'Salida: ', date ("D  j/m/Y  g:i a" , $unixCo)."<br>";
 	echo 'Cant. noches: ', $nights."<br>";
 	echo 'Cant. habitaciones: ', $reservationRoomsCount."<br><br>";
 	

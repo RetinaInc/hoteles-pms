@@ -20,7 +20,7 @@ if ($available)	{
 	
 	foreach ($available as $row) {
 	
-		echo form_open(base_url().'reservations/createReservation2/'.$row['id_room']);
+		echo form_open('reservations/createReservation2/'.$row['id_room']);
 		echo form_hidden('room_type', $reservationRoomType);
 		echo form_hidden('check_in', $reservationCheckIn);
 		echo form_hidden('check_out', $reservationCheckOut);
@@ -30,7 +30,14 @@ if ($available)	{
 	
 } else {
 
-      echo 'NO HAY HABITACIONES DISPONIBLES'."<br><br>";
+	echo 'NO HAY HABITACIONES DISPONIBLES'."<br><br>";
+	
+	echo form_open('reservations/createQuotation');
+	echo form_hidden('room_type', $reservationRoomType);
+	echo form_hidden('check_in', $reservationCheckIn);
+	echo form_hidden('check_out', $reservationCheckOut);
+	echo form_submit('sumit', 'Cotizar');
+	echo form_close();
 }
 
 ?>

@@ -63,4 +63,4 @@ echo form_close();
 
 ?><br /><br />
 
-<a href="<?php echo base_url().'rooms/infoRoom/'.$roomId?>">Volver</a>
+<a href="<?php echo base_url().'rooms/infoRoom/'.$roomId?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a>

@@ -8,7 +8,7 @@ foreach ($guest as $row) {
 	$guestId = $row['id_guest'];
 }
 
-echo 'EDITAR DATOS CLIENTE';?><br /><br /><?php
+echo 'EDITAR DATOS CLIENTE'."<br>";
 
 echo validation_errors();
 
@@ -20,8 +20,16 @@ foreach ($guest as $row) {?>
 	  <input name="guest_name" type="text" id="guest_name" value="<?php echo $row['name']; ?>" size="30" maxlength="30" />
 	</p>
     
+    <p>Seg Nombre:
+	  <input name="guest_name2" type="text" id="guest_name2" value="<?php echo $row['name2']; ?>" size="30" maxlength="30" />
+	</p>
+    
     <p>* Apellido:
 	<input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo $row['lastName']; ?>" size="30" maxlength="30" />
+	</p>
+    
+    <p>Seg Apellido:
+	  <input name="guest_last_name2" type="text" id="guest_last_name2" value="<?php echo $row['lastName2']; ?>" size="30" maxlength="30" />
 	</p>
     
     <p>* Teléfono:
@@ -40,11 +48,7 @@ foreach ($guest as $row) {?>
 
 echo form_submit('sumit', 'Enviar');
 echo form_close();
-?>
 
-<p><a href="<?php echo base_url().'guests/disableGuest/'.$guestId ?>" onclick="return confirm('Seguro que desea deshabilitar?')">  Deshabilitar Cliente</a></p>
-
-<?php
 $referer = $_SERVER['HTTP_REFERER'];
 echo "<a href='" . $referer . "'> Volver</a><br>";
 ?>

@@ -24,19 +24,45 @@ class Reservations extends Controller
 		echo 'reservations controller';
 	}
 	
+	
+	function viewPendingReservations()
+	{
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'checkIn';
+		}
+	
+		$hotel = $this->session->userdata('hotelid');
+		
+		$datestring = "%Y-%m-%d";
+		$time       = time();
+		$date       = mdate($datestring, $time);
+		
+		$exRooms         = $this->ROM->getRoomInfo($hotel, null, null, null, null, null, 1);
+		$rooms           = $this->ROM->getRoomReservationsGuest($hotel, null, null, null);
+		$guests          = $this->GSM->getGuestInfo($hotel, null, null, null, null, null, null);
+		$penReservations = $this->REM->getReservationInfo($hotel, 'checkIn >=', $date, $order, null, null, 1);
+		$allReservations = $this->REM->getReservationInfo($hotel, null, null, $order, null, null, 1);
+		
+		$data['exRooms']         = $exRooms;
+		$data['rooms']           = $rooms;
+		$data['guests']          = $guests;
+		$data['penReservations'] = $penReservations;
+		$data['allReservations'] = $allReservations;
+		
+		$this->load->view('pms/reservations/reservations_pending_view', $data);
+	}
+	
 
     function viewAllReservations()
 	{
-		//$order = $_POST["order"];
-		
-		/*
-		if ($order == NULL)
-		{
-			$order = 'CHECK_IN DESC';
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'checkIn';
 		}
-		*/
-	
-		$order = 'checkIn DESC';
+
 		$hotel = $this->session->userdata('hotelid');
 		
 		$rooms        = $this->ROM->getRoomReservationsGuest($hotel, null, null, null);
@@ -48,34 +74,6 @@ class Reservations extends Controller
 		$data['reservations'] = $reservations;
 		
 		$this->load->view('pms/reservations/reservations_all_view', $data);
-	}
-	
-	
-	function viewPendingReservations()
-	{
-		//$order = $_POST["order"];
-		
-		$order = 'id_reservation';
-		$hotel = $this->session->userdata('hotelid');
-		
-		$datestring = "%Y-%m-%d";
-		$time       = time();
-		$date       = mdate($datestring, $time);
-		
-		$exRooms         = $this->ROM->getRoomInfo($hotel, null, null, null, null, null, 1);
-		$rooms           = $this->ROM->getRoomReservationsGuest($hotel, null, null, null);
-		$guests          = $this->GSM->getGuestInfo($hotel, null, null, null, null, null, null);
-		$reservations    = $this->REM->getReservationInfo($hotel, 'checkIn >=', $date, $order, null, null, 1);
-		$allReservations = $this->REM->getReservationInfo($hotel, null, null, $order, null, null, 1);
-		
-		$data['exRooms']         = $exRooms;
-		$data['rooms']           = $rooms;
-		$data['guests']          = $guests;
-		$data['reservations']    = $reservations;
-		$data['allReservations'] = $allReservations;
-		
-		$this->load->view('pms/reservations/reservations_pending_view', $data);
-		
 	}
 	
 	
@@ -142,9 +140,9 @@ class Reservations extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('reservation_room_type','lang:room_type','required');
-		$this->form_validation->set_rules('reservation_check_in','lang:check_in','required|max_length[15]');
-		$this->form_validation->set_rules('reservation_check_out','lang:check_out','required|max_length[15]');
+		$this->form_validation->set_rules('reservation_room_type','lang:room_type','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_check_in','lang:check_in','trim|xss_clean|required|max_length[15]');
+		$this->form_validation->set_rules('reservation_check_out','lang:check_out','trim|xss_clean|required|max_length[15]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -164,9 +162,50 @@ class Reservations extends Controller
 			$reservationCheckIn  = set_value('reservation_check_in');
 			$reservationCheckOut = set_value('reservation_check_out');
 			
-			if ($reservationCheckOut <= $reservationCheckIn) {
+			$ci_array = explode ('-',$reservationCheckIn);
+			$day      = $ci_array[0];
+			$month    = $ci_array[1];
+			$year     = $ci_array[2];
+			$checkIn  = $year.'-'.$month.'-'.$day.' 12:00:00';
+	
+			$co_array = explode ('-',$reservationCheckOut);
+			$day      = $co_array[0];
+			$month    = $co_array[1];
+			$year     = $co_array[2];
+			$checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
+
+			//$datestring = "%d-%m-%Y";
+			//$time       = time();
+			//$date       = mdate($datestring, $time);
+	
+			/*
+			echo "<br>";
+			echo 'in: ', $reservationCheckIn;
+			echo "<br>";
+			echo 'out: ', $reservationCheckOut;
+			echo "<br>";
+			//$todays_date = date("d-m-Y"); 
+			echo 'human: ', $human = unix_to_human($time);
+			echo "<br>";
+			echo 'unixIn: ',$unixIn = human_to_unix($checkIn);
+			echo "<br>";
+			echo 'unixOut: ',$unixOut = human_to_unix($checkOut);
+			echo "<br>";
+			*/
+			
+			$unixCheckIn  = human_to_unix($checkIn);
+			$unixCheckOut = human_to_unix($checkOut);
+			$unixNow = time();
+			
+			if (($unixCheckOut <= $unixCheckIn) || ($unixCheckIn < $unixNow)) {
 				
-				$error = lang("errorCheckInOutDates");
+				if ($unixCheckOut <= $unixCheckIn) {
+					$error = lang("errorCheckInOutDates");
+				}
+				if ($unixCheckIn < $unixNow) {
+					$error = lang("errorCheckInToday");
+				}
+				
 				$rates     = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
 				$roomTypes = $this->ROM->getWhereInRoom($hotel);
 		
@@ -203,6 +242,7 @@ class Reservations extends Controller
 			}
 		}
 	}
+	
 	
 	
 	function createReservation2($roomId)
@@ -244,6 +284,7 @@ class Reservations extends Controller
 	}
 	
 	
+	
 	function createReservation3()
 	{
 		$hotel = $this->session->userdata('hotelid');
@@ -253,17 +294,20 @@ class Reservations extends Controller
 		$checkIn  = $_POST["check_in"];
 		$checkOut = $_POST["check_out"];
 		
-		$this->form_validation->set_rules('reservation_rate','lang:rate','required');
-		$this->form_validation->set_rules('reservation_plan','lang:plan','required');
-		$this->form_validation->set_rules('reservation_adults','lang:adults','required|integer|max_length[5]');
-		$this->form_validation->set_rules('reservation_children','lang:children','required|integer|max_length[5]');
-		$this->form_validation->set_rules('reservation_details','lang:details','max_length[300]');
+		$this->form_validation->set_rules('reservation_rate','lang:rate','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_plan','lang:plan','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_adults','lang:adults','trim|xss_clean|required|integer|max_length[5]');
+		$this->form_validation->set_rules('reservation_children','lang:children','trim|xss_clean|required|integer|max_length[5]');
+		$this->form_validation->set_rules('reservation_details','lang:details','trim|xss_clean|max_length[300]');
 		
-		$this->form_validation->set_rules('guest_name','lang:name','required|max_length[30]');
-		$this->form_validation->set_rules('guest_last_name','lang:last_name','required|max_length[30]');
-		$this->form_validation->set_rules('guest_telephone','lang:telephone','required|max_length[20]');
-		$this->form_validation->set_rules('guest_email','lang:email','valid_email|max_length[50]');
-		$this->form_validation->set_rules('guest_address','lang:address','max_length[300]');
+		$this->form_validation->set_rules('guest_ci','lang:ci','trim|xss_clean|max_length[8]');
+		$this->form_validation->set_rules('guest_name','lang:name','trim|xss_clean|required|max_length[30]');
+		$this->form_validation->set_rules('guest_name2','lang:name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_last_name','lang:last_name','trim|xss_clean|required|max_length[30]');
+		$this->form_validation->set_rules('guest_last_name2','lang:last_name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_telephone','lang:telephone','trim|xss_clean|required|max_length[20]');
+		$this->form_validation->set_rules('guest_email','lang:email','trim|xss_clean|required|valid_email|max_length[50]');
+		$this->form_validation->set_rules('guest_address','lang:address','trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -292,28 +336,194 @@ class Reservations extends Controller
 		
 		} else {
 		
-			//$reservation_rate = set_value('reservation_rate');
+			$reservation_rate    = set_value('reservation_rate');
+			$reservation_plan    = set_value('reservation_plan');
 			$reservationAdults   = set_value('reservation_adults');
 			$reservationChildren = set_value('reservation_children');
 			$reservationDetails  = set_value('reservation_details');
 			
-		/*
+			$guestCi        = set_value('guest_ci');	
+			$guestName      = set_value('guest_name');
+			$guestName2     = set_value('guest_name2');
+			$guestLastName  = set_value('guest_last_name');
+			$guestLastName2 = set_value('guest_last_name2');
+			$guestTelephone = set_value('guest_telephone');
+			$guestEmail     = set_value('guest_email');
+			$guestAddress   = set_value('guest_address');
+			
+			if ($guestCi == NULL) {
+				$guestCi = NULL;
+			}
+			if ($guestName2 == NULL) {
+				$guestName2 = NULL;
+			}
+			if ($guestLastName2 == NULL) {
+				$guestLastName2 = NULL;
+			}
+			if ($guestAddress == NULL) {
+				$guestAddress = NULL;
+			}
+			
 			$data = array(
-				'STATUS' => 
-				'RES_DATE' => 
-				'CHECK_IN' =>
-				'CHECK_OUT' => 
-				'PAYMENT_STAT' => 
-				'DETAILS' => 
-				'FK_ID_GUEST' => 
+				'ci'        => $guestCi,
+				'name'      => $guestName,
+				'name2'     => $guestName2,
+				'lastName'  => $guestLastName,
+				'lastName2' => $guestLastName2,
+				'telephone' => $guestTelephone,
+				'email'     => $guestEmail,
+				'address'   => $guestAddress
 				);
 			
-			$this->GM->update('GUEST', 'ID_GUEST', $guest_id, $data);  
-				
-			$this->info_guest_reservations($guest_id); 
-			*/
+			$this->GNM->insert('GUEST', $data);  
+			
+			$guestId = $this->db->insert_id('GUEST');
+			
+			$datestring = "%Y-%m-%d %h:%i";
+			$time       = time();
+		    $date       = mdate($datestring, $time);
+
+			$data = array(
+				'resDate'     => $date,
+				'status'     => 'Reserved',
+				'checkIn'     => $checkIn,
+				'checkOut'    => $checkOut,
+				'details'     => $reservationDetails,
+				'total'       => '0',
+				'paymentStat' => 'Not canceled',
+				'billingStat' => 'Not billed',
+				'fk_guest'    => $guestId
+				);
+			
+			$this->GNM->insert('RESERVATION', $data);  
+			
+			$reservationId = $this->db->insert_id('RESERVATION');
+			
+			$data = array(
+				'adults'   => $reservationAdults,
+				'children' => $reservationChildren,
+				'fk_room'  => $roomId,
+				'fk_reservation' => $reservationId
+				);
+			
+			$this->GNM->insert('ROOM_RESERVATION', $data);  
+			
+			$this->viewAllReservations(); 
 		}
 	}
+	
+	
+	function createQuotation()
+	{
+		$hotel = $this->session->userdata('hotelid');
+
+		$roomType            = $_POST["room_type"];
+		$reservationCheckIn  = $_POST["check_in"];
+		$reservationCheckOut = $_POST["check_out"];
+		
+		$roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomType, null, null, null, 1);
+		$rates        = $this->GNM->getInfo($hotel, 'RATE',       null,           null,     null, null, null, 1);
+		$plans        = $this->GNM->getInfo($hotel, 'PLAN',       null,           null,     null, null, null, 1);
+		
+		$ci_array = explode ('-',$reservationCheckIn);
+		$day      = $ci_array[0];
+		$month    = $ci_array[1];
+		$year     = $ci_array[2];
+		$checkIn  = $year.'-'.$month.'-'.$day;
+		
+		$co_array = explode ('-',$reservationCheckOut);
+		$day      = $co_array[0];
+		$month    = $co_array[1];
+		$year     = $co_array[2];
+		$checkOut = $year.'-'.$month.'-'.$day;
+		
+		$nights = (strtotime($checkOut) - strtotime($checkIn)) / (60 * 60 * 24);
+		
+		$data['roomTypeInfo'] = $roomTypeInfo; 
+		$data['checkIn']      = $checkIn.' 12:00:00'; 
+		$data['checkOut']     = $checkOut.' 10:00:00'; 
+		$data['nights']       = $nights; 
+		$data['rates']        = $rates;
+		$data['plans']        = $plans;   
+			
+		$this->load->view('pms/reservations/reservation_create_quotation_view', $data);
+	}
+	
+	
+	/*
+	function createReservation11()
+	{
+		$hotel = $this->session->userdata('hotelid');
+		
+		$this->form_validation->set_rules('reservation_adults','lang:adults','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_children','lang:children','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_room_count','lang:room_count','trim|xss_clean|required');
+		$this->form_validation->set_rules('reservation_check_in','lang:check_in','trim|xss_clean|required|max_length[15]');
+		$this->form_validation->set_rules('reservation_check_out','lang:check_out','trim|xss_clean|required|max_length[15]');
+		
+		if ($this->form_validation->run() == FALSE) {
+		
+			$roomTypes = $this->ROM->getWhereInRoom($hotel);
+			$error = 1;
+		
+			$data['roomTypes'] = $roomTypes;
+			$data['error'] = $error;
+		
+			$this->load->view('pms/reservations/reservation_create_1_view', $data);
+		
+		} else {
+		
+			$reservationAdults    = set_value('reservation_adults');
+			$reservationChildren  = set_value('reservation_children');
+			$reservationRoomCount = set_value('reservation_room_count');
+			$reservationCheckIn   = set_value('reservation_check_in');
+			$reservationCheckOut  = set_value('reservation_check_out');
+			
+			$datestring = "%d-%m-%Y";
+			$time       = time();
+			$date       = mdate($datestring, $time);
+		
+			if (($reservationCheckOut <= $reservationCheckIn) || ($reservationCheckIn < $date)) {
+				
+				if ($reservationCheckOut <= $reservationCheckIn) {
+					$error = lang("errorCheckInOutDates");
+				}
+				if ($reservationCheckIn < $date) {
+					$error = lang("errorCheckInToday");
+				}
+				
+				$data['error'] = $error;
+		
+				$this->load->view('pms/reservations/reservation_create_1_view', $data);
+				
+			} else {
+			
+			    $ci_array = explode ('-',$reservationCheckIn);
+			    $day      = $ci_array[0];
+			    $month    = $ci_array[1];
+			    $year     = $ci_array[2];
+			    $checkIn  = $year.'-'.$month.'-'.$day.' 12:00:00';
+		
+			    $co_array = explode ('-',$reservationCheckOut);
+			    $day      = $co_array[0];
+			    $month    = $co_array[1];
+			    $year     = $co_array[2];
+			    $checkOut = $year.'-'.$month.'-'.$day.' 10:00:00';
+		
+			    $available    = $this->ROM->getAvailability($hotel, $reservationRoomType, $checkIn, $checkOut);
+			    $roomTypeInfo = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $reservationRoomType, null, null, null, 1);
+			
+			    $data['available']           = $available; 
+			    $data['roomTypeInfo']        = $roomTypeInfo; 
+			    $data['reservationRoomType'] = $reservationRoomType; 
+			    $data['reservationCheckIn']  = $reservationCheckIn; 
+			    $data['reservationCheckOut'] = $reservationCheckOut; 
+			
+			    $this->load->view('pms/reservations/reservation_create_2_view', $data);
+			}
+		}
+	}
+	*/
 	
 	
 	function modifyReservationRooms($reservationId, $roomId)
@@ -365,8 +575,8 @@ class Reservations extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('reservation_check_in','lang:check_in','required|max_length[15]');
-		$this->form_validation->set_rules('reservation_check_out','lang:check_out','required|max_length[15]');
+		$this->form_validation->set_rules('reservation_check_in','lang:check_in','trim|xss_clean|required|max_length[15]');
+		$this->form_validation->set_rules('reservation_check_out','lang:check_out','trim|xss_clean|required|max_length[15]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		

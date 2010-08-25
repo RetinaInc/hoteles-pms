@@ -11,14 +11,21 @@ foreach ($guest as $row) {
 	
 	if ($row['disable'] == 1) {
 	
-	    echo anchor(base_url().'guests/editGuest/'.$row['id_guest'],'Editar')."<br><br>"; 
-	
+	    echo anchor(base_url().'guests/editGuest/'.$row['id_guest'],'Editar')."<br>"; 
+		?>
+        <a href="<?php echo base_url().'guests/disableGuest/'.$guestId ?>" onclick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar</a><br /><br />
+		<?php
+		
 	} else if ($row['disable'] == 0){
 		
 		 echo anchor(base_url().'guests/enableGuest/'.$row['id_guest'],'Habilitar')."<br><br>"; 
 	}
 	
 	echo 'Nombre: ',   $row['name'].' '.$row['lastName']."<br>";
+	
+	if (($row['ci'] != NULL) || ($row['ci'] != 0)) {
+		echo 'CI: V-', $row['ci']."<br>";
+	}
 	echo 'Teléfono: ', $row['telephone']."<br>";
 	
 	if ($row['email'] != NULL) {
@@ -26,12 +33,12 @@ foreach ($guest as $row) {
 	}
 	
 	if ($row['address'] != NULL) {
-		echo 'Dirección: ', $row['address']."<br><br>";
+		echo 'Dirección: ', $row['address']."<br>";
 	}
 }
 
 
-echo 'RESERVACIONES CLIENTE'."<br><br>";
+echo "<br>".'RESERVACIONES CLIENTE'."<br><br>";
 
 ?>
 
@@ -115,7 +122,8 @@ echo 'RESERVACIONES CLIENTE'."<br><br>";
   ?>
 </table>
 
-<p><a href="<?php echo base_url().'guests/viewGuests/'?>">Volver a Clientes</a></p>
-<p><a href="<?php echo base_url().'reservations/viewPendingReservations/'?>">Volver a Reservaciones</a></p>
-<p><a href="<?php echo base_url().'rooms/viewRooms/'?>">Volver a Habitaciones</a></p>
-<p><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver a Tipos de habitaciones</a></p>
+<br />
+<a href="<?php echo base_url().'guests/viewGuests/'?>">Volver a Clientes</a><br />
+<a href="<?php echo base_url().'reservations/viewPendingReservations/'?>">Volver a Reservaciones</a><br />
+<a href="<?php echo base_url().'rooms/viewRooms/'?>">Volver a Habitaciones</a><br />
+<a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver a Tipos de habitaciones</a><br />

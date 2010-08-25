@@ -9,8 +9,11 @@ $lang['Reserved'] = 'Reservada';
 $lang['Guaranteed Reservation'] = 'Reservaci&oacute;n garantizada';
 $lang['No Show'] = 'No apareci&oacute;';
 $lang['number'] = 'N&uacute;mero';
+$lang['ci'] = 'CI';
 $lang['name'] = 'Nombre';
+$lang['name2'] = 'Seg. Nombre';
 $lang['last_name'] = 'Apellido';
+$lang['last_name2'] = 'Seg. Apellido';
 $lang['status'] = 'Estado';
 $lang['room_type'] = 'Tipo de habitaci&oacute;n';
 $lang['abrv'] = 'Abrev.';
@@ -41,6 +44,8 @@ $lang['errorPaxMax_Beds'] = 'La Cantidad de camas debe ser menor o igual al Pax 
 $lang['errorPlanName'] = 'Nombre de plan no disponible';
 $lang['errorCurrentSeason'] = 'No se puede deshabilitar la temporada actual!';
 $lang['errorCheckInOutDates'] = 'La fecha de salida debe ser mayor a la fecha de llegada';
+$lang['errorCheckInToday'] = 'La fecha de llegada debe ser igual o mayor a la fecha de hoy';
+$lang['errorPrices'] = 'Debe llenar el precio de cada d&iacute;a o el precio &uacute;nico';
 
 $lang['guestDisabled'] = 'Cliente Deshabilitado';
 

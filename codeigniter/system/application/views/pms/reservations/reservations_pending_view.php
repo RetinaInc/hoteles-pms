@@ -11,11 +11,8 @@ if ($exRooms) {
 	echo anchor(base_url().'reservations/createReservation1/','Crear Nueva Reservación')."<br><br>";
 }
 
-if ($allReservations) {
-
-	echo anchor(base_url().'reservations/viewAllReservations/','Ver Todas')."<br><br>";
-	?>
-
+if ($penReservations) {
+?>
 	<table width="852" border="1">
   	  <tr>
 		<td width="101">
@@ -74,7 +71,7 @@ if ($allReservations) {
 	  </tr>
 	
   	  <?php 
-  	  foreach ($reservations as $row) {
+  	  foreach ($penReservations as $row) {
   
   	  $hotel = $this->session->userdata('hotelid');
   	  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
@@ -154,6 +151,11 @@ if ($allReservations) {
 <?php
 } else {
 
-	echo "<br><br>".'No existen reservaciones!';
+	echo "<br><br>".'No existen reservaciones pendientes!'."<br>";
+}
+
+if ($allReservations) {
+
+	echo "<br>".anchor(base_url().'reservations/viewAllReservations/','Ver Reservaciones Anteriores')."<br><br>";
 }
 ?>

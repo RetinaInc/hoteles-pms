@@ -6,34 +6,48 @@ $this->load->view('pms/header');
 echo 'PRECIOS'."<br><br>";
 
 foreach ($season as $row) {
+
+	$seasonId   = $row['id_season'];
+	$seasonName = $row['name'];
+	$dateStart  = $row['dateStart'];
+	$dateEnd    = $row['dateEnd'];
 	
-	$seasonId = $row['id_season'];
-	echo 'TEMPORADA: ', $row['name']."<br>";
-	echo 'Fecha Inicio: ', $row['dateStart']."<br>";
-	echo 'Fecha Fin: ', $row['dateEnd']."<br>";
+	$dS_array = explode ('-',$dateStart);
+	$year     = $dS_array[0];
+	$month    = $dS_array[1];
+	$day      = $dS_array[2];
+	$dateS    = $day.'-'.$month.'-'.$year;
+	
+	$dE_array = explode ('-',$dateEnd);
+	$year     = $dE_array[0];
+	$month    = $dE_array[1];
+	$day      = $dE_array[2];
+	$dateE    = $day.'-'.$month.'-'.$year;	
+	
+	echo $seasonName.' ('.$dateS.' al '.$dateE.') <br>';
 }
 
 foreach ($rate as $row) {
 	
 	$rateId = $row['id_rate'];
-	echo 'TARIFA: ', $row['name']."<br>";
+	echo 'Tarifa ', $row['name']."<br>";
 }
 
 foreach ($plan as $row) {
 	
 	$planId = $row['id_plan'];
-	echo 'PLAN: ', $row['name']."<br>";
+	echo 'Plan ', $row['name']."<br>";
 }
 ?>
 
 <p>
-<table width="367" border="1">
+<table width="700" border="1">
   <tr>
     <td width="150">&nbsp;</td>
     <?php 
 	foreach ($roomTypes as $row) {
 	?>
-    <td width="150"><?php echo $row['name']; ?></td>
+    <td width="452"><?php echo $row['name']; ?></td>
     <?php
 	}
 	?>
@@ -51,7 +65,7 @@ foreach ($plan as $row) {
 		}
 	}
 	?>
-    <td width="45">Bs.F.</td>
+    <td width="76">Bs.F.</td>
   </tr>
   <tr>
     <td>Martes</td>
@@ -146,7 +160,6 @@ foreach ($plan as $row) {
 </table>
 </p>
 
-<?php
-echo anchor(base_url().'prices/editPrices/'.$seasonId.'/'.$rateId.'/'.$planId, 'Editar Precios');
-?>
+<p><a href="<?php echo base_url().'prices/editPrices/'.$seasonId.'/'.$rateId.'/'.$planId ?>">Editar Precios</a></p>
+<p><a href="<?php echo base_url().'prices/selectPlanPrices/'.$seasonId.'/'.$rateId?>">Volver</a></p>
 

@@ -3,41 +3,42 @@
 $this->load->view('pms/header'); 
 ?>
 
-<h3>Seleccione Temporada</h3>
+<h3>Precios</h3>
 
-	<table width="575" border="0">
+<?php 
+if ($roomTypes) {
+
+	if (($seasons) && ($rates) && ($plans)) {
+?>
+	<h4>Seleccione Temporada</h4>
+
 	  <?php
       foreach ($seasons as $row) { 
-      ?>    
-      <tr>
-		<td height="35">
-        <?php echo anchor(base_url().'prices/selectRatePrices/'.$row['id_season'], $row['name']);?></td> 
-        
-	    <td>
-		<?php 
+     
+	  echo anchor(base_url().'prices/selectRatePrices/'.$row['id_season'], $row['name'])."<br>";
+	  
 		$dS       = $row['dateStart'];
 		$dS_array = explode ('-',$dS);
 		$year     = $dS_array[0];
 		$month    = $dS_array[1];
 		$day      = $dS_array[2];
 		echo $day.'-'.$month.'-'.$year;
-		?>
-        </td>
-        
-        <td>
-		<?php 
+		echo ' al ';
 		$dE       = $row['dateEnd'];
 		$dE_array = explode ('-',$dE);
 		$year     = $dE_array[0];
 		$month    = $dE_array[1];
 		$day      = $dE_array[2];
 		echo $day.'-'.$month.'-'.$year;
-		?>
-        </td>
-      </tr>
-      <?php
+		echo "<br><br>";
 	  }
-	  ?>
-	</table>
+	 
+	} else {
+		echo 'Deben existir temporadas, tarifas y planes para agregar los precios.';
+	} 
+	
+} else {
+	echo 'Deben existir tipos de habitaciones para agregar los precios.';
+}
 
-
+?>

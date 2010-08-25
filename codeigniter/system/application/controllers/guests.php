@@ -51,8 +51,12 @@ class Guests extends Controller
 	
 	function infoGuestReservations($guestId)
 	{
-		//$order = $_POST["order"];
-		$order = 'checkIn DESC';
+		if (isset($_POST["order"])) {
+			$order = $_POST["order"];
+		}else {
+			$order = 'checkIn DESC';
+		}
+
 		$hotel = $this->session->userdata('hotelid');
 		
 		$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, null);
@@ -69,11 +73,13 @@ class Guests extends Controller
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$this->form_validation->set_rules('guest_name','lang:name','required|max_length[30]');
-		$this->form_validation->set_rules('guest_last_name','lang:last_name','required|max_length[30]');
-		$this->form_validation->set_rules('guest_telephone','lang:telephone','required|numeric|max_length[20]');
-		$this->form_validation->set_rules('guest_email','lang:email','required|valid_email|max_length[50]');
-		$this->form_validation->set_rules('guest_address','lang:address','max_length[300]');
+		$this->form_validation->set_rules('guest_name','lang:name','trim|xss_clean|required|max_length[30]');
+		$this->form_validation->set_rules('guest_name2','lang:name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_last_name','lang:last_name','trim|xss_clean|required|max_length[30]');
+		$this->form_validation->set_rules('guest_last_name2','lang:last_name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_telephone','lang:telephone','trim|xss_clean|required|numeric|max_length[20]');
+		$this->form_validation->set_rules('guest_email','lang:email','trim|xss_clean|required|valid_email|max_length[50]');
+		$this->form_validation->set_rules('guest_address','lang:address','trim|xss_clean|max_length[300]');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
@@ -86,14 +92,18 @@ class Guests extends Controller
 		} else {
 		
 			$guestName      = set_value('guest_name');
+			$guestName2     = set_value('guest_name2');
 			$guestLastName  = set_value('guest_last_name');
+			$guestLastName2 = set_value('guest_last_name2');
 			$guestTelephone = set_value('guest_telephone');
 			$guestEmail     = set_value('guest_email');
 			$guestAddress   = set_value('guest_address');
 			
 			$data = array(
 				'name'      => ucwords(strtolower($guestName)),
+				'name2'     => ucwords(strtolower($guestName2)),
 				'lastName'  => ucwords(strtolower($guestLastName)),
+				'lastName2' => ucwords(strtolower($guestLastName2)),
 				'telephone' => $guestTelephone,
 				'email'     => $guestEmail,
 				'address'   => $guestAddress

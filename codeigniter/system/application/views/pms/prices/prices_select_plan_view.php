@@ -26,9 +26,10 @@ if ($plans) {
 } else {
 
 	echo 'No existen planes'."<br><br>";
-	//echo anchor(base_url().'plans/addPlan/','Agregar Nuevo Plan')."<br><br>";
 }
 ?>
+
+<p><a href="<?php echo base_url().'prices/selectRatePrices/'.$seasonId?>">Volver</a></p>
 	
  
 
