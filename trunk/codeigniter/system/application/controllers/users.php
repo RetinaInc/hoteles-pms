@@ -97,14 +97,25 @@ class Users extends Controller
 		$userId = $this->session->userdata('userid');
 		$hotel = $this->session->userdata('hotelid');
 		
-		$userInfo  = $this->GNM->getInfo($hotel, 'USER',  'id_user',  $userId, null, null, null, 1);
-		$hotelInfo = $this->GNM->getInfo(null,   'HOTEL', 'id_hotel', $hotel,  null, null, null, 1);
-	
-		$data['userInfo']  = $userInfo;
-		$data['hotelInfo'] = $hotelInfo;
+		if ($userId) {
 		
-		$this->load->view('pms/main', $data);
+			$userInfo  = $this->GNM->getInfo($hotel, 'USER',  'id_user',  $userId, null, null, null, 1);
+			$hotelInfo = $this->GNM->getInfo(null,   'HOTEL', 'id_hotel', $hotel,  null, null, null, 1);
+		
+			$data['userInfo']  = $userInfo;
+			$data['hotelInfo'] = $hotelInfo;
+			
+			$this->load->view('pms/main', $data);
+			
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
+
+
+
 
 
 }

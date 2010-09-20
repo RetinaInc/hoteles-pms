@@ -8,7 +8,7 @@ class Prices_model extends Model
 	}
 	
 	
-	function getPriceInfo($season, $rate, $plan, $roomType)
+	function getPriceInfo($season, $rate, $plan, $roomType, $persType)
 	{
 		if ($season != null) {
 		
@@ -30,17 +30,28 @@ class Prices_model extends Model
   			$this->db->where('fk_room_type', $roomType);
   		}
 		
+		if ($persType != null) {
+		
+  			$this->db->where('persType', $persType);
+  		}
+		
 		$query = $this->db->get('PRICE');
 		return $query->result_array();
 	}
 	
 	
-	function updatePrice($season, $rate, $plan, $roomType, $data)
+	function updatePrice($season, $rate, $plan, $roomType, $persType, $data)
 	{
 		$this->db->where('fk_season', $season);
 		$this->db->where('fk_rate', $rate);
 		$this->db->where('fk_plan', $plan);
-		$this->db->where('fk_room_type', $roomType);
+		$this->db->where('persType', $persType);
+		
+		if ($roomType != null) {
+		
+  			$this->db->where('fk_room_type', $roomType);
+  		}
+		
 		$this->db->update('PRICE', $data);
 	}
 	

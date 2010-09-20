@@ -18,27 +18,47 @@ class Plans extends Controller
 	
 	function viewPlans()
 	{
-		$hotel = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			$hotel = $this->session->userdata('hotelid');
+				
+			$plans    = $this->GNM->getInfo($hotel, 'PLAN', null,      null, null, null, null, 1);
+			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
 			
-		$plans    = $this->GNM->getInfo($hotel, 'PLAN', null,      null, null, null, null, 1);
-		$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+			$data['plans'] = $plans;
+			$data['plansDis'] = $plansDis;
+			
+			$this->load->view('pms/plans/plans_view', $data);
 		
-		$data['plans'] = $plans;
-		$data['plansDis'] = $plansDis;
-		
-		$this->load->view('pms/plans/plans_view', $data);
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function viewDisabledPlans()
 	{
-	    $hotel = $this->session->userdata('hotelid');
-	
-		$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+		$userId = $this->session->userdata('userid');
 		
-		$data['plansDis'] = $plansDis;
+		if ($userId) {
 		
-		$this->load->view('pms/plans/plans_disabled_view', $data);
+			$hotel = $this->session->userdata('hotelid');
+		
+			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+			
+			$data['plansDis'] = $plansDis;
+			
+			$this->load->view('pms/plans/plans_disabled_view', $data);
+			
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
@@ -51,7 +71,17 @@ class Plans extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$this->load->view('pms/plans/plan_add_view');
+			$userId = $this->session->userdata('userid');
+		
+			if ($userId) {
+		
+				$this->load->view('pms/plans/plan_add_view');
+			
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -80,11 +110,21 @@ class Plans extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 			
-		    $plan = $this->GNM->getInfo($hotel, 'PLAN','id_plan', $planId, null, null, null, 1);
-			
-			$data['plan'] = $plan;
+			$userId = $this->session->userdata('userid');
 		
-			$this->load->view('pms/plans/plan_edit_view', $data);
+			if ($userId) {
+			
+				$plan = $this->GNM->getInfo($hotel, 'PLAN','id_plan', $planId, null, null, null, 1);
+				
+				$data['plan'] = $plan;
+			
+				$this->load->view('pms/plans/plan_edit_view', $data);
+				
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -105,21 +145,40 @@ class Plans extends Controller
 	
 	function disablePlan($planId)
 	{
-		$this->GNM->disable('PLAN', 'id_plan', $planId); 
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewPlans(); 	
+		if ($userId) {
+
+			$this->GNM->disable('PLAN', 'id_plan', $planId); 
+			$this->viewPlans(); 
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}	
 	}
 	
 	
 	function enablePlan($planId)
 	{
-		$data = array(
-				'disable' => 1
-				);
-			
-		$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewPlans(); 	
+		if ($userId) {
+		
+			$data = array(
+					'disable' => 1
+					);
+				
+			$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
+			
+			$this->viewPlans(); 	
+			
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	

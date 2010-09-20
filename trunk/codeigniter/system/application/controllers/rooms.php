@@ -26,125 +26,185 @@ class Rooms extends Controller
 	
 	function viewRooms()
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'number';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+			
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'number';
+			}
+			
+			$hotel = $this->session->userdata('hotelid');
+		
+			$rooms             = $this->ROM->getRoomInfo($hotel, null, null, $order, null, null, 1);
+			$roomsCount        = $this->ROM->getRoomCount($hotel, null,     null,             null, null, 1);
+			$roomsCountRunning = $this->ROM->getRoomCount($hotel, 'status', 'Running',        null, null, 1);
+			$roomsCountOos     = $this->ROM->getRoomCount($hotel, 'status', 'Out of service', null, null, 1);
+			$roomTypes         = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+			
+			$data['rooms']             = $rooms;
+			$data['roomsCount']        = $roomsCount;
+			$data['roomsCountOos']     = $roomsCountOos;
+			$data['roomsCountRunning'] = $roomsCountRunning;
+			$data['roomTypes']         = $roomTypes;
+			
+			$this->load->view('pms/rooms/rooms_view', $data);
+		
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-		
-		$hotel = $this->session->userdata('hotelid');
-	
-		$rooms             = $this->ROM->getRoomInfo($hotel, null, null, $order, null, null, 1);
-		$roomsCount        = $this->ROM->getRoomCount($hotel, null,     null,             null, null, 1);
-		$roomsCountRunning = $this->ROM->getRoomCount($hotel, 'status', 'Running',        null, null, 1);
-		$roomsCountOos     = $this->ROM->getRoomCount($hotel, 'status', 'Out of service', null, null, 1);
-		$roomTypes         = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
-		
-		$data['rooms']             = $rooms;
-		$data['roomsCount']        = $roomsCount;
-		$data['roomsCountOos']     = $roomsCountOos;
-		$data['roomsCountRunning'] = $roomsCountRunning;
-		$data['roomTypes']         = $roomTypes;
-		
-		$this->load->view('pms/rooms/rooms_view', $data);
 	}
 	
 	
 	function viewRoomTypes()
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'paxStd';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'paxStd';
+			}
+			
+			$hotel = $this->session->userdata('hotelid');
+			
+			$roomTypes      = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, $order, null, null, 1);
+			$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', null, null, null, null, 1);
+			$roomTypesDis   = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
+			
+			$data['roomTypes']      = $roomTypes;
+			$data['roomTypesCount'] = $roomTypesCount;
+			$data['roomTypesDis']   = $roomTypesDis;
+			
+			$this->load->view('pms/rooms/room_types_view', $data);
+		
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-		
-		$hotel = $this->session->userdata('hotelid');
-		
-		$roomTypes      = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, $order, null, null, 1);
-		$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', null, null, null, null, 1);
-		$roomTypesDis   = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
-		
-		$data['roomTypes']      = $roomTypes;
-		$data['roomTypesCount'] = $roomTypesCount;
-		$data['roomTypesDis']   = $roomTypesDis;
-		
-		$this->load->view('pms/rooms/room_types_view', $data);
 	}
 	
 	
 	function viewDisabledRoomTypes()
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'paxStd';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'paxStd';
+			}
+	
+			$hotel = $this->session->userdata('hotelid');
+			
+			$roomTypes      = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
+			$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', 'disable', '0', null, null, null);
+			
+			$data['roomTypes']      = $roomTypes;
+			$data['roomTypesCount'] = $roomTypesCount;
+			
+			$this->load->view('pms/rooms/room_types_disabled_view', $data);
+		
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-
-		$hotel = $this->session->userdata('hotelid');
-		
-		$roomTypes      = $this->GNM->getInfo($hotel,  'ROOM_TYPE', 'disable', '0', $order, null, null, null);
-		$roomTypesCount = $this->GNM->getCount($hotel, 'ROOM_TYPE', 'disable', '0', null, null, null);
-		
-		$data['roomTypes']      = $roomTypes;
-		$data['roomTypesCount'] = $roomTypesCount;
-		
-		$this->load->view('pms/rooms/room_types_disabled_view', $data);
 	}
 	
 	
 	function infoRoom($roomId)
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'checkIn';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'checkIn';
+			}
+			
+			$hotel = $this->session->userdata('hotelid');
+			
+			$room             = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
+			$roomReservations = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, $order);
+			
+			$data['room']             = $room;
+			$data['roomReservations'] = $roomReservations;
+			
+			$this->load->view('pms/rooms/room_info_view', $data);
+			
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-		
-		$hotel = $this->session->userdata('hotelid');
-		
-		$room             = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
-		$roomReservations = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, $order);
-		
-		$data['room']             = $room;
-		$data['roomReservations'] = $roomReservations;
-		
-		$this->load->view('pms/rooms/room_info_view', $data);
 	}
 	
 	
 	function infoRoomType($roomTypeId)
 	{
-		$hotel = $this->session->userdata('hotelid');
-			
-		$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
-		$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
-		$roomTypeRoomCount        = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId,  null,  null, null);
-		$roomTypeRoomCountRunning = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Running', null);
-		$roomTypeRoomCountOos     = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Out of service', null);
-		$roomTypeReservations     = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, 'RE.checkIn DESC');
-	
-		$data['roomType']       = $roomType;
-		$data['roomTypeImages'] = $roomTypeImages;
-		$data['roomTypeRoomCount']        = $roomTypeRoomCount;
-		$data['roomTypeRoomCountRunning'] = $roomTypeRoomCountRunning;
-		$data['roomTypeRoomCountOos']     = $roomTypeRoomCountOos;
-		$data['roomTypeReservations']     = $roomTypeReservations;
+		$userId = $this->session->userdata('userid');
 		
-		$this->load->view('pms/rooms/room_type_info_view', $data);
+		if ($userId) {
+		
+			$hotel = $this->session->userdata('hotelid');
+				
+			$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
+			$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
+			$roomTypeRoomCount        = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId,  null,  null, null);
+			$roomTypeRoomCountRunning = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Running', null);
+			$roomTypeRoomCountOos     = $this->ROM->getRoomCount($hotel, 'fk_room_type', $roomTypeId, 'status', 'Out of service', null);
+			$roomTypeReservations     = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, 'RE.checkIn DESC');
+		
+			$data['roomType']       = $roomType;
+			$data['roomTypeImages'] = $roomTypeImages;
+			$data['roomTypeRoomCount']        = $roomTypeRoomCount;
+			$data['roomTypeRoomCountRunning'] = $roomTypeRoomCountRunning;
+			$data['roomTypeRoomCountOos']     = $roomTypeRoomCountOos;
+			$data['roomTypeReservations']     = $roomTypeReservations;
+			
+			$this->load->view('pms/rooms/room_type_info_view', $data);
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function imagesRoomType($roomTypeId)
 	{
-		$hotel = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			$hotel = $this->session->userdata('hotelid');
+				
+			$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
+			$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
 			
-		$roomType                 = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, null);
-		$roomTypeImages           = $this->GNM->getInfo($hotel, 'IMAGE',     'fk_room_type', $roomTypeId, null, null, null, null);
-		
-		$data['roomType']       = $roomType;
-		$data['roomTypeImages'] = $roomTypeImages;
-		
-		$this->load->view('pms/rooms/room_type_images_view', $data);
+			$data['roomType']       = $roomType;
+			$data['roomTypeImages'] = $roomTypeImages;
+			
+			$this->load->view('pms/rooms/room_type_images_view', $data);
+			
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
@@ -157,15 +217,25 @@ class Rooms extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$hotel = $this->session->userdata('hotelid');
+			$userId = $this->session->userdata('userid');
+		
+			if ($userId) {
 			
-			$maxRoomNumber = $this->ROM->getMaxRoomNumber($hotel);
-			$roomTypes     = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
-		
-			$data['maxRoomNumber'] = $maxRoomNumber;
-			$data['roomTypes']     = $roomTypes;
-		
-			$this->load->view('pms/rooms/room_add_view', $data);
+				$hotel = $this->session->userdata('hotelid');
+				
+				$maxRoomNumber = $this->ROM->getMaxRoomNumber($hotel);
+				$roomTypes     = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+			
+				$data['maxRoomNumber'] = $maxRoomNumber;
+				$data['roomTypes']     = $roomTypes;
+			
+				$this->load->view('pms/rooms/room_add_view', $data);
+				
+			} else {
+			
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -201,10 +271,18 @@ class Rooms extends Controller
 			
 		if ($this->form_validation->run() == FALSE) {
 		
-			$error = NULL;
-			$data['error'] = $error;
+			$userId = $this->session->userdata('userid');
+		
+			if ($userId) {
 			
-			$this->load->view('pms/rooms/room_type_add_view', $data);
+				$data['error'] = NULL;
+				$this->load->view('pms/rooms/room_type_add_view', $data);
+			
+			} else {
+			
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -250,61 +328,82 @@ class Rooms extends Controller
 	
 	
 	function addRoomTypeImage($roomTypeId)
-	{	
-		$hotel = $this->session->userdata('hotelid');
+	{
+		$userId = $this->session->userdata('userid');
 		
-		$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
-		$error = 1;
+		if ($userId) {
+	
+			$hotel = $this->session->userdata('hotelid');
 			
-		$data['roomType'] = $roomType;
-		$data['error'] = $error;
+			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+			$error = 1;
+				
+			$data['roomType'] = $roomType;
+			$data['error'] = $error;
+			
+			$this->load->view('pms/rooms/room_type_add_image_view', $data);
 		
-		$this->load->view('pms/rooms/room_type_add_image_view', $data);
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
+	
 	
 	function addRoomTypeImage2($roomTypeId)
 	{	
-		$hotel = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
 		
-		$config['upload_path'] = './assets/images/';
-		$config['allowed_types'] = 'gif|jpg|png';
-		$config['max_size']	= '0';
-		$config['max_width']  = '0';
-		$config['max_height']  = '0';
+		if ($userId) {
 		
-		$this->load->library('upload', $config);
-		
-		if ( ! $this->upload->do_upload())
-		{
 			$hotel = $this->session->userdata('hotelid');
-		
-			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 			
-			$data = array('error' => $this->upload->display_errors());
-			$data['roomType'] = $roomType;
-
-			$this->load->view('pms/rooms/room_type_add_image_view', $data);
-		}	
-		else
-		{
-			$data = array('upload_data' => $this->upload->data());
+			$config['upload_path'] = './assets/images/';
+			$config['allowed_types'] = 'gif|jpg|png';
+			$config['max_size']	= '0';
+			$config['max_width']  = '0';
+			$config['max_height']  = '0';
 			
-			foreach ($data as $row) {
+			$this->load->library('upload', $config);
 			
-				$fullPath = $row['full_path'];
-				$fileName = $row['file_name'];
-				$fileExt = $row['file_ext'];
+			if ( ! $this->upload->do_upload())
+			{
+				$hotel = $this->session->userdata('hotelid');
+			
+				$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+				
+				$data = array('error' => $this->upload->display_errors());
+				$data['roomType'] = $roomType;
+	
+				$this->load->view('pms/rooms/room_type_add_image_view', $data);
+			}	
+			else
+			{
+				$data = array('upload_data' => $this->upload->data());
+				
+				foreach ($data as $row) {
+				
+					$fullPath = $row['full_path'];
+					$fileName = $row['file_name'];
+					$fileExt = $row['file_ext'];
+				}
+				
+				$data = array(
+					'image'        => $fileName,
+					'fk_hotel'     => $hotel,
+					'fk_room_type' => $roomTypeId
+					);
+				
+				$this->GNM->insert('IMAGE', $data);  
+					
+				$this->infoRoomType($roomTypeId); 
 			}
 			
-			$data = array(
-				'image'        => $fileName,
-				'fk_hotel'     => $hotel,
-				'fk_room_type' => $roomTypeId
-				);
-			
-			$this->GNM->insert('IMAGE', $data);  
-				
-			$this->infoRoomType($roomTypeId); 
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
 
 	}
@@ -344,14 +443,24 @@ class Rooms extends Controller
 		$this->form_validation->set_rules('room_room_type','lang:room_type','trim|xss_clean|required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
+			
+			$userId = $this->session->userdata('userid');
 		
-			$room      = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
-		
-			$data['room']      = $room;
-			$data['roomTypes'] = $roomTypes;
-		
-			$this->load->view('pms/rooms/room_edit_view', $data);
+			if ($userId) {
+
+				$room      = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+			
+				$data['room']      = $room;
+				$data['roomTypes'] = $roomTypes;
+			
+				$this->load->view('pms/rooms/room_edit_view', $data);
+			
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -387,13 +496,23 @@ class Rooms extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
-			$error = NULL;
-			
-			$data['error'] = $error;
-			$data['roomType'] = $roomType;
-			
-			$this->load->view('pms/rooms/room_type_edit_view', $data);
+			$userId = $this->session->userdata('userid');
+		
+			if ($userId) {
+	
+				$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+				$error = NULL;
+				
+				$data['error'] = $error;
+				$data['roomType'] = $roomType;
+				
+				$this->load->view('pms/rooms/room_type_edit_view', $data);
+				
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -445,105 +564,135 @@ class Rooms extends Controller
 	
 	function deleteRoom($roomId)
 	{
-		$hotel  = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
 		
-		$roomReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, null);
-		
-		$datestring = "%Y-%m-%d  %h:%i %a";
-		$time       = time();
-		$date       = mdate($datestring, $time);
-		
-		$delete    = 'Yes';
-		$iniResNum = array();
-		
-		foreach ($roomReservation as $row) {
-		
-		 	$resNum   = $row['id_reservation'];
-			$checkIn  = $row['checkIn'];
-			$checkOut = $row['checkOut'];
-			$status   = $row['status'];
+		if ($userId) {
+
+			$hotel  = $this->session->userdata('hotelid');
 			
-			if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')){
+			$roomReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, null);
 			
-                $delete = 'No';
+			$datestring = "%Y-%m-%d  %h:%i %a";
+			$time       = time();
+			$date       = mdate($datestring, $time);
+			
+			$delete    = 'Yes';
+			$iniResNum = array();
+			
+			foreach ($roomReservation as $row) {
+			
+				$resNum   = $row['id_reservation'];
+				$checkIn  = $row['checkIn'];
+				$checkOut = $row['checkOut'];
+				$status   = $row['status'];
 				
-				$newResNum = array ($resNum);
-				$resultado = array_merge($iniResNum, $newResNum);
-				$iniResNum = $resultado;
+				if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')){
+				
+					$delete = 'No';
+					
+					$newResNum = array ($resNum);
+					$resultado = array_merge($iniResNum, $newResNum);
+					$iniResNum = $resultado;
+				}
 			}
-		}
-		
-		if ($delete == 'No') {
-		
-			echo lang("errorPendingReservation")."<br>";
-			foreach ($resultado as $actual)
-    		echo '# ', $actual . "<br>";
-			$this->infoRoom($roomId);
 			
-		} else {
+			if ($delete == 'No') {
+			
+				echo lang("errorPendingReservation")."<br>";
+				foreach ($resultado as $actual)
+				echo '# ', $actual . "<br>";
+				$this->infoRoom($roomId);
+				
+			} else {
+			
+				$this->GNM->disable('ROOM', 'id_room', $roomId);  
+				$this->viewRooms(); 
+			}	
 		
-			$this->GNM->disable('ROOM', 'id_room', $roomId);  
-			$this->viewRooms(); 
-		}	
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function disableRoomType($roomTypeId)
 	{
-		$hotel  = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
 		
-		$roomTypeReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, null);
+		if ($userId) {
 		
-		$datestring = "%Y-%m-%d  %h:%i %a";
-		$time       = time();
-		$date       = mdate($datestring, $time);
-		
-		$delete    = 'Yes';
-		$iniResNum = array();
-		
-		foreach ($roomTypeReservation as $row) {
-		
-			$resNum   = $row['id_reservation'];
-			$checkIn  = $row['checkIn'];
-			$checkOut = $row['checkOut'];
-			$status   = $row['status'];
+			$hotel  = $this->session->userdata('hotelid');
 			
-			if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')) {
+			$roomTypeReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, null);
+			
+			$datestring = "%Y-%m-%d  %h:%i %a";
+			$time       = time();
+			$date       = mdate($datestring, $time);
+			
+			$delete    = 'Yes';
+			$iniResNum = array();
+			
+			foreach ($roomTypeReservation as $row) {
+			
+				$resNum   = $row['id_reservation'];
+				$checkIn  = $row['checkIn'];
+				$checkOut = $row['checkOut'];
+				$status   = $row['status'];
 				
-				$delete = 'No';
-				
-				$newResNum = array ($resNum);
-				$resultado = array_merge($iniResNum, $newResNum);
-				$iniResNum = $resultado;
+				if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')) {
+					
+					$delete = 'No';
+					
+					$newResNum = array ($resNum);
+					$resultado = array_merge($iniResNum, $newResNum);
+					$iniResNum = $resultado;
+				}
 			}
-		}
-		
-		if ($delete == 'No') {
-		
-			echo lang("errorPendingReservation")."<br>";
-			foreach ($resultado as $actual)
-    		echo '# ', $actual . "<br>"; 
-			$this->infoRoomType($roomTypeId);
 			
-		} else {
+			if ($delete == 'No') {
+			
+				echo lang("errorPendingReservation")."<br>";
+				foreach ($resultado as $actual)
+				echo '# ', $actual . "<br>"; 
+				$this->infoRoomType($roomTypeId);
+				
+			} else {
+			
+				$this->GNM->disable('ROOM_TYPE', 'id_room_type', $roomTypeId); 
+				$this->GNM->disable('ROOM',      'fk_room_type', $roomTypeId);   
+				$this->viewRoomTypes(); 
+			}	
 		
-			$this->GNM->disable('ROOM_TYPE', 'id_room_type', $roomTypeId); 
-			$this->GNM->disable('ROOM',      'fk_room_type', $roomTypeId);   
-			$this->viewRoomTypes(); 
-		}	
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function enableRoomType($roomTypeId)
 	{
-		$data = array(
-				'disable' => 1
-				);
-			
-		$this->GNM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data); 
-		$this->GNM->update('ROOM',      'fk_room_type', $roomTypeId, $data);   
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewRoomTypes(); 	
+		if ($userId) {
+		
+			$data = array(
+					'disable' => 1
+					);
+				
+			$this->GNM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data); 
+			$this->GNM->update('ROOM',      'fk_room_type', $roomTypeId, $data);   
+			
+			$this->viewRoomTypes(); 
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}	
 	}
 	
 	

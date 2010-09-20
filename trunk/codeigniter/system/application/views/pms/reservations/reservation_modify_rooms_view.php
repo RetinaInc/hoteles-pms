@@ -4,9 +4,9 @@
 
 $this->load->view('pms/header'); 
 
-foreach ($reservationRooms as $row) {
+foreach ($roomReservationInfo as $row) {
 
-	if ($row['id_reservation'] == $reservationId) {
+	if ($row['id_room'] == $roomId) {
 		
 		$fullCheckIn   = $row['checkIn'];
 		$checkIn_array = explode (' ', $fullCheckIn);
@@ -30,15 +30,18 @@ foreach ($reservationRooms as $row) {
 		echo 'Check-In: ', $ci."<br>";
 		echo 'Check-Out: ', $co."<br>";
 		echo 'Habitación # '.$row['number'].' ('.$row['abrv'].')'."<br><br>";
-		$roomId   = $row['id_room'];
-		$roomAbrv = $row['rtname'];
-		$roomType = $row['id_room_type'];
+		
+		$roomId        = $row['id_room'];
+		$roomTypeId    = $row['id_room_type'];
+		$roomTypeAbrv  = $row['abrv'];
+		$roomTypeName  = $row['rtname'];
+		$reservationId = $row['id_reservation'];
 	}	
 }	
 
 if ($availableType) {
 
-	echo 'Otras habitaciones tipo "'.$row['rtname'].'" disponibles: '."<br><br>";	
+	echo 'Otras habitaciones tipo "'.$roomTypeName.'" disponibles: '."<br><br>";	
 	
 	foreach ($availableType as $row) {?>
     
@@ -47,7 +50,7 @@ if ($availableType) {
 	
 } else {
 
-	echo 'No hay otras habitaciones tipo "'.$row['rtname'].'" disponibles!';	
+	echo 'No hay otras habitaciones tipo "'.$roomTypeName.'" disponibles!';	
 }
 
 
@@ -55,21 +58,52 @@ if ($availableOther) {
 
 	echo "<br><br><br>".'Otros tipos de habitaciones disponibles: ';
 
-    foreach ($roomTypes as $row) {
-	
-        if ($row['id_room_type'] != $roomType) echo "<br><br>".$row['name'].': ';
+	 foreach ($roomTypes as $row) {
+	 
+	 	$availableType = 'No';
 	 
 		foreach ($availableOther as $row1) {
 			
-			if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomType)) {
+			if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomTypeId)) {
+			
+			    $availableType = 'Yes';
+			}
+		}
+		
+		if ($availableType == 'Yes') {
+			
+			foreach ($availableOther as $row1) {
+				
+				if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomTypeId)) {
+				
+					echo $row['name'].': ';
+					?>&nbsp;<a href="<?php echo base_url().'reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row1['id_room']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row1['number'];?> </a>&nbsp;<?php
+				}
+			}
+		}
+		
+		echo "<br><br>";
+		
+ 	}
+	
+	/*
+    foreach ($roomTypes as $row) {
+	
+        if ($row['id_room_type'] != $roomTypeId) echo "<br><br>".$row['name'].': ';
+	 
+		foreach ($availableOther as $row1) {
+			
+			if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomTypeId)) {
 			
 			    ?>&nbsp;<a href="<?php echo base_url().'reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row1['id_room']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row1['number'];?> </a>&nbsp;<?php
 			}
 		}
  	}
+	*/
+	
 } else {
 
-	echo "<br><br>".'NO HAY OTROS TIPOS DE HABITACIONES DISPONIBLES'."<br><br>";
+	echo "<br><br>".'No hay otros tipos de habitaciones disponibles'."<br><br>";
 }
 
 

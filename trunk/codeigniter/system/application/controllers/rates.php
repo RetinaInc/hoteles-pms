@@ -17,54 +17,84 @@ class Rates extends Controller
 	
 	function viewRates()
 	{
-		$hotel = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
 		
-		$rates    = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
-		$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+		if ($userId) {
 		
-		$data['rates'] = $rates;
-		$data['ratesDis'] = $ratesDis;
+			$hotel = $this->session->userdata('hotelid');
+			
+			$rates    = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+			$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+			
+			$data['rates'] = $rates;
+			$data['ratesDis'] = $ratesDis;
+			
+			$this->load->view('pms/rates/rates_view', $data);
+			
+		} else {
 		
-		$this->load->view('pms/rates/rates_view', $data);
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function viewDisabledRates()
 	{
-	    $hotel = $this->session->userdata('hotelid');
-	
-		$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+		$userId = $this->session->userdata('userid');
 		
-		$data['ratesDis'] = $ratesDis;
+		if ($userId) {
 		
-		$this->load->view('pms/rates/rates_disabled_view', $data);
+			$hotel = $this->session->userdata('hotelid');
+		
+			$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+			
+			$data['ratesDis'] = $ratesDis;
+			
+			$this->load->view('pms/rates/rates_disabled_view', $data);
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
 	function addRate()
-	{
+	{	
 		$hotel = $this->session->userdata('hotelid');
-		
+			
 		$this->form_validation->set_rules('rate_name', 'lang:name', 'trim|xss_clean|required|max_length[100]|callback_checkRateName');
 		$this->form_validation->set_rules('rate_description', 'lang:description', 'trim|xss_clean|max_length[300]');
-		
-		if ($this->form_validation->run() == FALSE) {
-		
-			$this->load->view('pms/rates/rate_add_view');
 			
-		} else {
+		if ($this->form_validation->run() == FALSE) {
+			
+			$userId = $this->session->userdata('userid');
 		
+			if ($userId) {
+			
+				$this->load->view('pms/rates/rate_add_view');
+			
+			} else {
+			
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
+				
+		} else {
+			
 			$rateName        = set_value('rate_name');
 			$rateDescription = set_value('rate_description');
-			
-			$data = array(
-				  'name'        => ucwords(strtolower($rateName)),
-				  'description' => $rateDescription,
-				  'fk_hotel'    => $hotel
-				   );
-			
-			$this->GNM->insert('RATE', $data);  
 				
+			$data = array(
+				'name'        => ucwords(strtolower($rateName)),
+				'description' => $rateDescription,
+				'fk_hotel'    => $hotel
+					);
+				
+			$this->GNM->insert('RATE', $data);  
+					
 			$this->viewRates(); 
 		}	
 	}
@@ -77,13 +107,23 @@ class Rates extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$hotel = $this->session->userdata('hotelid');
-			
-			$rate = $this->GNM->getInfo($hotel, 'RATE', 'id_rate', $rateId, null, null, null, 1);
-			
-			$data['rate'] = $rate;
+			$userId = $this->session->userdata('userid');
 		
-			$this->load->view('pms/rates/rate_edit_view', $data);
+			if ($userId) {
+		
+				$hotel = $this->session->userdata('hotelid');
+				
+				$rate = $this->GNM->getInfo($hotel, 'RATE', 'id_rate', $rateId, null, null, null, 1);
+				
+				$data['rate'] = $rate;
+			
+				$this->load->view('pms/rates/rate_edit_view', $data);
+				
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -104,21 +144,40 @@ class Rates extends Controller
 	
 	function disableRate($rateId)
 	{
-		$this->GNM->disable('RATE', 'id_rate', $rateId); 
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewRates(); 	
+		if ($userId) {
+		
+			$this->GNM->disable('RATE', 'id_rate', $rateId); 
+			$this->viewRates(); 
+		
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}	
 	}
 	
 	
 	function enableRate($rateId)
 	{
-		$data = array(
-				'disable' => 1
-				);
-			
-		$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewRates(); 	
+		if ($userId) {
+		
+			$data = array(
+					'disable' => 1
+					);
+				
+			$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
+			
+			$this->viewRates(); 
+				
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	

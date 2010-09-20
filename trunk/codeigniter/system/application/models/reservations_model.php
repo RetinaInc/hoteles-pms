@@ -25,34 +25,47 @@ class Reservations_model extends Model
 			$this->db->where('RE.disable', 1);
 		}
 
-		$this->db->select('DISTINCT(RE.id_reservation), RE.resDate, RE.status, RE.checkIn, RE.checkOut, RE.total, RE.details, RE.paymentStat, RE.billingStat, RE.fk_guest, (G.lastName)gLname');
+		$this->db->select('DISTINCT(RE.id_reservation), RE.resDate, RE.status, RE.checkIn, RE.checkOut, RE.details, RE.paymentStat, RE.billingStat, RE.fk_rate, RE.fk_plan, RE.fk_guest, (G.lastName)gLname');
+		$this->db->select('RATE.name as ratename');
+		$this->db->select('PLAN.name as planname');
 		$this->db->where('RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type and RE.fk_guest = G.id_guest');
 		$this->db->where('RT.fk_hotel', $hotel);
+		$this->db->join('RATE','RATE.id_rate = RE.fk_rate','left'); 
+		$this->db->join('PLAN','PLAN.id_plan = RE.fk_plan','left'); 
 	
 		$query = $this->db->get('RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT, GUEST G', $lim1, $lim2);
 		return $query->result_array();
 	}
 	
 	
-	
-	/*
-	function getRoomReservations($hotel, $field, $value, $order)
+	function getPaymentInfo($hotel, $field, $value, $reservationId)
 	{
 		if ($field != null and $value != null) {
+		
   			$this->db->where($field, $value);
   		}
+	
+		$this->db->select('DISTINCT(PA.id_payment), PA.*');
+		$this->db->where('PA.fk_reservation', $reservationId);
+		$this->db->where('PA.fk_reservation = RE.id_reservation and RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.fk_hotel', $hotel);
+		$query = $this->db->get('PAYMENT PA, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
+		return $query->result_array();
+	}
+	
+	
+	/* OJOOO!!!
+	function updateRR($hotel, $field1, $value1, $field2, $value2, $data)
+	{
+		if ($field2 != null and $value2 != null) {
 		
-		if ($order != null) {
-  			$this->db->order_by($order);
+  			$this->db->where($field2, $value2);
   		}
 		
-		$this->db->select('RT.id_room_type, RT.abrv, (RT.name)rtname, RT.description, RO.id_room, RO.number, (RO.name)rname, RR.adults, RR.children, RE.id_reservation, (RE.status)restatus, RE.checkIn, RE.checkOut, RE.fk_guest');
-		$this->db->from('ROOM_TYPE RT, ROOM RO, ROOM_RESERVATION RR, RESERVATION RE');
-		$this->db->where('RT.id_room_type = RO.fk_room_type AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation');
+		$this->db->where($field1, $value1);
+		$this->db->where('RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
-		
-		$query = $this->db->get();
-		return $query->result_array();
+		$this->db->update('ROOM_RESERVATION', $data);
 	}
 	*/
 	

@@ -1,4 +1,38 @@
 <head>
+
+<script type="text/javascript" src="<?php echo base_url()."assets/js/jquery-1.3.2.min.js" ?>"></script>
+
+<script type="text/javascript">
+
+	$(function(){
+		
+		<?php 
+		if ($type == 'hasWeekdays') {
+		?>
+			$('#noWeekdays').hide();
+			$('#hasWeekdays').show();
+		<?php
+		} else {
+		?>
+			$('#hasWeekdays').hide();
+			$('#noWeekdays').show();
+		<?php
+		}
+		?>
+		
+		$('#noWeekdays a').click(function(){
+				$('#noWeekdays').hide();
+				$('#hasWeekdays').show();
+		});
+		
+		$('#hasWeekdays a').click(function(){
+				$('#hasWeekdays').hide();
+				$('#noWeekdays').show();
+		});
+	});
+
+</script>
+
 <SCRIPT TYPE="text/javascript">
 <!--
 // copyright 1999 Idocs, Inc. http://www.idocs.com
@@ -86,121 +120,126 @@ foreach ($plan as $row) {
 	$planId = $row['id_plan'];
 	echo 'Plan ', $row['name']."<br>";
 }
-
-echo form_open(base_url().'prices/addPrices2/'.$seasonId.'/'.$rateId.'/'.$planId);
 ?>
-<p>Precio único:
-<input name="un_price" type="text" id="un_price" value="<?php echo set_value('un_price'); ?>" onKeyPress="return numbersonly(this, event)" size="12" maxlength="12"/> 
-	Bs.F.</p>
- 
-<p>Precio por día (Si se deja en blanco se tomará el precio único para ese día):</p>
-<table width="400" border="1">
-  <tr>
-    <td width="69">&nbsp;</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	?>
-    <td width="315"><?php echo $row['name']; ?></td>
-    <?php
-	}
-	?>
-  </tr>
-  <tr>
-    <td>Lunes</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="mon_price<?php echo $roomTypeId?>" type="text" id="mon_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('mon_price'.$roomTypeId); ?>"/>    
-    </td>
-    <?php
-	}
-	?>
-  	<td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Martes</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td><input name="tue_price<?php echo $roomTypeId?>" type="text" id="tue_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('tue_price'.$roomTypeId); ?>"/></td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Miércoles</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="wed_price<?php echo $roomTypeId?>" type="text" id="wed_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('wed_price'.$roomTypeId); ?>"/>    </td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Jueves</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="thu_price<?php echo $roomTypeId?>" type="text" id="thu_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('thu_price'.$roomTypeId); ?>"/>    </td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Viernes</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="fri_price<?php echo $roomTypeId?>" type="text" id="fri_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('fri_price'.$roomTypeId); ?>"/>    </td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Sábado</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="sat_price<?php echo $roomTypeId?>" type="text" id="sat_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('sat_price'.$roomTypeId); ?>"/>    </td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-  <tr>
-    <td>Domingo</td>
-    <?php 
-	foreach ($roomTypes as $row) {
-	$roomTypeId = $row['id_room_type'];
-	?>
-	<td>
-    <input name="sun_price<?php echo $roomTypeId?>" type="text" id="sun_price<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" maxlength="12" value="<?php echo set_value('sun_price'.$roomTypeId); ?>"/>    </td>
-    <?php
-	}
-	?>
-    <td>Bs.F.</td>
-  </tr>
-</table>
+
+<div id="noWeekdays">
+<?php
+$attributesPN = array('id' => 'perNight');
+echo form_open(base_url().'prices/addPricesPerNight/'.$seasonId.'/'.$rateId.'/'.$planId, $attributesPN);
+?>
 <br />
+Precio por noche:
+<br />
+ <table width="295" border="1">
+  <tr>
+    <td width="163">Tipo de Hab</td>
+    <td width="72">Precio</td>
+    <td width="38">&nbsp;</td>
+  </tr>
+   <?php 
+	foreach ($roomTypes as $row) {
+	$roomTypeId = $row['id_room_type'];
+	?>
+    <tr>
+    	<td width="163"><?php echo '* '.$row['name']; ?></td>
+    	<td>
+    	<input name="pricepn<?php echo $roomTypeId?>" type="text" id="pricepn<?php echo $roomTypeId?>" onKeyPress="return numbersonly(this, event)" value="<?php echo set_value('pricepn'.$roomTypeId); ?>" size="12" maxlength="12"/>    	</td>
+   	    <td>Bs.F.</td>
+    </tr>
+   
+    <?php
+	}
+	?>
+  <tr>
+    <td width="163"><strong>Niños</strong></td>
+    <td width="72"><input name="pricepn_children" type="text" id="pricepn_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('pricepn_children'); ?>" size="12" maxlength="12"/>    </td>
+    <td width="38">Bs.F.</td>
+  </tr>
+  <tr>
+   	<td width="163"><strong>3era edad</strong></td>
+    <td>
+    	<input name="pricepn_seniors" type="text" id="pricepn_seniors" onKeyPress="return numbersonly(this, event)" value="<?php echo set_value('pricepn_seniors'); ?>" size="12" maxlength="12"/>    	</td>
+   	<td>Bs.F.</td>
+   </tr>
+</table>
+
+<br />
+<a href="#">Agregar precios según día</a>
+<br /><br />
 <?php
 echo form_submit('sumit', 'Enviar');
 echo form_close();
 ?>
+</div>
+
+<div id="hasWeekdays">
+<?php
+$attributesED = array('id' => 'eachDay');
+echo form_open(base_url().'prices/addPricesEachDay/'.$seasonId.'/'.$rateId.'/'.$planId, $attributesED);
+?> 
+<br />
+Precio por noche según el día:
+<br />
+<table width="929" border="1">
+  <tr>
+    <td width="150">&nbsp;</td>
+    <td width="80">Lunes</td>
+    <td width="80">Martes</td>
+    <td width="80">Miércoles</td>
+    <td width="80">Jueves</td>
+    <td width="80">Viernes</td>
+    <td width="80">Sábado</td>
+    <td width="80">Domingo</td>
+    <td width="50">&nbsp;</td>
+  </tr>
+  	<?php 
+	foreach ($roomTypes as $row) {
+	$roomTypeId = $row['id_room_type'];
+	?>
+  <tr>
+    <td><?php echo '* '.$row['name']; ?></td>
+    <td><input name="mon_price<?php echo $roomTypeId?>" type="text" id="mon_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('mon_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="tue_price<?php echo $roomTypeId?>" type="text" id="tue_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('tue_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="wed_price<?php echo $roomTypeId?>" type="text" id="wed_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('wed_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="thu_price<?php echo $roomTypeId?>" type="text" id="thu_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('thu_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="fri_price<?php echo $roomTypeId?>" type="text" id="fri_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('fri_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sat_price<?php echo $roomTypeId?>" type="text" id="sat_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sat_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sun_price<?php echo $roomTypeId?>" type="text" id="sun_price<?php echo $roomTypeId?>" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sun_price'.$roomTypeId); ?>" size="12" maxlength="12"/></td>
+    <td>Bs.F.</td>
+  </tr>
+  <?php
+  }
+  ?>
+  <tr>
+    <td><strong>Niños</strong></td>
+    <td><input name="mon_price_children" type="text" id="mon_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('mon_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="tue_price_children" type="text" id="tue_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('tue_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="wed_price_children" type="text" id="wed_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('wed_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="thu_price_children" type="text" id="thu_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('thu_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="fri_price_children" type="text" id="fri_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('fri_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sat_price_children" type="text" id="sat_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sat_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sun_price_children" type="text" id="sun_price_children" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sun_price_children'); ?>" size="12" maxlength="12"/></td>
+    <td>Bs.F.</td>
+  </tr>
+  <tr>
+    <td><strong>3era edad</strong></td>
+    <td><input name="mon_price_seniors" type="text" id="mon_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('mon_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="tue_price_seniors" type="text" id="tue_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('tue_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="wed_price_seniors" type="text" id="wed_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('wed_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="thu_price_seniors" type="text" id="thu_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('thu_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="fri_price_seniors" type="text" id="fri_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('fri_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sat_price_seniors" type="text" id="sat_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sat_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td><input name="sun_price_seniors" type="text" id="sun_price_seniors" onkeypress="return numbersonly(this, event)" value="<?php echo set_value('sun_price_seniors'); ?>" size="12" maxlength="12"/></td>
+    <td>Bs.F.</td>
+  </tr>
+</table>
+<br />
+<a href="#">Agregar único precio por noche</a>
+<br /><br />
+<?php
+echo form_submit('sumit', 'Enviar');
+echo form_close();
+?>
+</div>
 
 <p><a href="<?php echo base_url().'prices/selectPlanPrices/'.$seasonId.'/'.$rateId?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a></p>
