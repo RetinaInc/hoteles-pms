@@ -1,16 +1,5 @@
 
-<html>
-<head>
-
 <script type="text/javascript" src="<?php echo base_url()."assets/js/jquery-1.3.2.min.js" ?>"></script>
-
-<style type="text/css">
-<!--
-.Estilo1 {color: #FF0000}
--->
-</style>
-
-</head>
 
 <?php 
 
@@ -27,8 +16,7 @@ if ($reservation) {
 		$checkOut      = $row['checkOut'];
 		$guestId       = $row['fk_guest'];
 	
-		echo 'RESERVACIÓN #'.$reservationId."<br>";
-		echo 'Estado: ', lang($row['status'])."<br>"; 
+		echo 'CHECK OUT - RESERVACIÓN #'.$reservationId."<br>";
 	}
 	
 	$datestring = "%Y-%m-%d";
@@ -116,7 +104,7 @@ if ($reservation) {
 		echo 'Salida: ', $checkOutDay.' '.$checkOutDate;
 		?>
 		</td>
-		<td><?php echo 'Cant. habitaciones: ', $reservationRoomCount; ?></td>
+		<td><?php echo 'Cant. habitaciones: ', $reservationRoomsCount; ?></td>
 		<td><?php echo 'Total pagado: ', $paid.' Bs.F.'; ?></td>
 	  </tr>
 	</table>
@@ -127,27 +115,25 @@ if ($reservation) {
 	<br />
 	
 	INFORMACIÓN HABITACIÓN(ES)<br /><br />
-	<table width="1055" border="0">
+	<table width="769" border="0">
 	  <tr>
-		<td width="60">#</td>
-		<td width="60">Tipo</td>
-		<td width="60">Adultos</td>
-		<td width="60">Niños</td>
+		<td width="61">#</td>
+		<td width="67">Tipo</td>
+		<td width="75">Adultos</td>
+		<td width="71">Niños</td>
 		<?php 
 		if ($children == 'Yes') {
-			?><td width="60">Edad</td>
-<?php
+			?><td width="66">Edad</td>
+		<?php
 		}
-			echo 'RRC: ', $reservationRoomCount;
 		if ($reservationRoomCount > 1) {
 		?>
-			<td width="190">Cliente</td>
+			<td width="235">Cliente</td>
 		<?php
 		}
 		?>
-		<td width="70">Total Hab</td>
-		<td width="134"></td>
-        <td width="144"></td>
+		<td width="80">Total Hab</td>
+		<td width="80"></td>
 	  </tr>
 	  <?php
 	  foreach ($reservationRoomInfo as $row) {
@@ -185,35 +171,21 @@ if ($reservation) {
 		?>
 	 
 		<td><?php echo $row['total']?> Bs.F.</td>
-        
+		<td>
 		<?php 
 			if (($date < $ciDate)&& ($status != 'Canceled')) {
-				?>
-            	<td>
-				<?php
-					echo anchor(base_url().'reservations/modifyReservationRooms/'.$reservationId.'/'.$row['id_room'],'Cambiar Habitación');
-				?>
-                </td>
-				<?php
-			} 	
-		 
-			if (($date <= $coDate)&& ($status != 'Canceled')) {
-				?>
-            	<td id="modT">
-				<?php
-					echo anchor(base_url().'reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$row['id_room'],'Modificar Monto');
-				?>
-                </td>
-				<?php
+				
+				echo anchor(base_url().'reservations/modifyReservationRooms/'.$reservationId.'/'.$row['id_room'],'Cambiar');
 			} 	
 		?>
+		</td>
 	  </tr>
 	  <?php
 	  }
 	  ?>
 	</table>
 	
-<br />
+	<br />
 	
 	<table width="200" border="1">
 	  <tr>

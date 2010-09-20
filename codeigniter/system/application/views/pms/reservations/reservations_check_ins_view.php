@@ -1,40 +1,52 @@
 
+<html>
+<head>
+
+<script language='javascript' src="<?php echo base_url() . "assets/calendario/"?>popcalendar.js"></script>
+
+</head>
+
 <?php 
 $this->load->view('pms/header');
 ?>
 
-<h3>Reservaciones Pendientes</h3>
+<h3>Check Ins</h3>
 
 <?php
 
-$attributes = array('id' => 'form_search');
-echo form_open('reservations/searchReservation', $attributes);
+$weekDays = array('Domingo', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado');
+$dateDay = $weekDays[date('N', strtotime($checkInDate))];
 
-$data = array(
-       'name' => 'search',
-       'id'   => 'search'
-       );
-echo form_input($data);
+$unixDate = human_to_unix($checkInDate.' 00:00:00');
+$date = date ("j/m/Y" , $unixDate);
 
-echo form_submit('sumit', 'Buscar Reservación');
-echo form_close();
+?>
+<table width="538" border="0">
+  <tr>
+    <td width="169"><?php echo $dateDay.' '.$date; ?></td>
+    <td width="94">Buscar Fecha</td>
+    <?php 
+	$attributes = array('id' => 'checkInDate');
+	echo form_open('reservations/viewCheckIns', $attributes); 
+	?>
+    <td width="88">
+    <input name="check_in_date" type="text" id="check_in_date" onClick="popUpCalendar(this, checkInDate.check_in_date, 'dd-mm-yyyy');" value="<?php echo set_value('check_in_date'); ?>" size="10" maxlength="10" />
+    </td>
+    <td width="159"><?php  echo form_submit('sumit', 'Buscar'); ?></td>
+    <?php echo form_close(); ?>
+  </tr>
+</table>
+<br>
+<?php
 
-if (($exRooms) && ($exSeasons) &&($exRates) && ($exPlans)) {
-
-	echo anchor(base_url().'reservations/createReservation1/','Crear Nueva Reservación')."<br><br>";
-} else {
-
-	echo 'Deden existir habitaciones, tamporadas, tarifas y planes para poder hacer una reservación!';
-}
-
-if ($penReservations) {
+if ($dateCheckIns) {
 ?>
 	<table width="995" border="1">
   	  <tr>
 		<td width="45">
     	<?php
 		echo '#';
-        echo form_open(base_url().'reservations/viewPendingReservations');
+        echo form_open('reservations/viewCheckIns');
 		echo form_hidden('order', 'id_reservation');
 		echo form_submit('sumit', '^');
         echo form_close();
@@ -43,7 +55,7 @@ if ($penReservations) {
 		<td width="226">
         <?php
 		echo 'Nombre Cliente ';
-        echo form_open(base_url().'reservations/viewPendingReservations');
+        echo form_open('reservations/viewCheckIns');
 		echo form_hidden('order', 'gLname');
 		echo form_submit('sumit', '^');
         echo form_close();
@@ -52,7 +64,7 @@ if ($penReservations) {
 		<td width="104">
     	<?php
 		echo 'Fecha Check-In';
-        echo form_open(base_url().'reservations/viewPendingReservations');
+        echo form_open('reservations/viewCheckIns');
 		echo form_hidden('order', 'checkIn');
 		echo form_submit('sumit', '^');
         echo form_close();
@@ -61,7 +73,7 @@ if ($penReservations) {
 		<td width="112">
     	<?php
 		echo 'Fecha Check-Out';
-        echo form_open(base_url().'reservations/viewPendingReservations');
+        echo form_open('reservations/viewCheckIns');
 		echo form_hidden('order', 'checkOut');
 		echo form_submit('sumit', '^');
         echo form_close();
@@ -70,7 +82,7 @@ if ($penReservations) {
 		<td width="141">
     	<?php
 		echo 'Estado';
-        echo form_open(base_url().'reservations/viewPendingReservations');
+        echo form_open('reservations/viewCheckIns');
 		echo form_hidden('order', 'status');
 		echo form_submit('sumit', '^');
         echo form_close();
@@ -82,7 +94,7 @@ if ($penReservations) {
 	  </tr>
 	
   	  <?php 
-  	  foreach ($penReservations as $row) {
+  	  foreach ($dateCheckIns as $row) {
   
 		  $hotel = $this->session->userdata('hotelid');
 		  
@@ -156,12 +168,9 @@ if ($penReservations) {
     	<td>
     	<?php 
 		echo $reservationRoomsCount;
-	
-    	foreach($rooms as $row1) {
-	
-			if ($row1['id_reservation'] == $row['id_reservation']) {
-		
-				echo ' ('.$row1 ['number'].')';
+		foreach ($reservationRoomInfo as $row1) {
+			if ($row1['fk_reservation'] == $row['id_reservation']) {
+				echo '('.$row1['number'].')';
 			}
 		}
 		?>
@@ -178,11 +187,8 @@ if ($penReservations) {
 <?php
 } else {
 
-	echo "<br><br>".'No existen reservaciones pendientes!'."<br>";
-}
-
-if ($allReservations) {
-
-	echo "<br>".anchor(base_url().'reservations/viewAllReservations/','Ver Reservaciones Anteriores')."<br><br>";
+	echo "<br><br>".'No existen check ins!'."<br>";
 }
 ?>
+
+</html>

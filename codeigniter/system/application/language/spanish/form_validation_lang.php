@@ -2,8 +2,8 @@
 
 $lang['Running'] = 'Funcionando';
 $lang['Out of service'] = 'Fuera de servicio';
-$lang['Checked-In'] = 'Checked-In';
-$lang['Checked-Out'] = 'Checked-Out';
+$lang['Checked In'] = 'Checked In';
+$lang['Checked Out'] = 'Checked Out';
 $lang['Canceled'] = 'Cancelada';
 $lang['Reserved'] = 'Reservada';
 $lang['Guaranteed Reservation'] = 'Reservaci&oacute;n garantizada';
@@ -11,9 +11,9 @@ $lang['No Show'] = 'No apareci&oacute;';
 $lang['number'] = 'N&uacute;mero';
 $lang['ci'] = 'CI';
 $lang['name'] = 'Nombre';
-$lang['name2'] = 'Seg. Nombre';
+$lang['2name'] = 'Seg. Nombre';
 $lang['last_name'] = 'Apellido';
-$lang['last_name2'] = 'Seg. Apellido';
+$lang['2last_name'] = 'Seg. Apellido';
 $lang['status'] = 'Estado';
 $lang['room_type'] = 'Tipo de habitaci&oacute;n';
 $lang['abrv'] = 'Abrev.';
@@ -30,10 +30,24 @@ $lang['dateEnd'] = 'Fecha fin';
 $lang['season'] = 'Temporada a la que pertenece';
 $lang['username'] = 'Usuario';
 $lang['password'] = 'Contrase&ntilde;a';
-$lang['check_in'] = 'Fecha de llegada';
-$lang['check_out'] = 'Fecha de salida';
+$lang['check_in'] = 'Fecha llegada';
+$lang['check_out'] = 'Fecha salida';
 $lang['rate'] = 'Tarifa';
 $lang['plan'] = 'Plan';
+$lang['pers_type'] = 'Tipo';
+$lang['pers_id'] = 'CI / RIF';
+$lang['payment_amount'] = 'Monto pago';
+$lang['payment_type'] = 'Tipo pago';
+$lang['payment_bank'] = 'Banco';
+$lang['check_num'] = 'N&uacute;mero de cheque';
+$lang['transfer_num'] = 'N&uacute;mero de transferencia';
+$lang['cash'] = 'Efectivo';
+$lang['debit'] = 'D&eacute;bito';
+$lang['check'] = 'Cheque';
+$lang['credit'] = 'Cr&eacute;dito';
+$lang['transfer'] = 'Transferencia';
+$lang['new_total'] = 'Nuevo Monto';
+
 
 $lang['errorPendingReservation'] = 'No se puede eliminar porque tiene reservaciones pendientes: ';
 $lang['errorRoomNumber'] = 'N&uacute;mero de habitaci&oacute;n no disponible';
@@ -45,9 +59,14 @@ $lang['errorPlanName'] = 'Nombre de plan no disponible';
 $lang['errorCurrentSeason'] = 'No se puede deshabilitar la temporada actual!';
 $lang['errorCheckInOutDates'] = 'La fecha de salida debe ser mayor a la fecha de llegada';
 $lang['errorCheckInToday'] = 'La fecha de llegada debe ser igual o mayor a la fecha de hoy';
-$lang['errorPrices'] = 'Debe llenar el precio de cada d&iacute;a o el precio &uacute;nico';
+$lang['errorPrices'] = 'Debe llenar todos los precios';
+$lang['errorOtherGuests'] = 'Debe llenar todos los nombres de los clientes de las habitaciones';
+$lang['errorPaymentBank'] = 'Debe llenar todos los datos del cheque';
+$lang['errorPaymentTransfer'] = 'Debe llenar el n&uacute;mero de tranferencia';
+$lang['errorPaymentAmount'] = 'El monto de pago debe ser menor o igual a monto por pagar';
 
-$lang['guestDisabled'] = 'Cliente Deshabilitado';
+$lang['NoAvailability'] = 'No hay disponibilidad!';
+$lang['guestDisabled'] = 'Cliente Deshabilitado'; 
 
 
 

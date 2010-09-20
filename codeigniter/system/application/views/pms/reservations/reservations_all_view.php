@@ -8,17 +8,17 @@ echo 'RESERVACIONES';
 ?>
 <br /><br />
 
-<table width="852" border="1">
+<table width="995" border="1">
   <tr>
-    <td width="101">
+    <td width="45">
     	<?php
-		echo '# Confirmación';
+		echo '#';
         echo form_open(base_url().'reservations/viewAllReservations');
 		echo form_hidden('order', 'RE.id_reservation');
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>  	</td>
-	<td width="187">
+<td width="226">
         <?php
 		echo 'Nombre Cliente ';
         echo form_open(base_url().'reservations/viewAllReservations');
@@ -26,7 +26,7 @@ echo 'RESERVACIONES';
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>   	</td>
-	<td width="110">
+<td width="104">
     	<?php
 		echo 'Fecha Check-In';
         echo form_open(base_url().'reservations/viewAllReservations');
@@ -34,7 +34,7 @@ echo 'RESERVACIONES';
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>  	</td>
-	<td width="119">
+  <td width="112">
     	<?php
 		echo 'Fecha Check-Out';
         echo form_open(base_url().'reservations/viewAllReservations');
@@ -42,7 +42,7 @@ echo 'RESERVACIONES';
 		echo form_submit('sumit', '^');
         echo form_close();
 		?> 	</td>
-	<td width="150">
+  <td width="141">
     	<?php
 		echo 'Estado';
         echo form_open(base_url().'reservations/viewAllReservations');
@@ -50,18 +50,33 @@ echo 'RESERVACIONES';
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>   	</td>
-    <td width="59">Habitación(nes)</td>
-    <td width="37">Pago</td>
-    <td width="37">Debe</td>
+    <td width="115">Habitación(nes)</td>
+    <td width="100">Pago</td>
+    <td width="100">Por pagar</td>
   </tr>
 	
   <?php 
   foreach ($reservations as $row) {
   
-  $hotel = $this->session->userdata('hotelid');
-  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
-  
-  ?>  
+	  $hotel = $this->session->userdata('hotelid');
+	  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
+	  
+	  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
+	  $payments = getPaymentInfo($hotel, null, null, $row['id_reservation']);
+		  
+	  $total = 0;
+	  foreach ($reservationRoomInfo as $row1) {
+		  $total = $total + $row1['total'];
+	  }
+		
+	  $paid = 0;
+	  foreach ($payments as $row1) {
+	  	  $paid = $paid + $row1['amount'];
+	  }
+		
+	  $toPay = $total - $paid;
+  ?> 
+   
   <tr>
     <td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
     <td>
@@ -119,8 +134,8 @@ echo 'RESERVACIONES';
 	}
 	?>
     </td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td><?php echo $paid; ?> Bs.F.</td>
+    <td><?php echo $toPay;?> Bs.F.</td>
   </tr>
   <?php
   }

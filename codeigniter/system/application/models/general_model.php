@@ -83,6 +83,12 @@ class General_model extends Model
 		$this->db->update($table); 
 	}
 	
+	function delete($table, $field, $value)
+	{
+		$this->db->where($field, $value);
+		$this->db->delete($table); 
+	}
+	
 	
 	function validationCheck($hotel, $table, $field1, $value1, $field2, $value2, $disable)
 	{

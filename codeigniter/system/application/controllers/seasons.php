@@ -19,53 +19,83 @@ class Seasons extends Controller
 	
 	function viewSeasons()
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'dateStart';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'dateStart';
+			}
+			
+			$hotel = $this->session->userdata('hotelid');
+		
+			$seasons    = $this->GNM->getInfo($hotel, 'SEASON', null, null, $order, null, null, 1);
+			$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
+			
+			$data['seasons']    = $seasons;
+			$data['seasonsDis'] = $seasonsDis;
+			
+			$this->load->view('pms/seasons/seasons_view', $data);
+			
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-		
-	    $hotel = $this->session->userdata('hotelid');
-	
-		$seasons    = $this->GNM->getInfo($hotel, 'SEASON', null, null, $order, null, null, 1);
-		$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
-		
-		$data['seasons']    = $seasons;
-		$data['seasonsDis'] = $seasonsDis;
-		
-		$this->load->view('pms/seasons/seasons_view', $data);
 	}
 	
 	
 	function viewDisabledSeasons()
 	{
-		if (isset($_POST["order"])) {
-			$order = $_POST["order"];
-		}else {
-			$order = 'dateStart';
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+		
+			if (isset($_POST["order"])) {
+				$order = $_POST["order"];
+			}else {
+				$order = 'dateStart';
+			}
+			
+			$hotel = $this->session->userdata('hotelid');
+		
+			$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
+			
+			$data['seasonsDis']    = $seasonsDis;
+			
+			$this->load->view('pms/seasons/seasons_disabled_view', $data);
+			
+		} else {
+		
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
-		
-	    $hotel = $this->session->userdata('hotelid');
-	
-		$seasonsDis = $this->GNM->getInfo($hotel, 'SEASON', 'disable', '0', $order, null, null, null);
-		
-		$data['seasonsDis']    = $seasonsDis;
-		
-		$this->load->view('pms/seasons/seasons_disabled_view', $data);
 	}
 	
 	
 	function infoSeason($seasonId)
-	{	
-	    $hotel = $this->session->userdata('hotelid');
-	
-		$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
-		$fSeason = $this->GNM->getInfo($hotel, 'SEASON', 'fk_season', $seasonId, null, null, null, null);
+	{
+		$userId = $this->session->userdata('userid');
 		
-		$data['season'] = $season;
-		$data['fSeason'] = $fSeason;
+		if ($userId) {
+			
+			$hotel = $this->session->userdata('hotelid');
 		
-		$this->load->view('pms/seasons/season_info_view', $data);
+			$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+			$fSeason = $this->GNM->getInfo($hotel, 'SEASON', 'fk_season', $seasonId, null, null, null, null);
+			
+			$data['season'] = $season;
+			$data['fSeason'] = $fSeason;
+			
+			$this->load->view('pms/seasons/season_info_view', $data);
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}
 	}
 	
 	
@@ -76,15 +106,25 @@ class Seasons extends Controller
         $this->form_validation->set_rules('season_name', 'lang:name', 'trim|xss_clean|required|max_length[300]|callback_checkSeasonName');
 		$this->form_validation->set_rules('season_dateStart', 'lang:dateStart', 'trim|xss_clean|required|max_length[10]');
 		$this->form_validation->set_rules('season_dateEnd', 'lang:dateEnd', 'trim|xss_clean|required|max_length[10]');
-		$this->form_validation->set_rules('season_season','lang:season','trim|xss_clean|');
+		$this->form_validation->set_rules('season_season','lang:season','trim|xss_clean');
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$seasons = $this->GNM->getInfo($hotel, 'SEASON', null, null, null, null, null, null);
+			$userId = $this->session->userdata('userid');
 		
-			$data['seasons'] = $seasons;
-		
-			$this->load->view('pms/seasons/season_add_view', $data);
+			if ($userId) {
+
+				$seasons = $this->GNM->getInfo($hotel, 'SEASON', null, null, null, null, null, null);
+			
+				$data['seasons'] = $seasons;
+			
+				$this->load->view('pms/seasons/season_add_view', $data);
+			
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -109,6 +149,8 @@ class Seasons extends Controller
 			
 				$seasonSeason = NULL;
 			}
+			
+			$checkSeason = $this->SEM->getCheckSeason($seasonDateStart, $seasonDateEnd);
 			
 			$data = array(
 				'name'      => ucwords(strtolower($seasonName)),
@@ -136,13 +178,23 @@ class Seasons extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
-			$seasons = $this->GNM->getInfo($hotel, 'SEASON', null,        null,      null, null, null, null);
+			$userId = $this->session->userdata('userid');
 		
-			$data['season'] = $season;
-			$data['seasons'] = $seasons;
+			if ($userId) {
 		
-			$this->load->view('pms/seasons/season_edit_view', $data);
+				$season  = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+				$seasons = $this->GNM->getInfo($hotel, 'SEASON', null,        null,      null, null, null, null);
+			
+				$data['season'] = $season;
+				$data['seasons'] = $seasons;
+			
+				$this->load->view('pms/seasons/season_edit_view', $data);
+			
+			} else {
+				
+				$data['error'] = NULL;
+				$this->load->view('pms/users/user_sign_in', $data);
+			}
 			
 		} else {
 		
@@ -184,52 +236,72 @@ class Seasons extends Controller
 	
 	function disableSeason($seasonId)
 	{
-		$hotel  = $this->session->userdata('hotelid');
+		$userId = $this->session->userdata('userid');
 		
-		$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+		if ($userId) {
 		
-		$datestring = "%Y-%m-%d  %h:%i %a";
-		$time       = time();
-		$date       = mdate($datestring, $time);
-		
-		$delete    = 'Yes';
-		
-		foreach ($season as $row) {
-		
-			$dateStart  = $row['dateStart'];
-			$dateEnd    = $row['dateEnd'];
+			$hotel  = $this->session->userdata('hotelid');
 			
-			if (($dateStart < $date) && ($date < $dateEnd)) {
+			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+			
+			$datestring = "%Y-%m-%d  %h:%i %a";
+			$time       = time();
+			$date       = mdate($datestring, $time);
+			
+			$delete    = 'Yes';
+			
+			foreach ($season as $row) {
+			
+				$dateStart  = $row['dateStart'];
+				$dateEnd    = $row['dateEnd'];
 				
-				$delete = 'No';
+				if (($dateStart < $date) && ($date < $dateEnd)) {
+					
+					$delete = 'No';
+				}
 			}
-		}
-		
-		if ($delete == 'No') {
-		
-			echo lang("errorCurrentSeason")."<br>";
-		
-			$this->infoSeason($seasonId);
+			
+			if ($delete == 'No') {
+			
+				echo lang("errorCurrentSeason")."<br>";
+			
+				$this->infoSeason($seasonId);
+				
+			} else {
+			
+				$this->GNM->disable('SEASON', 'id_season', $seasonId); 
+				$this->GNM->disable('SEASON', 'fk_season', $seasonId);   
+				$this->viewSeasons(); 
+			}
 			
 		} else {
-		
-			$this->GNM->disable('SEASON', 'id_season', $seasonId); 
-			$this->GNM->disable('SEASON', 'fk_season', $seasonId);   
-			$this->viewSeasons(); 
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}	
 	}
 	
 	
 	function enableSeason($seasonId)
 	{
-		$data = array(
-				'disable' => 1
-				);
-			
-		$this->GNM->update('SEASON', 'id_season', $seasonId, $data); 
-		$this->GNM->update('SEASON', 'fk_season', $seasonId, $data);   
+		$userId = $this->session->userdata('userid');
 		
-		$this->viewSeasons(); 	
+		if ($userId) {
+		
+			$data = array(
+					'disable' => 1
+					);
+				
+			$this->GNM->update('SEASON', 'id_season', $seasonId, $data); 
+			$this->GNM->update('SEASON', 'fk_season', $seasonId, $data);   
+			
+			$this->viewSeasons(); 
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
+		}	
 	}
 	
 	

@@ -3,23 +3,11 @@
 $this->load->view('pms/header'); 
 ?>
 
-<h3>Clientes</h3>
+<h3>Clientes Encontrados</h3>
 
 <?php
 
-$attributes = array('id' => 'form_search');
-echo form_open('guests/searchGuests', $attributes);
-
-$data = array(
-       'name' => 'search',
-       'id'   => 'search'
-       );
-echo form_input($data);
-
-echo form_submit('sumit', 'Buscar Cliente');
-echo form_close();
-
-if ($guests) {
+if ($result) {
 	?>
 	<table width="549" border="1">
   	  <tr>
@@ -29,7 +17,7 @@ if ($guests) {
       </tr>
 	
  	  <?php 
-  	  foreach ($guests as $row) {?>
+  	  foreach ($result as $row) {?>
       <tr>
         <td><?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['id_guest'],$row['lastName'].' '.$row['lastName2'].', '.$row['name'].' '.$row['name2']);?></td>
         <td><?php echo $row['telephone'];?></td>
@@ -39,12 +27,12 @@ if ($guests) {
       }
       ?>
 </table>
-
-<p><a href="<?php echo base_url().'guests/viewDisableGuests/'?>">Ver Clientes Deshabilitados</a></p>
  
 <?php
 } else {
 	
-	echo 'No existen clientes!';
+	echo 'No existen cliente con ese nombre!';
 }
 ?>
+<br />
+<a href="<?php echo base_url().'guests/viewGuests/'?>">Volver a Clientes</a><br />

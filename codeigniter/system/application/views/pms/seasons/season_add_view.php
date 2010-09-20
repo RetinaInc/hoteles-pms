@@ -32,8 +32,10 @@ echo form_open(base_url().'seasons/addSeason/', $attributes);?>
 	        <option value= "NULL" <?php echo set_select('season_season', NULL); ?> ><?php echo 'Ninguna' ?></option>
             <?php
 		    foreach ($seasons as $row) { 
+				if ($row['fk_season'] == NULL) {
 			?>
             <option value="<?php echo $row['id_season']; ?>" <?php echo set_select('season_season', $row['id_season']); ?> ><?php echo $row['name']; ?></option><?php 
+				}
 			}
 			?>
 	</select>

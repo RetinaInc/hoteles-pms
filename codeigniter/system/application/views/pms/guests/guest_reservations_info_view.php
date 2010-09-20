@@ -42,7 +42,7 @@ echo "<br>".'RESERVACIONES CLIENTE'."<br><br>";
 
 ?>
 
-<table width="800" border="1">
+<table width="942" border="1">
   <tr>
     <td width="123">
     	<?php
@@ -76,16 +76,31 @@ echo "<br>".'RESERVACIONES CLIENTE'."<br><br>";
 		echo form_submit('sumit', '^');
         echo form_close();
 		?>    </td>
-    <td width="68">Cant. Hab</td>
-    <td width="43">Pago</td>
-    <td width="47">Debe</td>
+    <td width="100">Cant. Hab</td>
+    <td width="100">Pago</td>
+    <td width="100">Por pagar</td>
   </tr>
  
  <?php 
+ $hotel = $this->session->userdata('hotelid');
+ 
  foreach ($reservations as $row) {
  
-     $hotel = $this->session->userdata('hotelid');
 	 $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
+	 $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
+     $payments = getPaymentInfo($hotel, null, null, $row['id_reservation']);
+		  
+		  $total = 0;
+		  foreach ($reservationRoomInfo as $row1) {
+			$total = $total + $row1['total'];
+		  }
+		
+		  $paid = 0;
+		  foreach ($payments as $row1) {
+			$paid = $paid + $row1['amount'];
+		  }
+		
+		  $toPay = $total - $paid;
   ?>
   <tr>
     <td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
@@ -112,10 +127,19 @@ echo "<br>".'RESERVACIONES CLIENTE'."<br><br>";
 		$day            = $date_array[2];
 		echo $day.'-'.$month.'-'.$year;
 	?>    </td>
-    <td><?php echo $row['restatus'];?></td>
-    <td><?php echo $reservationRoomsCount;?></td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
+    <td><?php echo lang($row['status']);?></td>
+    <td>
+	<?php 
+	echo $reservationRoomsCount;
+	foreach ($reservationRoomInfo as $row1) {
+		if ($row1['fk_reservation'] == $row['id_reservation']) {
+			echo '('.$row1['number'].')';
+		}
+	}
+	?>
+    </td>
+    <td><?php echo $paid; ?> Bs.F.</td>
+    <td><?php echo $toPay; ?> Bs.F.</td>
   </tr>
   <?php
   }

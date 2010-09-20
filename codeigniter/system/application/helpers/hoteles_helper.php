@@ -7,13 +7,37 @@
 
 
 /*
- * get_	count
+ * getRRCount
  *
  * Returns how many rooms are in a reservation 
  *
  * @access	public
  * @return	string
  */	
+
+function getPaymentInfo($hotel, $field, $value, $reservationId)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('reservations_model');
+	
+	$result = $CI->reservations_model->getPaymentInfo($hotel, $field, $value, $reservationId);
+		
+	return $result;
+}
+
+/*
+function getPaymentsAmount($hotel, $reservationId)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('reservations_model');
+	
+	$result = $CI->reservations_model->getPaymentsAmount($hotel, $reservationId);
+		
+	return $result;
+}
+*/
 
 
 function getRRCount($hotel, $field1, $value1, $field2, $value2)
@@ -23,6 +47,18 @@ function getRRCount($hotel, $field1, $value1, $field2, $value2)
 	$CI->load->model('rooms_model');
 	
 	$result = $CI->rooms_model->getRRCount($hotel, $field1, $value1, $field2, $value2);
+		
+	return $result;
+}
+
+
+function getRRInfo($hotel, $field, $value)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('rooms_model');
+	
+	$result = $CI->rooms_model->getRRInfo($hotel, $field, $value);
 		
 	return $result;
 }
