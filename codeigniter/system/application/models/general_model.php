@@ -10,7 +10,7 @@ class General_model extends Model
 	
 	function getInfo($hotel, $table, $field, $value, $order, $lim1, $lim2, $disable)
 	{
-		if ($field != null and $value != null) {
+		if ($field != null && $value != null) {
 		
   			$this->db->where($field, $value);
   		}
@@ -37,12 +37,12 @@ class General_model extends Model
 	
 	function getCount($hotel, $table, $field1, $value1, $field2, $value2, $disable)
 	{
-		if ($field1 != null and $value1 != null) {
+		if ($field1 != null && $value1 != null) {
 		
   			$this->db->where($field1, $value1);
   		}
 		
-		if ($field2 != null and $value2 != null) {
+		if ($field2 != null && $value2 != null) {
 		
   			$this->db->where($field2, $value2);
   		}
@@ -62,6 +62,44 @@ class General_model extends Model
 		return $query;
 	}
 	
+	
+	function getTotalRows($hotel, $table, $field, $value, $disable)
+	{
+		if ($field != null && $value != null)
+		{
+  			$this->db->where($field, $value);
+  		}
+		
+		if ($disable != null) {
+		
+			$this->db->where($table.'.'.'disable', 1); 
+		}
+		
+		$this->db->where('fk_hotel', $hotel);
+		$this->db->from($table);
+		$query = $this->db->count_all_results();
+		return $query;
+	}
+	
+	/*
+	function getName($hotel, $table, $field1, $value1, $field2, $value2)
+	{
+		if ($hotel != null) {
+		
+  			$this->db->where('fk_hotel', $hotel);
+  		}
+		
+		if ($field2 != null && $value2 != null) {
+		
+  			$this->db->where($field2, $value2);
+  		}
+		
+		$this->db->where($field1, $value1);
+		$this->db->select('name');
+		$query = $this->db->get($table);
+		return $query->result_array();
+	}
+	*/
 	
 	function insert($table, $data)
 	{
@@ -92,12 +130,12 @@ class General_model extends Model
 	
 	function validationCheck($hotel, $table, $field1, $value1, $field2, $value2, $disable)
 	{
-		if ($field1 != null and $value1 != null) {
+		if ($field1 != null && $value1 != null) {
 		
   			$this->db->where($field1, $value1);
   		}
 		
-		if ($field2 != null and $value2 != null) {
+		if ($field2 != null && $value2 != null) {
 		
   			$this->db->where($field2, $value2);
   		}
@@ -119,7 +157,7 @@ class General_model extends Model
 	
 	function doubleUpdate($table, $field1, $value1, $field2, $value2, $data)
 	{
-		if ($field2 != null and $value2 != null) {
+		if ($field2 != null && $value2 != null) {
 		
   			$this->db->where($field2, $value2);
   		}

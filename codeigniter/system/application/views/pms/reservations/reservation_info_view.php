@@ -1,34 +1,42 @@
 
-<html>
-<head>
+<?php
+$this->load->view('pms/header'); 
+?>
 
-<script type="text/javascript" src="<?php echo base_url()."assets/js/jquery-1.3.2.min.js" ?>"></script>
-
-<style type="text/css">
-<!--
-.Estilo1 {color: #FF0000}
--->
-</style>
-
-</head>
+<h3>Información Reservación</h3>
 
 <?php 
+$weekDays = array('Dom', 'Lun','Mar','Mie','Jue','Vie','Sab', 'Dom');
 
-$this->load->view('pms/header'); 
-
-if ($reservation) {
+if (isset($message)) {
+	
+	echo "<strong>".$message."</strong>";
+	echo "<br><br>";
+}
+	
+if (isset($reservation)) {
 
 	foreach ($reservation as $row) {
 	
 		$reservationId = $row['id_reservation'];
+		$resDate	   = $row['resDate'];
 		$status        = $row['status'];
 		$payStatus     = $row['paymentStat'];
 		$checkIn       = $row['checkIn'];
 		$checkOut      = $row['checkOut'];
 		$guestId       = $row['fk_guest'];
+		
+		$rD_array  = explode (' ',$resDate);
+		$rDate     = $rD_array[0];
 	
-		echo 'RESERVACIÓN #'.$reservationId."<br>";
-		echo 'Estado: ', lang($row['status'])."<br>"; 
+		$reservDate  = date('l', strtotime($rDate));
+        $reservDay   = $weekDays[date('N', strtotime($reservDate))];
+        $unixResDate = human_to_unix($resDate);
+        $reservDate  = date ("j/m/Y" , $unixResDate);
+				
+		echo 'Reservación #'.$reservationId."<br>";
+		echo 'Estado: ', lang($row['status'])."<br>";
+		echo 'Fecha Reservación: ', $reservDay.' '.$reservDate."<br><br>";
 	}
 	
 	$datestring = "%Y-%m-%d";
@@ -40,8 +48,6 @@ if ($reservation) {
 	
 	$checkOut_array = explode (' ',$checkOut);
 	$coDate         = $checkOut_array[0];
-		
-	echo "<br>".'INFORMACIÓN CLIENTE'."<br><br>";
 	
 	foreach ($guest as $row) {
 		
@@ -49,7 +55,8 @@ if ($reservation) {
 		
 		if ($row['disable'] == 1) {
 		
-			echo anchor(base_url().'guests/infoGuestReservations/'.$row['id_guest'],$row['lastName'].' '.$row['lastName2'].', '.$row['name'].' '.$row['name2'])."<br>";
+			echo 'Cliente: ';
+			echo anchor('guests/infoGuestReservations/'.$row['id_guest'], $row['lastName'].' '.$row['lastName2'].', '.$row['name'].' '.$row['name2'])."<br>";
 		
 			echo 'Teléfono: '.$row['telephone']."<br>";
 	 
@@ -70,176 +77,295 @@ if ($reservation) {
 	$children = 'No';
 	
 	foreach ($reservationRoomInfo as $row) {
+	
 		$total = $total + $row['total'];
 		
 		if ($row['children'] != 0) {
+		
 			$children = 'Yes';
 		}
 	}
 	
 	foreach ($payments as $row) {
+	
 		$paid = $paid + $row['amount'];
 	}
 	
 	$amountToPay = $total - $paid;
-	
 	?>
+    
 	<table width="898" border="0">
-	<?php
-	foreach ($reservation as $row) {
+    
+	  <?php
+	  foreach ($reservation as $row) {
 	
-		$weekDays = array('Dom', 'Lun','Mar','Mie','Jue','Vie','Sab');
-		
-		?>
-	  <tr>
-		<td width="220"><?php echo 'Tarifa ', $row['ratename']; ?></td>
-		<td width="220">
-		<?php 
-		$checkInDate = date('l', strtotime($ciDate));
-		$checkInDay  = $weekDays[date('N', strtotime($checkInDate))];
-		$unixInDate  = human_to_unix($row['checkIn']);
-		$checkInDate = date ("j/m/Y" , $unixInDate);
-		echo 'Llegada: ', $checkInDay.' '.$checkInDate;
-		?>
-		</td>
-		<td width="220"><?php echo 'Cant. noches: ', $nights; ?></td>
-		<td width="220"><?php echo 'Total a pagar: ', $total.' Bs.F.'; ?></td>
-	  </tr>
-	  <tr>
-		<td><?php echo 'Plan ', $row['planname']; ?></td>
-		<td>
-		<?php 
-		$checkOutDate = date('l', strtotime($coDate));
-		$checkOutDay  = $weekDays[date('N', strtotime($checkOutDate))];
-		$unixCoDate   = human_to_unix($row['checkOut']);
-		$checkOutDate = date ("j/m/Y" , $unixCoDate);
-		echo 'Salida: ', $checkOutDay.' '.$checkOutDate;
-		?>
-		</td>
-		<td><?php echo 'Cant. habitaciones: ', $reservationRoomCount; ?></td>
-		<td><?php echo 'Total pagado: ', $paid.' Bs.F.'; ?></td>
-	  </tr>
+	  	  ?>
+        
+	  	  <tr>
+			<td width="220">
+				<?php 
+                echo 'Tarifa ', $row['ratename']; 
+                ?>
+       	 	</td>
+        
+			<td width="220">
+				<?php 
+                $checkInDate = date('l', strtotime($ciDate));
+                $checkInDay  = $weekDays[date('N', strtotime($checkInDate))];
+                $unixInDate  = human_to_unix($row['checkIn']);
+                $checkInDate = date ("j/m/Y" , $unixInDate);
+                echo 'Llegada: ', $checkInDay.' '.$checkInDate;
+                ?>
+			</td>
+        
+			<td width="220">
+				<?php 
+                echo 'Cant. noches: ', $nights; 
+                ?>
+        	</td>
+        
+			<td width="220">
+				<?php 
+                echo 'Total a pagar: ', $total.' Bs.F.'; 
+                ?>
+        	</td>
+	  	  </tr>
+      
+		  <tr>
+			<td>
+				<?php 
+                echo 'Plan ', $row['planname']; 
+                ?>
+        	</td>
+        
+			<td>
+				<?php 
+                $checkOutDate = date('l', strtotime($coDate));
+                $checkOutDay  = $weekDays[date('N', strtotime($checkOutDate))];
+                $unixCoDate   = human_to_unix($row['checkOut']);
+                $checkOutDate = date ("j/m/Y" , $unixCoDate);
+                echo 'Salida: ', $checkOutDay.' '.$checkOutDate;
+                ?>
+			</td>
+        
+			<td>
+				<?php 
+                echo 'Cant. habitaciones: ', $reservationRoomCount; 
+                ?>
+        	</td>
+        
+			<td>
+				<?php 
+                echo 'Total pagado: ', $paid.' Bs.F.'; 
+                ?>
+        	</td>
+      	  </tr>
+	  <?php
+	  }
+	  ?>
 	</table>
-	<?php
-	}
-	?>
 	
 	<br />
 	
-	INFORMACIÓN HABITACIÓN(ES)<br /><br />
-	<table width="1055" border="0">
+	INFORMACIÓN HABITACIÓN(ES)
+    
+    <br /><br />
+    
+	<table width="937" border="0">
+    
 	  <tr>
-		<td width="60">#</td>
-		<td width="60">Tipo</td>
-		<td width="60">Adultos</td>
-		<td width="60">Niños</td>
+		<td width="73">#</td>
+        
+		<td width="73">Tipo</td>
+        
+		<td width="73">Adultos</td>
+        
+		<td width="73">Niños</td>
+        
 		<?php 
 		if ($children == 'Yes') {
-			?><td width="60">Edad</td>
-<?php
+			?>
+            <td width="73">Edad</td>
+			<?php
 		}
-			echo 'RRC: ', $reservationRoomCount;
+			
 		if ($reservationRoomCount > 1) {
-		?>
-			<td width="190">Cliente</td>
-		<?php
+			?>
+			<td width="229">Cliente</td>
+			<?php
 		}
 		?>
-		<td width="70">Total Hab</td>
-		<td width="134"></td>
-        <td width="144"></td>
+        
+		<td width="85">Total Hab</td>
+        
+		<td width="110"></td>
+        
+        <td width="110"></td>
 	  </tr>
+      
 	  <?php
 	  foreach ($reservationRoomInfo as $row) {
 	  ?>
-	  <tr>
-		<td height="41"><?php echo $row['number']?></td>
-		<td><?php echo $row['abrv']?></td>
-		<td><?php echo $row['adults']?></td>
-		<td><?php echo $row['children'];?></td>
-		<?php
-		if ($children == 'Yes') {
-			?><td><?php
-			foreach ($otherGuest as $row1) {
-				if (($row1['fk_room'] == $row['id_room']) && ($row1['age'] != NULL)) {
-					echo $row1['age']."&nbsp;&nbsp;";
-				}
-			}
-			?></td><?php
-		}
-		
-		if ($reservationRoomCount > 1) {
-		?>
+	  	<tr>
+			<td height="41">
+				<?php 
+                echo $row['number'];
+                ?>
+        	</td>
+        
 			<td>
-			<?php 
-			foreach ($otherGuest as $row1) {
-				if ($row1['fk_room'] == $row['id_room']) {
-					echo $row1['name'].' '. $row1['lastName']."<br>";
-					echo $row1['ci'];
-				}
+				<?php 
+                echo $row['abrv'];
+                ?>
+        	</td>
+        
+			<td>
+				<?php 
+                echo $row['adults'];
+                ?>
+        	</td>
+        
+			<td>
+				<?php 
+                echo $row['children'];
+                ?>
+        	</td>
+        
+	  		<?php
+			if ($children == 'Yes') {
+				?>
+        		<td>
+					<?php
+                    foreach ($otherGuest as $row1) {
+					
+                        if (($row1['fk_room'] == $row['id_room']) && ($row1['age'] != NULL)) {
+						
+                            echo $row1['age']."&nbsp;&nbsp;";
+                        }
+                    }
+                    ?>
+            	</td>
+	  		<?php
+     		}
+		
+			if ($reservationRoomCount > 1) {
+			?>
+				<td>
+					<?php 
+                    foreach ($otherGuest as $row1) {
+					
+                        if ($row1['fk_room'] == $row['id_room']) {
+						
+							if ($row1['name'] != NULL) {
+								
+								echo $row1['name'].' '. $row1['lastName']."<br>";
+                            	echo $row1['idType'].' - '.$row1['idNum']."<br>";
+                    			echo anchor('reservations/modifyRoomReservationOtherGuest/'.$reservationId.'/'.$row1['id_other_guest'],'Cambiar')."<br><br>";
+							}
+                        }
+                    }
+                    ?>
+				</td>
+				<?php
 			}
 			?>
-			</td>
-		<?php
-		}
-		?>
 	 
-		<td><?php echo $row['total']?> Bs.F.</td>
-        
-		<?php 
-			if (($date < $ciDate)&& ($status != 'Canceled')) {
+			<td>
+				<?php 
+                echo $row['total'];
+                ?> 
+                Bs.F.
+        	</td>
+        	
+			<?php 
+			if (($date <= $ciDate)&& ($status != 'Canceled')) {
 				?>
-            	<td>
-				<?php
-					echo anchor(base_url().'reservations/modifyReservationRooms/'.$reservationId.'/'.$row['id_room'],'Cambiar Habitación');
-				?>
-                </td>
+        		<td>
+					<?php
+                    echo anchor('reservations/modifyReservationRooms/'.$reservationId.'/'.$row['id_room'],'Cambiar Habitación');
+                    ?>
+            	</td>
 				<?php
 			} 	
 		 
 			if (($date <= $coDate)&& ($status != 'Canceled')) {
 				?>
             	<td id="modT">
-				<?php
-					echo anchor(base_url().'reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$row['id_room'],'Modificar Monto');
-				?>
-                </td>
-				<?php
+					<?php
+                    echo anchor('reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$row['id_room'],'Modificar Monto');
+                    ?>
+            	</td>
+			<?php
 			} 	
-		?>
-	  </tr>
+			?>
+            
+	    </tr>
+        
 	  <?php
 	  }
 	  ?>
 	</table>
 	
-<br />
+	<br />
 	
 	<table width="200" border="1">
-	  <tr>
+    
+	  <tr>	
 		<td>Opciones</td>
 	  </tr>
+      
 	  <?php
-		if ($paid != 0) {
+	  if ($paid != 0) {
 	  ?>
-	  <tr>
-		<td><?php echo anchor(base_url().'reservations/viewReservationPayments/'.$reservationId, 'Ver Pagos')?></td>
-	  </tr>
+	  	<tr>
+			<td>
+				<?php 
+                echo anchor('reservations/viewReservationPayments/'.$reservationId, 'Ver Pagos');
+                ?>
+        	</td>
+	  	</tr>
 	  <?php
 	  }
 	  
 	  if ($payStatus != 'Paid') {
 	  ?>
-	  <tr>
-		<td><?php echo anchor(base_url().'reservations/payReservation/'.$reservationId, 'Registrar Pago')?></td>
-	  </tr>
-	<?php
+	  	<tr>
+			<td>
+				<?php 
+                echo anchor('reservations/payReservation/'.$reservationId, 'Registrar Pago');
+                ?>
+        	</td>
+	  	</tr>
+	  <?php
 	  }
 	  
-	  if (($date == $ciDate) && ($status != 'Canceled')) {
+	  if (($date == $ciDate) && ($status != 'Canceled') && ($status != 'Checked In')) {
 	  ?>
 		<tr>
-			<td><?php echo anchor(base_url().'reservations/checkInReservation/'.$reservationId,'Check-In')?></td>
+			<td>
+				<?php
+                echo anchor('reservations/checkInReservation/'.$reservationId, 'Check In', array('onClick' => "return confirm('Realizar Check In?')"));
+                ?>
+            </td>
+		</tr>
+	  <?php
+	  }
+	  
+	  if ($status == 'Checked In') {
+	  ?>
+		<tr>
+			<td>
+				<?php
+				if($amountToPay == 0) {
+				
+                	echo anchor('reservations/checkOutReservation/'.$reservationId, 'Check Out', array('onClick' => "return confirm('Realizar Check Out?')"));
+					
+				} else {
+					
+					echo anchor('reservations/checkOutReservation/'.$reservationId, 'Check Out', array('onClick' => "return confirm('Seguro que desea realizar Check Out? Todavía no se han registrado todos los Pagos!')"));
+				}
+                ?>
+            </td>
 		</tr>
 	  <?php
 	  }
@@ -247,7 +373,11 @@ if ($reservation) {
 	  if (($date < $ciDate)&& ($status != 'Canceled')) {
 	  ?>
 		<tr>
-			<td><a href="<?php echo base_url().'reservations/cancelReservation/'.$reservationId.'/'.$guestId ?>" onClick="return confirm('Seguro que desea cancelar?')">Cancelar Reservación</a></td>
+			<td>
+				<?php
+                echo anchor('reservations/cancelReservation/'.$reservationId.'/'.$guestId, 'Cancelar Reservación', array('onClick' => "return confirm('Seguro que desea cancelar?')"));
+                ?>
+           </td>
 		</tr>
 	  <?php
 	  }
@@ -263,17 +393,16 @@ if ($reservation) {
 	</table>
 	
 	<br />
-	
+    
 	<?php
-	$referer = $_SERVER['HTTP_REFERER'];
-	echo "<a href='" . $referer . "'> Volver</a><br>";
 	
 } else {
 
-	echo 'No existe ese número de reservación'."<br><br>";
-	
-	echo anchor ('reservations/viewPendingReservations', 'Volver');
+	echo 'No existe ese número de reservación';
+	echo "<br><br>";
 }
+
+echo anchor ('reservations/viewPendingReservations', 'Volver a reservaciones');
 
 ?>
 

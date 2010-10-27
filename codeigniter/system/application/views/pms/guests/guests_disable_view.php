@@ -1,38 +1,88 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
-
-echo 'CLIENTES DESHABILITADOS'."<br><br>";
-
 ?>
 
-<table width="911" border="1">
+<h3>Clientes Deshabilitados</h3>
+
+<?php
+$attributes = array('id' => 'form_search');
+echo form_open('guests/searchGuests', $attributes);
+
+$data = array(
+       'name' => 'search',
+       'id'   => 'search',
+	   'size' => '30'
+       );
+echo form_input($data);
+
+echo form_submit('sumit', 'Buscar Cliente');
+echo form_close();
+?>
+
+<table width="774" border="1">
 
   <tr>
-    <td width="132">Nombre</td>
-    <td width="142">Teléfono</td>
+  
+    <td width="250">Nombre</td>
+    
+    <td width="130">Cédula</td>
+     
+    <td width="130">Teléfono</td>
+    
     <td width="150">Correo</td>
-    <td width="229">Dirección</td>
-    <td width="131">Ver Reservaciones</td>
-    <td width="87">Habilitar</td>
+    
+    <td width="80">Habilitar</td>
+    
   </tr>
 	
   <?php 
-  foreach ($guests as $row) {?>
+  foreach ($guestsDis as $row) {
+  ?>
   <tr>
-    <td><?php echo $row['lastName'].', '.$row['name'];?></td>
-    <td><?php echo $row['telephone'];?></td>
-    <td><?php echo $row['email'];?></td>
-    <td><?php echo $row['address'];?></td>
-    <td><?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['id_guest'],'Ver Reservaciones');?></td>
-    <td><a href="<?php echo base_url().'guests/enableGuest/'.$row['id_guest'] ?>" onclick="return confirm('Seguro que desea habilitar?')">  Habilitar</a></td>
+  
+    <td>
+    	<?php 
+            echo anchor('guests/infoGuestReservations/'.$row['id_guest'].'/checkIn', $row['lastName'].' '.$row['lastName2'].', '.$row['name'].' '.$row['name2']);
+        ?>
+    </td>
+    
+    <td>
+		<?php 
+        echo $row['idType'].'-'.$row['idNum'];
+        ?>
+    </td>
+    
+    <td>
+		<?php 
+        echo $row['telephone'];
+        ?>
+    </td>
+    
+    <td>
+		<?php 
+        echo $row['email'];
+        ?>
+    </td>
+    
+    <td>
+		<?php 
+		echo anchor('guests/enableGuest/'.$row['id_guest'], 'Habilitar', array('onClick' => "return confirm('Seguro que desea habilitar?')"));  
+        ?>
+    </td>
+    
   </tr>
   <?php
   }
   ?>
-
 </table>
 
-<p><a href="<?php echo base_url().'guests/viewGuests/'?>">Volver a Clientes</a></p>
+<br />
 
+<?php
+
+echo $this->pagination->create_links();
+
+echo "<br><br>";
+echo anchor('guests/viewGuests/', 'Volver a Clientes');
+?>

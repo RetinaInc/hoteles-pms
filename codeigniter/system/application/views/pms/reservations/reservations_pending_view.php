@@ -12,177 +12,273 @@ echo form_open('reservations/searchReservation', $attributes);
 
 $data = array(
        'name' => 'search',
-       'id'   => 'search'
+       'id'   => 'search',
+	   'onKeyPress'   => "return numbersonly(this, event)"
        );
 echo form_input($data);
 
 echo form_submit('sumit', 'Buscar Reservación');
 echo form_close();
 
+$create = 'No';
+
 if (($exRooms) && ($exSeasons) &&($exRates) && ($exPlans)) {
 
-	echo anchor(base_url().'reservations/createReservation1/','Crear Nueva Reservación')."<br><br>";
+	$create = 'Yes';
+	
 } else {
 
 	echo 'Deden existir habitaciones, tamporadas, tarifas y planes para poder hacer una reservación!';
+	echo "<br>";
 }
+
+?>
+<table width="1272" border="0">
+  <tr>
+  
+  	<?php
+	if ($create == 'Yes') {
+
+		?>
+        <td width="250">
+	        <?php
+			echo anchor('reservations/createReservation1/','Crear Nueva Reservación');
+			?>       	</td>
+<?php
+	}
+	
+	if ($prevReservations) {
+
+		?>
+        <td width="250">
+	        <?php
+			echo anchor('reservations/viewPreviousReservations/','Ver Reservaciones Anteriores');
+			?>       	</td>
+<?php
+	}
+	
+	if ($canReservations) {
+
+		?>
+        <td width="250">
+	        <?php
+			echo anchor('reservations/viewCanceledReservations/','Ver Reservaciones Canceladas');
+			?>       	</td>
+<?php
+	}
+	
+	if ($noShows) {
+
+		?>
+        <td width="250">
+	        <?php
+			echo anchor('reservations/viewNoShows/','Ver Reservaciones Olvidadas');
+			?>      	</td>
+<?php
+	}
+	
+	if (($prevReservations) || ($canReservations) || ($noShows)) {
+
+		?>
+        <td width="250">
+	        <?php
+			echo anchor('reservations/viewAllReservations/','Ver Todas');
+			?>      	</td>
+   	<?php
+	}
+	?>
+  </tr>
+</table>
+
+<?php
+/*
+foreach ($penReservations as $row) {
+  
+  	$pen = 'No';
+	
+	if (($row['status'] != 'Checked In') && ($row['status'] != 'Canceled')) {
+		
+		$pen = 'Yes';
+	}
+}
+*/
+
+$total = count($penReservations);
+echo "<br>";
+echo 'Total reservaciones pendientes: ', $total;
 
 if ($penReservations) {
 ?>
-	<table width="995" border="1">
+	<br /><br />
+    
+	<table width="1182" border="1">
+    
   	  <tr>
-		<td width="45">
-    	<?php
-		echo '#';
-        echo form_open(base_url().'reservations/viewPendingReservations');
-		echo form_hidden('order', 'id_reservation');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
+		<td width="80">
+			<?php
+			echo anchor('reservations/viewPendingReservations/id_reservation', '#');
+            ?>        
+		</td>
         
-		<td width="226">
-        <?php
-		echo 'Nombre Cliente ';
-        echo form_open(base_url().'reservations/viewPendingReservations');
-		echo form_hidden('order', 'gLname');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
+  		<td width="250">
+        	<?php
+			echo anchor('reservations/viewPendingReservations/gLname', 'Cliente');
+            ?>        
+     	</td>
         
-		<td width="104">
-    	<?php
-		echo 'Fecha Check-In';
-        echo form_open(base_url().'reservations/viewPendingReservations');
-		echo form_hidden('order', 'checkIn');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
+	  	<td width="160">
+			<?php
+			echo anchor('reservations/viewPendingReservations/checkIn', 'Fecha Check In');
+            ?>        
+       	</td>
         
-		<td width="112">
-    	<?php
-		echo 'Fecha Check-Out';
-        echo form_open(base_url().'reservations/viewPendingReservations');
-		echo form_hidden('order', 'checkOut');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
+  		<td width="160">
+			<?php
+			echo anchor('reservations/viewPendingReservations/checkOut', 'Fecha Check Out');
+            ?>      
+       	</td>
         
-		<td width="141">
-    	<?php
-		echo 'Estado';
-        echo form_open(base_url().'reservations/viewPendingReservations');
-		echo form_hidden('order', 'status');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
+		<td width="130">
+			<?php
+			echo anchor('reservations/viewPendingReservations/status', 'Estado');
+            ?>        
+       	</td>
         
-    	<td width="115">Habitación(nes)</td>
-    	<td width="100">Pago</td>
-    	<td width="100">Por pagar</td>
+    	<td width="170">Habitación(nes)</td>
+        
+    	<td width="90">Pago</td>
+        
+    	<td width="90">Por pagar</td>
 	  </tr>
 	
   	  <?php 
   	  foreach ($penReservations as $row) {
   
-		  $hotel = $this->session->userdata('hotelid');
+  	  	  if (($row['status'] != 'Checked In') && ($row['status'] != 'Canceled')) {
 		  
-		  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
-		  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
-		  $payments = getPaymentInfo($hotel, null, null, $row['id_reservation']);
-		  
-		  $total = 0;
-		  foreach ($reservationRoomInfo as $row1) {
-			$total = $total + $row1['total'];
-		  }
-		
-		  $paid = 0;
-		  foreach ($payments as $row1) {
-			$paid = $paid + $row1['amount'];
-		  }
-		
-		  $toPay = $total - $paid;
-  	  ?>
+			  $hotel = $this->session->userdata('hotelid');
+			  
+			  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
+			  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
+			  $payments              = getPaymentInfo($hotel, null, null, $row['id_reservation']);
+			  
+			  $total = 0;
+			  foreach ($reservationRoomInfo as $row1) {
+			  
+				$total = $total + $row1['total'];
+			  }
+			
+			  $paid = 0;
+			  foreach ($payments as $row1) {
+			  
+				$paid = $paid + $row1['amount'];
+			  }
+			
+			  $toPay = $total - $paid;
+  	  		  ?>
       
-  <tr>
-   	<td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
+  	  <tr>
+   		<td>
+			<?php 
+            echo anchor('reservations/infoReservation/'.$row['id_reservation'].'/n/', $row['id_reservation']);
+            ?>
+        </td>
     	
         <td>
-    	<?php 
-		foreach ($guests as $row1) { 
-	
-	    	if ($row1['id_guest'] == $row['fk_guest']) {
+    		<?php 
+			foreach ($guests as $row1) { 
 		
-		   		if ($row1['disable'] == 1) {
+				if ($row1['id_guest'] == $row['fk_guest']) {
 			
-			    	echo anchor(base_url().'guests/infoGuestReservations/'.$row1['id_guest'],$row1['lastName'].' '.$row1['lastName2'].', '.$row1['name'].' '.$row1['name2']);
+					if ($row1['disable'] == 1) {
 				
-				} else {
-			
-			    	echo $row1['lastName'].', '.$row1['name'];
-		   		}
-	    	}
-   		}
-		?>
-   	</td>
+						echo anchor('guests/infoGuestReservations/'.$row1['id_guest'], $row1['lastName'].' '.$row1['lastName2'].', '.$row1['name'].' '.$row1['name2']);
+					
+					} else {
+				
+						echo $row1['lastName'].', '.$row1['name'];
+					}
+				}
+			}
+			?>
+   		</td>
         
     	<td>
-		<?php
-		$checkIn       = $row['checkIn'];
-		$checkIn_array = explode (' ',$checkIn);
-		$date          = $checkIn_array[0];
-		$date_array    = explode ('-',$date);
-		$year          = $date_array[0];
-		$month         = $date_array[1];
-		$day           = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-		?>
-   	</td>
+			<?php
+            $checkIn       = $row['checkIn'];
+            $checkIn_array = explode (' ',$checkIn);
+            $date          = $checkIn_array[0];
+            $date_array    = explode ('-',$date);
+            $year          = $date_array[0];
+            $month         = $date_array[1];
+            $day           = $date_array[2];
+            echo $day.'-'.$month.'-'.$year;
+            ?>
+   		</td>
     	
         <td>
-		<?php 
-		$checkOut       = $row['checkOut'];
-		$checkOut_array = explode (' ',$checkOut);
-		$date           = $checkOut_array[0];
-		$date_array     = explode ('-',$date);
-		$year           = $date_array[0];
-		$month          = $date_array[1];
-		$day            = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-		?>
-   	</td>
-    
-    	<td><?php echo lang($row['status']);?></td>
+			<?php 
+            $checkOut       = $row['checkOut'];
+            $checkOut_array = explode (' ',$checkOut);
+            $date           = $checkOut_array[0];
+            $date_array     = explode ('-',$date);
+            $year           = $date_array[0];
+            $month          = $date_array[1];
+            $day            = $date_array[2];
+            echo $day.'-'.$month.'-'.$year;
+            ?>
+   		</td>
     
     	<td>
-    	<?php 
-		echo $reservationRoomsCount;
-	
-    	foreach($rooms as $row1) {
-	
-			if ($row1['id_reservation'] == $row['id_reservation']) {
-		
-				echo ' ('.$row1 ['number'].')';
-			}
-		}
-		?>
-	</td>
+			<?php 
+            echo lang($row['status']);
+            ?>
+        </td>
+    
+    	<td>
+			<?php 
+            echo $reservationRoomsCount;
         
-    	<td><?php echo $paid; ?> Bs.F.</td>
-    	<td><?php echo $toPay; ?> Bs.F.</td>
+            foreach($rooms as $row1) {
+        
+                if ($row1['id_reservation'] == $row['id_reservation']) {
+            
+                    echo ' ('.$row1 ['number'].')';
+                }
+            }
+            ?>
+		</td>
+        
+    	<td>
+			<?php 
+            echo $paid; 
+            ?> 
+            Bs.F.
+        </td>
+        
+    	<td>
+			<?php 
+            echo $toPay; 
+            ?> 
+            Bs.F.
+        </td>
+        
   	  </tr>
   	  <?php
-  	  }
+  	  	}
+	  }
   	  ?>
-</table>
+	</table>
+
+<br />
 
 <?php
+
+echo $this->pagination->create_links();
+
 } else {
 
-	echo "<br><br>".'No existen reservaciones pendientes!'."<br>";
-}
-
-if ($allReservations) {
-
-	echo "<br>".anchor(base_url().'reservations/viewAllReservations/','Ver Reservaciones Anteriores')."<br><br>";
+	echo "<br><br>";
+	echo 'No existen reservaciones pendientes!'."<br>";
 }
 ?>

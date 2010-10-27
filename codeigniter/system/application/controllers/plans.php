@@ -8,9 +8,11 @@ class Plans extends Controller
         $this->load->model('general_model','GNM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
+		$this->load->library('pagination');
 		$this->load->library('session');
-		$this->load->helper('hoteles');
 		$this->load->helper('language');
+		$this->load->helper('hoteles');
+		$this->load->helper('date');
         $this->load->helper('form');
 		$this->load->helper('url');
 	}
@@ -23,9 +25,19 @@ class Plans extends Controller
 		if ($userId) {
 		
 			$hotel = $this->session->userdata('hotelid');
-				
-			$plans    = $this->GNM->getInfo($hotel, 'PLAN', null,      null, null, null, null, 1);
-			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+			
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GNM->getTotalRows($hotel, 'PLAN', null, null, 1);
+			
+			$config['base_url'] = base_url().'plans/viewPlans/';
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '4';
+			$config['num_links'] = '50';
+		
+			$this->pagination->initialize($config);
+			
+			$plans    = $this->GNM->getInfo($hotel, 'PLAN', null,      null, 'name', $config['per_page'], $lim2, 1);
+			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null,   null, null, null);
 			
 			$data['plans'] = $plans;
 			$data['plansDis'] = $plansDis;
@@ -48,7 +60,17 @@ class Plans extends Controller
 		
 			$hotel = $this->session->userdata('hotelid');
 		
-			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0',  null, null, null, null);
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GNM->getTotalRows($hotel, 'PLAN', 'disable', '0', null);
+			
+			$config['base_url'] = base_url().'plans/viewDisabledPlans/';
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '3';
+			$config['num_links'] = '50';
+		
+			$this->pagination->initialize($config);
+			
+			$plansDis = $this->GNM->getInfo($hotel, 'PLAN', 'disable', '0', 'name', $config['per_page'], $lim2, null);
 			
 			$data['plansDis'] = $plansDis;
 			
@@ -96,7 +118,10 @@ class Plans extends Controller
 			
 			$this->GNM->insert('PLAN', $data);  
 				
-			$this->viewPlans(); 
+			$data['message'] = lang("addPlanMessage");
+			$data['type'] = 'plans';
+				
+			$this->load->view('pms/success', $data); 
 		}	
 	}
 	
@@ -138,7 +163,10 @@ class Plans extends Controller
 			
 			$this->GNM->update('PLAN', 'id_plan', $planId, $data);  
 				
-			$this->viewPlans();  
+			$data['message'] = lang("editPlanMessage");
+			$data['type'] = 'plans';
+				
+			$this->load->view('pms/success', $data);   
 		}	
 	}
 	
@@ -150,7 +178,11 @@ class Plans extends Controller
 		if ($userId) {
 
 			$this->GNM->disable('PLAN', 'id_plan', $planId); 
-			$this->viewPlans(); 
+		
+			$data['message'] = lang("disablePlanMessage");
+			$data['type'] = 'plans';
+				
+			$this->load->view('pms/success', $data); 
 		
 		} else {
 			
@@ -172,7 +204,10 @@ class Plans extends Controller
 				
 			$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
 			
-			$this->viewPlans(); 	
+			$data['message'] = lang("enablePlanMessage");
+			$data['type'] = 'plans';
+				
+			$this->load->view('pms/success', $data); 	
 			
 		} else {
 		

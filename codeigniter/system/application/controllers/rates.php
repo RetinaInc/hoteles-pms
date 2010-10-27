@@ -8,8 +8,11 @@ class Rates extends Controller
         $this->load->model('general_model','GNM');
         $this->lang->load ('form_validation','spanish');
         $this->load->library('form_validation');
+		$this->load->library('pagination');
 		$this->load->library('session');
+		$this->load->helper('language');
 		$this->load->helper('hoteles');
+		$this->load->helper('date');
         $this->load->helper('form');
 		$this->load->helper('url');
 	}
@@ -23,7 +26,17 @@ class Rates extends Controller
 		
 			$hotel = $this->session->userdata('hotelid');
 			
-			$rates    = $this->GNM->getInfo($hotel, 'RATE', null, null, null, null, null, 1);
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GNM->getTotalRows($hotel, 'RATE', null, null, 1);
+			
+			$config['base_url'] = base_url().'rates/viewRates/';
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '4';
+			$config['num_links'] = '50';
+		
+			$this->pagination->initialize($config);
+			
+			$rates    = $this->GNM->getInfo($hotel, 'RATE', null, null, 'name', $config['per_page'] , $lim2, 1);
 			$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
 			
 			$data['rates'] = $rates;
@@ -47,7 +60,17 @@ class Rates extends Controller
 		
 			$hotel = $this->session->userdata('hotelid');
 		
-			$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', null, null, null, null);
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GNM->getTotalRows($hotel, 'RATE', 'disable', '0', null);
+			
+			$config['base_url'] = base_url().'rates/viewDisabledRates/';
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '3';
+			$config['num_links'] = '50';
+		
+			$this->pagination->initialize($config);
+			
+			$ratesDis = $this->GNM->getInfo($hotel, 'RATE', 'disable', '0', 'name', $config['per_page'], $lim2, null);
 			
 			$data['ratesDis'] = $ratesDis;
 			
@@ -95,7 +118,10 @@ class Rates extends Controller
 				
 			$this->GNM->insert('RATE', $data);  
 					
-			$this->viewRates(); 
+			$data['message'] = lang("addRateMessage");
+			$data['type'] = 'rates';
+				
+			$this->load->view('pms/success', $data); 
 		}	
 	}
 	
@@ -137,7 +163,10 @@ class Rates extends Controller
 			
 			$this->GNM->update('RATE', 'id_rate', $rateId, $data);  
 				
-			$this->viewRates();  
+			$data['message'] = lang("editRateMessage");
+			$data['type'] = 'rates';
+				
+			$this->load->view('pms/success', $data);  
 		}	
 	}
 	
@@ -149,7 +178,11 @@ class Rates extends Controller
 		if ($userId) {
 		
 			$this->GNM->disable('RATE', 'id_rate', $rateId); 
-			$this->viewRates(); 
+			
+			$data['message'] = lang("disableRateMessage");
+			$data['type'] = 'rates';
+				
+			$this->load->view('pms/success', $data);
 		
 		} else {
 		
@@ -171,7 +204,10 @@ class Rates extends Controller
 				
 			$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
 			
-			$this->viewRates(); 
+			$data['message'] = lang("enableRateMessage");
+			$data['type'] = 'rates';
+				
+			$this->load->view('pms/success', $data);
 				
 		} else {
 		

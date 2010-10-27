@@ -1,9 +1,11 @@
 
-
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
+<h3>Modificar Habitación</h3>
+
+<?php
 foreach ($roomReservationInfo as $row) {
 
 	if ($row['id_room'] == $roomId) {
@@ -43,9 +45,13 @@ if ($availableType) {
 
 	echo 'Otras habitaciones tipo "'.$roomTypeName.'" disponibles: '."<br><br>";	
 	
-	foreach ($availableType as $row) {?>
-    
-		<a href="<?php echo base_url().'reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row['id_room']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row['number'];?></a><?php
+	foreach ($availableType as $row) {
+		
+		if ($row['id_room'] != $roomId) {
+			
+			echo anchor('reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row['id_room'], ' # '.$row['number'].' ', array('onClick' => "return confirm('Seguro que desea cambiar?')"));
+			
+		}
 	}
 	
 } else {
@@ -77,7 +83,7 @@ if ($availableOther) {
 				if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomTypeId)) {
 				
 					echo $row['name'].': ';
-					?>&nbsp;<a href="<?php echo base_url().'reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row1['id_room']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row1['number'];?> </a>&nbsp;<?php
+					echo anchor('reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row1['id_room'], ' # '.$row1['number'].' ', array('onClick' => "return confirm('Seguro que desea cambiar?')"));
 				}
 			}
 		}
@@ -86,89 +92,15 @@ if ($availableOther) {
 		
  	}
 	
-	/*
-    foreach ($roomTypes as $row) {
-	
-        if ($row['id_room_type'] != $roomTypeId) echo "<br><br>".$row['name'].': ';
-	 
-		foreach ($availableOther as $row1) {
-			
-			if (($row1['fk_room_type'] == $row['id_room_type']) && ($row1['fk_room_type'] != $roomTypeId)) {
-			
-			    ?>&nbsp;<a href="<?php echo base_url().'reservations/modifyReservationRooms2/'.$reservationId.'/'.$roomId.'/'.$row1['id_room']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row1['number'];?> </a>&nbsp;<?php
-			}
-		}
- 	}
-	*/
-	
 } else {
 
 	echo "<br><br>".'No hay otros tipos de habitaciones disponibles'."<br><br>";
 }
 
+echo anchor('reservations/infoReservation/'.$reservationId.'/n/', 'Volver');
 
-
-
-
-
-
-
-/*
-if ($available_other)	
-{
-	echo "<br><br><br>".'Otros tipos de habitaciones disponibles: '."<br>";
-
-	foreach ($room_types as $row)
-	{
-		if ($row['ID_ROOM_TYPE'] != $room_type) echo "<br><br>".$row['NAME'].': ';
-	 
-		foreach ($available_other as $row1)
-		{
-			if (($row1['FK_ID_ROOM_TYPE'] == $row['ID_ROOM_TYPE']) && ($row1['FK_ID_ROOM_TYPE'] != $room_type))
-			{
-			?>&nbsp;<a href="<?php echo base_url().'reservations/modify_reservation_rooms_2/'.$reservation_id.'/'.$room_id.'/'.$row1['ID_ROOM']; ?>" onClick="return confirm('Seguro que desea cambiar?')" ><?php echo '# '.$row1['NUMBER'];?> </a>&nbsp;<?php
-			}
-		}
- 	}
-}
-else
-{
-	echo 'NO HAY OTROS TIPOS DE HABITACIONES DISPONIBLES'."<br><br>";
-}
-*/
-
-
-/*
-if ($available_all)	
-{	
-	echo 'Habitaciones disponibles: '."<br><br>";
-	
-	foreach ($room_types as $row)
-	{
-		echo $row['ABRV'].': ';
-		
-		foreach ($available_all as $row1)
-		{
-			if ($row1['FK_ID_ROOM_TYPE'] == $row['ID_ROOM_TYPE'])
-			{
-				echo anchor(base_url().'reservations/modify_reservation_rooms_2/'.$reservation_id.'/'.$room_id.'/'.$row1['ID_ROOM'], '&nbsp;'.'# '.$row1['NUMBER']).'&nbsp;&nbsp;';
-			}
-		}
-		echo "<br><br>";
-	}
-	
-	echo "<br><br>";
-	
-}
-else
-{
-	echo 'NO HAY OTRAS HABITACIONES DISPONIBLES'."<br><br>";
-}
-*/
 ?>
 
-
-<p><a href="<?php echo base_url().'reservations/infoReservation/'.$reservationId?>">Volver</a></p>
 
 
 

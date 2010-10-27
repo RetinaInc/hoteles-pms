@@ -17,16 +17,17 @@ if ($plansDis) {
 			echo 'Descripción: '.$row['description']."<br>";
 		}
 		
-		?>
-        <a href="<?php echo base_url().'plans/enablePlan/'.$row['id_plan'] ?>" onClick="return confirm('Seguro que desea habilitar?')">Habilitar</a><br /><br /><br />
-        <?php
+		echo anchor('plans/enablePlan/'.$row['id_plan'], 'Habilitar', array('onClick' => "return confirm('Seguro que desea habilitar?')"))."<br><br>";
 	}
+	
+	echo $this->pagination->create_links();
 	  
 } else {
 	
-	echo 'No existen planes deshabilitadas!'."<br>";
+	echo 'No existen planes deshabilitadas!';
 }
 
-echo "<br>".anchor(base_url().'plans/viewPlans/', 'Volver a Planes');
+echo "<br><br>";
+echo anchor('plans/viewPlans/', 'Volver a Planes');
 
 ?>

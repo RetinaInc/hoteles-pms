@@ -1,23 +1,31 @@
 
-
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
+<h3>Editar Habitación</h3>
+
+<span class="Estilo2">
+	(*)Campos obligatorios
+</span>
+
+<span class="Estilo1">
+	<?php
+	echo validation_errors();
+	?>
+</span>
+
+<?php
 foreach ($room as $row)
 {
 	$roomId     = $row['id_room'];
 	$roomNumber = $row['number'];
 }
 
-echo 'EDITAR HABITACIÓN #'.$roomNumber;?><br /><br /><?php
+echo form_open('rooms/editRoom/'.$roomId.'/'.$roomNumber);
 
-echo validation_errors();
-
-echo form_open(base_url().'rooms/editRoom/'.$roomId.'/'.$roomNumber);
-
-foreach ($room as $row)
-{?>
+foreach ($room as $row) {
+	?>
 	<p>* Número:
 	<input name="room_number" type="text" id="room_number" value="<?php echo $row['number']; ?>" size="5" maxlength="20" />
 	</p>
@@ -58,9 +66,16 @@ foreach ($room as $row)
 <?php
 }
 
-echo form_submit('sumit', 'Enviar');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea guardar?')"
+);
+echo form_submit($att, 'Guardar');
 echo form_close();
 
-?><br /><br />
+echo "<br><br>";
 
-<a href="<?php echo base_url().'rooms/infoRoom/'.$roomId?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a>
+echo anchor('rooms/infoRoom/'.$roomId, 'Cancelar', array('onClick' => "return confirm('Seguro que desea cancelar? Se perderá la información')"));
+
+?>

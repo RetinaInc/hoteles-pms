@@ -40,8 +40,12 @@
 |
 */
 
-$route['default_controller'] = "users";
+$route['default_controller'] = "users/userSignIn";
 $route['scaffolding_trigger'] = "";
+
+//$route['rooms/infoRoom/(:num)'] = "rooms/infoRoom/$1/";
+
+//$route['plans/disablePlan/(:any)'] = "plans/viewPlans";
 
 
 /* End of file routes.php */

@@ -1,18 +1,28 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
+?>
+
+<h3>Editar Plan</h3>
+
+<span class="Estilo2">
+	(*)Campos obligatorios
+</span>
+
+<span class="Estilo1">
+	<?php
+	echo validation_errors();
+	?>
+</span>
+
+<?php  
 
 foreach ($plan as $row)
 {
 	$planId = $row['id_plan'];
 }
 
-echo 'EDITAR PLAN'."<br><br>";
-
-echo validation_errors();
-
-echo form_open(base_url().'plans/editPlan/'.$planId);
+echo form_open('plans/editPlan/'.$planId);
 
 foreach ($plan as $row) {
 ?>
@@ -22,13 +32,17 @@ foreach ($plan as $row) {
     </p>
     
      <p> Descripción: </p>
-	 <p><textarea name="plan_description" rows="3" id="plan_description"><?php echo $row['description'];  ?></textarea></p>
+	 <p><textarea name="plan_description" rows="3" id="plan_description"><?php echo $row['description']; ?></textarea></p>
 	
 <?php
 }
-
-echo form_submit('sumit', 'Enviar');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea guardar?')"
+);
+echo form_submit($att, 'Guardar');
 echo form_close();
-?>
 
-<a href="<?php echo base_url().'plans/viewPlans'?>">Volver</a>
+echo anchor('plans/viewPlans', 'Volver', array('onClick' => "return confirm('Seguro que desea volver? Se perderán los cambios')"));
+?>

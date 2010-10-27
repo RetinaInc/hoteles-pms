@@ -6,10 +6,17 @@ $this->load->view('pms/header');
 <h3>Tarifas</h3>
 
 <?php
-echo anchor(base_url().'rates/addRate/','Agregar Nueva Tarifa')."<br><br>";
+echo anchor('rates/addRate/','Agregar Nueva Tarifa')."<br>";
+
+if ($ratesDis) {
+
+	echo anchor('rates/viewDisabledRates/', 'Ver Tarifas Deshabilitadas');
+	echo "<br>";
+}
 
 if ($rates) {
 
+	echo "<br>";
 	foreach ($rates as $row) { 
 		
 		echo $row['name']."<br>";
@@ -19,19 +26,16 @@ if ($rates) {
 			echo 'Descripción: '.$row['description']."<br>";
 		}
 		
-		echo anchor(base_url().'rates/editRate/'.$row['id_rate'], 'Editar')."<br>";
-		?>
-        <a href="<?php echo base_url().'rates/disableRate/'.$row['id_rate'] ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar</a><br /><br /><br />
-        <?php
+		echo anchor('rates/editRate/'.$row['id_rate'], 'Editar')."<br>";
+		echo anchor('rates/disableRate/'.$row['id_rate'], 'Deshabilitar', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>";
 	}
+	
+	echo $this->pagination->create_links();
 	  
 } else {
 	
-	echo 'No existen tarifas!'."<br>";
+	echo "<br><br>";
+	echo 'No existen tarifas!';
 }
 
-if ($ratesDis) {
-
-	echo "<br>".anchor(base_url().'rates/viewDisabledRates/', 'Ver Tarifas Deshabilitadas');
-}
 ?>

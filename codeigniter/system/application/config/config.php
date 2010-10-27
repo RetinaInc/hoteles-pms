@@ -324,6 +324,7 @@ $config['rewrite_short_tags'] = FALSE;
 */
 $config['proxy_ips'] = '';
 
+$config['encryption_key'] = "RP00Lsoq28twzY10842AVOm35vTB01037F5r62";
 
 $config['letter_replace_array'] = array(
 				'á' => 'a','é' => 'e','í' => 'i','ó' => 'o','ú' => 'u','ñ' => 'n',
@@ -332,6 +333,7 @@ $config['letter_replace_array'] = array(
                 ' el ' => ' ',
 				' lo ' => ' '
 );
+
 
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

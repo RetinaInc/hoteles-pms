@@ -1,194 +1,233 @@
 
-<html>
-<head>
-
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/"?>popcalendar.js"></script>
-
-</head>
-
 <?php 
 $this->load->view('pms/header');
 ?>
 
-<h3>Check Ins</h3>
+<h3>Check Ins Pendientes del Dia</h3>
 
 <?php
 
-$weekDays = array('Domingo', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado');
-$dateDay = $weekDays[date('N', strtotime($checkInDate))];
+if (isset($error)) {
+	
+	echo "<span class='Estilo1'>".$error."</span>";
+	echo "<br><br>";
+}
+
+$weekDays = array('Domingo', 'Lunes','Martes','Miercoles','Jueves','Viernes','Sabado', 'Domingo');
+$dateDay  = $weekDays[date('N', strtotime($checkInDate))];
 
 $unixDate = human_to_unix($checkInDate.' 00:00:00');
-$date = date ("j/m/Y" , $unixDate);
-
+$date     = date ("j/m/Y" , $unixDate);
 ?>
+
 <table width="538" border="0">
   <tr>
-    <td width="169"><?php echo $dateDay.' '.$date; ?></td>
-    <td width="94">Buscar Fecha</td>
-    <?php 
-	$attributes = array('id' => 'checkInDate');
-	echo form_open('reservations/viewCheckIns', $attributes); 
-	?>
-    <td width="88">
-    <input name="check_in_date" type="text" id="check_in_date" onClick="popUpCalendar(this, checkInDate.check_in_date, 'dd-mm-yyyy');" value="<?php echo set_value('check_in_date'); ?>" size="10" maxlength="10" />
+  
+    <td width="169">
+		<?php 
+        echo $dateDay.' '.$date; 
+        ?>
     </td>
-    <td width="159"><?php  echo form_submit('sumit', 'Buscar'); ?></td>
-    <?php echo form_close(); ?>
+    
+    <td width="94">
+    Buscar Fecha
+    <span class="Estilo2">(dd - mm - yyyy)</span> 
+    </td>
+    
+    <?php
+	$attributes = array('id' => 'checkInDate');
+	echo form_open('reservations/viewCheckIns/date', $attributes); 
+	?>
+    
+    <td width="88">
+        <input name="check_in_date" type="text" id="check_in_date" onClick="popUpCalendar(this, checkInDate.check_in_date, 'dd-mm-yyyy');" onKeyPress="return rifnumbers(this, event)" value="<?php echo set_value('check_in_date'); ?>" size="10" maxlength="10" />
+    </td>
+    
+    <td width="159">
+		<?php 
+        echo form_submit('sumit', 'Buscar'); 
+        ?>
+    </td>
+    
+    <?php
+	echo form_close();
+	?>
+    
   </tr>
 </table>
+
 <br>
-<?php
 
-if ($dateCheckIns) {
-?>
-	<table width="995" border="1">
+<?php
+if ($resIds) {
+
+	$total = count($resIds);
+	echo 'Total check ins: ', $total;
+	?>
+    
+    <br /><br />
+    
+	<table width="1182" border="1">
   	  <tr>
-		<td width="45">
-    	<?php
-		echo '#';
-        echo form_open('reservations/viewCheckIns');
-		echo form_hidden('order', 'id_reservation');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-        
-		<td width="226">
-        <?php
-		echo 'Nombre Cliente ';
-        echo form_open('reservations/viewCheckIns');
-		echo form_hidden('order', 'gLname');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-        
-		<td width="104">
-    	<?php
-		echo 'Fecha Check-In';
-        echo form_open('reservations/viewCheckIns');
-		echo form_hidden('order', 'checkIn');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-        
-		<td width="112">
-    	<?php
-		echo 'Fecha Check-Out';
-        echo form_open('reservations/viewCheckIns');
-		echo form_hidden('order', 'checkOut');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-        
-		<td width="141">
-    	<?php
-		echo 'Estado';
-        echo form_open('reservations/viewCheckIns');
-		echo form_hidden('order', 'status');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-        
-    	<td width="115">Habitación(nes)</td>
-    	<td width="100">Pago</td>
-    	<td width="100">Por pagar</td>
-	  </tr>
-	
-  	  <?php 
-  	  foreach ($dateCheckIns as $row) {
-  
-		  $hotel = $this->session->userdata('hotelid');
-		  
-		  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
-		  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
-		  $payments = getPaymentInfo($hotel, null, null, $row['id_reservation']);
-		  
-		  $total = 0;
-		  foreach ($reservationRoomInfo as $row1) {
-			$total = $total + $row1['total'];
-		  }
-		
-		  $paid = 0;
-		  foreach ($payments as $row1) {
-			$paid = $paid + $row1['amount'];
-		  }
-		
-		  $toPay = $total - $paid;
-  	  ?>
       
-  <tr>
-   	<td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
-    	
-        <td>
-    	<?php 
-		foreach ($guests as $row1) { 
-	
-	    	if ($row1['id_guest'] == $row['fk_guest']) {
-		
-		   		if ($row1['disable'] == 1) {
-			
-			    	echo anchor(base_url().'guests/infoGuestReservations/'.$row1['id_guest'],$row1['lastName'].' '.$row1['lastName2'].', '.$row1['name'].' '.$row1['name2']);
-				
-				} else {
-			
-			    	echo $row1['lastName'].', '.$row1['name'];
-		   		}
-	    	}
-   		}
-		?>
-   	</td>
+		<td width="80">
+        	<?php
+            echo anchor('reservations/viewCheckIns/'.$checkInDate.'/id_reservation', '#');
+          	?>   
+        </td>
         
-    	<td>
-		<?php
-		$checkIn       = $row['checkIn'];
-		$checkIn_array = explode (' ',$checkIn);
-		$date          = $checkIn_array[0];
-		$date_array    = explode ('-',$date);
-		$year          = $date_array[0];
-		$month         = $date_array[1];
-		$day           = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-		?>
-   	</td>
-    	
-        <td>
-		<?php 
-		$checkOut       = $row['checkOut'];
-		$checkOut_array = explode (' ',$checkOut);
-		$date           = $checkOut_array[0];
-		$date_array     = explode ('-',$date);
-		$year           = $date_array[0];
-		$month          = $date_array[1];
-		$day            = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-		?>
-   	</td>
-    
-    	<td><?php echo lang($row['status']);?></td>
-    
-    	<td>
-    	<?php 
-		echo $reservationRoomsCount;
-		foreach ($reservationRoomInfo as $row1) {
-			if ($row1['fk_reservation'] == $row['id_reservation']) {
-				echo '('.$row1['number'].')';
-			}
-		}
-		?>
-	</td>
+		<td width="250">
+        	<?php
+            echo anchor('reservations/viewCheckIns/'.$checkInDate.'/gLname', 'Cliente');
+        	?>        
+       	</td>
         
-    	<td><?php echo $paid; ?> Bs.F.</td>
-    	<td><?php echo $toPay; ?> Bs.F.</td>
+		<td width="160">Fecha Check In</td>
+        
+  		<td width="160">
+    		<?php
+            echo anchor('reservations/viewCheckIns/'.$checkInDate.'/checkOut', 'Fecha Check Out');
+        	?>       
+     	</td>
+        
+		<td width="130">Estado </td>
+        
+    	<td width="170">Habitación(nes)</td>
+        
+    	<td width="90">Pago</td>
+        
+    	<td width="90">Por pagar</td>
   	  </tr>
-  	  <?php
-  	  }
-  	  ?>
-</table>
+	
+	<?php 
+	foreach ($resIds as $row) {
+  
+  		$hotel = $this->session->userdata('hotelid');
+		
+  		$reservationInfo = $this->REM->getReservationInfo($hotel, 'id_reservation', $row['id_reservation'], null, null, null, 1);
+		
+		foreach ($reservationInfo as $row1) {
+			  
+			$reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row1['id_reservation'], null, null);
+			$reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row1['id_reservation']);
+			$payments              = getPaymentInfo($hotel, null, null, $row1['id_reservation']);
+		  
+			$total = 0;
+			foreach ($reservationRoomInfo as $row2) {
+		  
+				$total = $total + $row2['total'];
+			}
+		
+			 $paid = 0;
+			 foreach ($payments as $row2) {
+		  
+				$paid = $paid + $row2['amount'];
+			}
+		
+			$toPay = $total - $paid;
+			?>
+	  
+		  <tr>
+			<td>
+				<?php 
+				echo anchor('reservations/infoReservation/'.$row1['id_reservation'].'/n/', $row1['id_reservation']);
+				?>
+			</td>
+		
+			<td>
+				<?php 
+				foreach ($guests as $row2) { 
+			
+					if ($row2['id_guest'] == $row1['fk_guest']) {
+				
+						if ($row2['disable'] == 1) {
+					
+							echo anchor('guests/infoGuestReservations/'.$row2['id_guest'], $row2['lastName'].' '.$row2['lastName2'].', '.$row2['name'].' '.$row2['name2']);
+						
+						} else {
+					
+							echo $row2['lastName'].', '.$row2['name'];
+						}
+					}
+				}
+				?>   	
+			</td>
+		
+			<td>
+				<?php
+				$checkIn       = $row1['checkIn'];
+				$checkIn_array = explode (' ',$checkIn);
+				$date          = $checkIn_array[0];
+				$date_array    = explode ('-',$date);
+				$year          = $date_array[0];
+				$month         = $date_array[1];
+				$day           = $date_array[2];
+				echo $day.'-'.$month.'-'.$year;
+				?>   	
+			</td>
+		
+			<td>
+				<?php 
+				$checkOut       = $row1['checkOut'];
+				$checkOut_array = explode (' ',$checkOut);
+				$date           = $checkOut_array[0];
+				$date_array     = explode ('-',$date);
+				$year           = $date_array[0];
+				$month          = $date_array[1];
+				$day            = $date_array[2];
+				echo $day.'-'.$month.'-'.$year;
+				?>   	
+			</td>
+	
+			<td>
+				<?php 
+				echo lang($row1['status']);
+				?>
+			</td>
+	
+			<td>
+				<?php 
+				echo $reservationRoomsCount;
+				foreach ($reservationRoomInfo as $row2) {
+				
+					if ($row2['fk_reservation'] == $row1['id_reservation']) {
+					
+						echo '('.$row2['number'].')';
+					}
+				}
+				?>	
+			</td>
+		
+			<td>
+				<?php 
+				echo $paid; 
+				?> 
+				Bs.F.
+			</td>
+		
+			<td>
+				<?php 
+				echo $toPay; 
+				?> 
+				Bs.F.
+			</td>
+		  </tr>
+		<?php
+		}
+  	}
+  	?>
+	</table>
+    
+	<br>
 
-<?php
+	<?php
+
+	echo $this->pagination->create_links();
+
 } else {
 
-	echo "<br><br>".'No existen check ins!'."<br>";
+	echo "<br><br>";
+	echo 'No existen check ins en la fecha!';
 }
-?>
 
-</html>
+?>

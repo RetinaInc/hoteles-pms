@@ -11,6 +11,7 @@ class Guests extends Controller
 		$this->load->model('general_model','GNM');
 		$this->lang->load('form_validation','spanish');
 		$this->load->library('form_validation');
+		$this->load->library('pagination');
 		$this->load->library('session');
 		$this->load->helper('language');
 		$this->load->helper('hoteles');
@@ -25,11 +26,11 @@ class Guests extends Controller
 	}
 	
 	
-	function guestNames()
+	function guestNames($disable)
 	{
 		$hotel = $this->session->userdata('hotelid');
 		
-		$names = $this->GSM->autocompleteGetGuestNames($hotel);
+		$names = $this->GSM->autocompleteGetGuestNames($hotel, $disable);
 		
 		$i=0;
 		foreach ($names as $row)
@@ -38,7 +39,10 @@ class Guests extends Controller
 			$i++;
 		}
 		
-		return $aux;
+		if ($names) {
+			
+			return $aux;
+		}
 	}
 	
 	
@@ -50,11 +54,24 @@ class Guests extends Controller
 
 			$hotel = $this->session->userdata('hotelid');
 			
-			$guests = $this->GSM->getGuestInfo($hotel, null, null, 'lastName', null, null, 1);
-			$name_aux = $this->guestNames();
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GSM->getTotalRowsGuests($hotel, null, null, 1);
 			
-			$data['names'] = $name_aux;
-			$data['guests'] = $guests;
+			$config['base_url']    = base_url().'guests/viewGuests';
+			$config['total_rows']  = $totalRows;
+			$config['per_page']    = '10';
+			$config['num_links']   = '50';
+			$config['uri_segment'] = 3;
+			
+			$this->pagination->initialize($config); 
+			
+			$guests    = $this->GSM->getGuestInfo($hotel, null, null, 'lastName', $config['per_page'], $lim2, 1);
+			$guestsDis = $this->GSM->getGuestInfo($hotel, 'G.disable', '0', 'lastName', null, null, null);
+			$name_aux  = $this->guestNames('1');
+			
+			$data['guests']    = $guests;
+			$data['guestsDis'] = $guestsDis;
+			$data['names']     = $name_aux;
 			
 			$this->load->view('pms/guests/guests_view', $data);
 			
@@ -74,9 +91,22 @@ class Guests extends Controller
 		
 			$hotel = $this->session->userdata('hotelid');
 			
-			$guests = $this->GSM->getGuestInfo($hotel, 'G.disable', '0', 'lastName', null, null, null);
+			$lim2      = $this->uri->segment(3);
+			$totalRows = $this->GSM->getTotalRowsGuests($hotel, 'G.disable', '0', null);
 			
-			$data['guests'] = $guests;
+			$config['base_url']    = base_url().'guests/viewDisableGuests';
+			$config['total_rows']  = $totalRows;
+			$config['per_page']    = '10';
+			$config['num_links']   = '50';
+			$config['uri_segment'] = 3;
+			
+			$this->pagination->initialize($config); 
+			
+			$guestsDis = $this->GSM->getGuestInfo($hotel, 'G.disable', '0', 'lastName', $config['per_page'], $lim2, null);
+			$name_aux  = $this->guestNames('0');
+			
+			$data['guestsDis'] = $guestsDis;
+			$data['names']     = $name_aux;
 			
 			$this->load->view('pms/guests/guests_disable_view', $data);
 		
@@ -94,16 +124,46 @@ class Guests extends Controller
 		
 		if ($userId) {
 		
-			if (isset($_POST["order"])) {
-				$order = $_POST["order"];
-			}else {
+			$hotel = $this->session->userdata('hotelid');
+		
+			$guestId = $this->uri->segment(3);
+			$order   = $this->uri->segment(4);
+			$lim2    = $this->uri->segment(5);
+			
+			if (($this->uri->segment(5) == FALSE) && ($this->uri->segment(4) == FALSE)) {
+				
+				$order = 'checkIn';
+				$lim2  = NULL;
+			}
+			
+			if (($this->uri->segment(5) == FALSE) && ($this->uri->segment(4) > 0)) {
+				
+				$order = 'checkIn';
+				$lim2  = $this->uri->segment(4);
+			}
+			
+			$rr        = $this->REM->getReservationInfo($hotel, 'RE.fk_guest', $guestId, null, null, null, null);
+			$totalRows = count($rr);
+			
+			$config['base_url']    = base_url().'guests/infoGuestReservations/'.$guestId.'/'.$order;
+			$config['total_rows']  = $totalRows;
+			$config['per_page']    = '5';
+			$config['num_links']   = '50';
+			$config['uri_segment'] = 5;
+			
+			$this->pagination->initialize($config); 
+			
+			if (($order == NULL) || ($order == 'checkIn')){
+			
 				$order = 'checkIn DESC';
 			}
-	
-			$hotel = $this->session->userdata('hotelid');
+			if ($order == 'checkOut'){
+			
+				$order = 'checkOut DESC';
+			}
 			
 			$guest        = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, null);
-			$reservations = $this->REM->getReservationInfo($hotel, 'RE.fk_guest', $guestId, $order, null, null, 1);
+			$reservations = $this->REM->getReservationInfo($hotel, 'RE.fk_guest', $guestId, $order, $config['per_page'], $lim2, null);
 			
 			$data['guest']        = $guest;
 			$data['reservations'] = $reservations;
@@ -121,7 +181,9 @@ class Guests extends Controller
 	function editGuest($guestId)
 	{
 		$hotel = $this->session->userdata('hotelid');
-			
+		
+		$this->form_validation->set_rules('guest_id_type','lang:id_type','trim|xss_clean|required');
+		$this->form_validation->set_rules('guest_id_num','lang:id_num','trim|xss_clean|required|max_length[10]|callback_checkGuestId');
 		$this->form_validation->set_rules('guest_name','lang:name','trim|xss_clean|required|max_length[30]');
 		$this->form_validation->set_rules('guest_name2','lang:name2','trim|xss_clean|max_length[30]');
 		$this->form_validation->set_rules('guest_last_name','lang:last_name','trim|xss_clean|required|max_length[30]');
@@ -150,6 +212,8 @@ class Guests extends Controller
 				
 		} else {
 			
+			$guestIdType    = set_value('guest_id_type');
+			$guestIdNum     = set_value('guest_id_num');
 			$guestName      = set_value('guest_name');
 			$guestName2     = set_value('guest_name2');
 			$guestLastName  = set_value('guest_last_name');
@@ -159,6 +223,8 @@ class Guests extends Controller
 			$guestAddress   = set_value('guest_address');
 				
 			$data = array(
+				'idType'    => $guestIdType,
+				'idNum'     => $guestIdNum,
 				'name'      => ucwords(strtolower($guestName)),
 				'name2'     => ucwords(strtolower($guestName2)),
 				'lastName'  => ucwords(strtolower($guestLastName)),
@@ -171,6 +237,62 @@ class Guests extends Controller
 			$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
 					
 			$this->infoGuestReservations($guestId); 
+		}
+	}
+	
+	
+	function searchGuest($reservationId)
+	{
+		$userId = $this->session->userdata('userid');
+		
+		if ($userId) {
+			
+			$hotel = $this->session->userdata('hotelid');
+			
+			$this->form_validation->set_rules('search_guest_id','lang:guest_id','trim|xss_clean|max_length[10]');
+			
+			if ($this->form_validation->run() == FALSE) {
+				
+				$reservationRoomInfo  = $this->ROM->getRRInfo($hotel, 'fk_reservation', $reservationId);
+				$reservationRoomCount = $this->ROM->getRRCount($hotel, 'fk_reservation', $reservationId, null, null);
+			
+				$data['error'] = 1;
+				$data['reservationId']        = $reservationId;
+				$data['reservationRoomInfo']  = $reservationRoomInfo;
+				$data['reservationRoomCount'] = $reservationRoomCount;
+						
+				$this->load->view('pms/reservations/reservation_create_3_view', $data);
+			
+			} else {
+			
+				$guestIdNum = set_value('search_guest_id');
+				
+				if ($guestIdNum != NULL) {
+					
+					$guest = $this->GSM->getGuestInfo($hotel, 'idNum', $guestIdNum, null, null, null, 1);
+					
+					if (!$guest) {
+						
+						$error = lang("errorNoExGuest");
+					} 
+				} 
+				
+				$reservationRoomInfo  = $this->ROM->getRRInfo($hotel, 'fk_reservation', $reservationId);
+				$reservationRoomCount = $this->ROM->getRRCount($hotel, 'fk_reservation', $reservationId, null, null);
+			
+				$data['error']                = $error;
+				$data['guest']                = $guest;
+				$data['reservationId']        = $reservationId;
+				$data['reservationRoomInfo']  = $reservationRoomInfo;
+				$data['reservationRoomCount'] = $reservationRoomCount;
+						
+				$this->load->view('pms/reservations/reservation_create_3_view', $data);
+			}
+		
+		} else {
+			
+			$data['error'] = NULL;
+			$this->load->view('pms/users/user_sign_in', $data);
 		}
 	}
 	
@@ -206,28 +328,31 @@ class Guests extends Controller
 					$delete = 'No';
 					
 					$newResNum = array ($resNum);
-					$resultado = array_merge($iniResNum, $newResNum);
-					$iniResNum = $resultado;
+					$result    = array_merge($iniResNum, $newResNum);
+					$iniResNum = $result;
 					
 					//echo 'new: ', print_r($new_res_num). "<br>";
-					//echo 'res: ', print_r($resultado). "<br>";
+					//echo 'res: ', print_r($result). "<br>";
 					//echo 'ini: ', print_r($ini_res_num). "<br>";
 				}
 			}
 			
 			if ($delete == 'No') {
 			
-				echo lang("errorPendingReservation")."<br>";
-				foreach ($resultado as $actual)
-				echo '# ',$actual . "<br>"; 
+				$data['error']  = lang("errorPendingReservation");
+				$data['result'] = $result;
+				$data['type']   = 'error_guest';
 				
-				$this->infoGuestReservations($guestId);
+				$this->load->view('pms/error', $data);
 				
 			} else {
 			
 				$this->GNM->disable('GUEST', 'id_guest', $guestId);
-				echo lang("guestDisabled");
-				$this->viewGuests(); 
+				
+				$data['message'] = lang("disableGuestMessage");
+				$data['type'] = 'guests';
+				
+				$this->load->view('pms/success', $data);
 			}	
 			
 		} else {
@@ -250,8 +375,10 @@ class Guests extends Controller
 				
 			$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
 				
-			echo lang("guestEnabled");	
-			$this->infoGuestReservations($guestId);	
+			$data['message'] = lang("enableGuestMessage");
+			$data['type'] = 'guests';
+				
+			$this->load->view('pms/success', $data);	
 		
 		} else {
 		
@@ -290,7 +417,25 @@ class Guests extends Controller
 				$this->load->view('pms/guests/guest_search_view',$data);
 		}
 	}
+	
+	
+	function checkGuestId($str)
+	{
+		$guestId = $this->uri->segment(3);
+		$hotel   = $this->session->userdata('hotelid');
+		
+		$guests = $this->GSM->validationCheckGuest($hotel, 'idNum', $str, 'id_guest !=', $guestId, null);
 
+		if ($guests) {
+		
+			$this->form_validation->set_message('checkGuestId', lang("errorId"));
+			return FALSE;
+			
+		} else {
+		
+			return TRUE;
+		}
+	}
 
 
 

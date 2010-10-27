@@ -1,11 +1,11 @@
 
-<html>
-
 <?php 
 $this->load->view('pms/header'); 
+?>
 
-echo 'PAGOS RESERVACIÓN'."<br>";
+<h3>Información Pago Reservación</h3>
 
+<?php
 foreach ($reservation as $row) {
 
 	$reservationId = $row['id_reservation'];
@@ -27,33 +27,77 @@ foreach ($reservation as $row) {
 	
 	echo 'Reservación # ', $reservationId."<br><br>";
 	?>
+    
 	<table width="940" border="0">
+    
 	  <tr>
       	<td width="284">
-		<?php 
-			foreach ($guest as $row1) {
-				if ($row1['id_guest'] == $guestId) {
-					echo 'Cliente: ', $row1['name'].' '.$row1['name2'].' '.$row1['lastName'].' '.$row1['lastName2'];		
-				}
-			}
-		?>        </td>
-		<td width="229"><?php echo 'Tarifa ', $row['ratename']; ?></td>
-		<td width="195"><?php echo 'Llegada: ', date ("D  j/m/Y" , $unixCi); ?></td>
-		<td width="214"><?php echo 'Cant. noches: ', $nights; ?></td>
+			<?php 
+            foreach ($guest as $row1) {
+			
+            	if ($row1['id_guest'] == $guestId) {
+				
+                	echo 'Cliente: ', $row1['name'].' '.$row1['name2'].' '.$row1['lastName'].' '.$row1['lastName2'];		
+                }
+            }
+            ?>        
+        </td>
+        
+		<td width="229">
+			<?php 
+            echo 'Tarifa ', $row['ratename']; 
+            ?>
+        </td>
+        
+		<td width="195">
+			<?php 
+            echo 'Llegada: ', date ("D  j/m/Y" , $unixCi); 
+            ?>
+        </td>
+        
+		<td width="214">
+			<?php 
+            echo 'Cant. noches: ', $nights; 
+            ?>
+        </td>
 	  </tr>
+      
 	  <tr>
-      	<td width="284"><?php echo 'Estado: ', lang($row['status']); ?></td>
-		<td><?php echo 'Plan ', $row['planname']; ?></td>
-		<td><?php echo 'Salida: ', date ("D  j/m/Y" , $unixCo); ?></td>
-		<td><?php echo 'Cant. habitaciones: ', $reservationRoomCount;?></td>
+      	<td width="284">
+			<?php 
+            echo 'Estado: ', lang($row['status']); 
+            ?>
+        </td>
+        
+		<td>
+			<?php 
+            echo 'Plan ', $row['planname']; 
+            ?>
+        </td>
+        
+		<td>
+			<?php 
+            echo 'Salida: ', date ("D  j/m/Y" , $unixCo); 
+            ?>
+        </td>
+        
+		<td>
+			<?php 
+            echo 'Cant. habitaciones: ', $reservationRoomCount;
+            ?>
+        </td>
 	  </tr>
-</table>
-<br />
-<?php
+      
+	</table>
+	
+    <br />
+	
+	<?php
 }
 
 $total = 0;
 foreach ($reservationRoomInfo as $row) {
+
 	$total = $total + $row['total'];
 }
 
@@ -61,6 +105,7 @@ echo 'Total reservación: ', $total.' Bs.F.'."<br>";
 
 $paid = 0;
 foreach ($payments as $row) {
+
 	$paid = $paid + $row['amount'];
 }
 
@@ -74,32 +119,55 @@ echo 'Total por pagar: ', $amountToPay.' Bs.F.'."<br><br>";
 
 <table width="487" border="1">
   <tr>
+  
     <td width="100">Fecha</td>
+    
     <td width="150">Tipo de Pago</td>
+    
     <td width="150">Monto</td>
+    
     <td width="59">Detalles</td>
+    
   </tr>
+  
+  <?php
+  foreach ($payments as $row) {
+  ?>
   <tr>
-  	<?php
-	foreach ($payments as $row) {
-    ?>
-    <td>
-	<?php 
+	<td>
+		<?php 
 		$unixDate = human_to_unix($row['date']);
 		echo date ("j/m/Y" , $unixCi); 
-	?>    </td>
-    <td><?php echo lang($row['type']) ?></td>
-    <td><?php echo $row['amount'] ?> Bs.F.</td>
-    <td><?php echo anchor('reservations/viewPaymentDetails/'.$row['fk_reservation'].'/'.$row['id_payment'], 'Ver');?></td>
-    <?php
-	}
-	?>
+		?>    
+    </td>
+    
+    <td>
+		<?php 
+        echo lang($row['type']);
+        ?>
+    </td>
+    
+    <td>
+		<?php 
+        echo $row['amount']; 
+        ?> 
+        Bs.F.
+    </td>
+    
+    <td>
+		<?php 
+        echo anchor('reservations/viewPaymentDetails/'.$row['fk_reservation'].'/'.$row['id_payment'], 'Ver');
+        ?>
+    </td>
   </tr>
+  <?php
+  }
+  ?>
+  
 </table>
+
 <br>
 
 <?php
-echo anchor ('reservations/infoReservation/'.$reservationId, 'Volver')
+echo anchor ('reservations/infoReservation/'.$reservationId.'/n/', 'Volver')
 ?>
-
-</html>
