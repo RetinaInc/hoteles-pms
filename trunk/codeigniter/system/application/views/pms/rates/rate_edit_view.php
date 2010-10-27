@@ -1,19 +1,27 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
+<h3>Editar Tarifa</h3> 
+
+<span class="Estilo2">
+	(*)Campos obligatorios
+</span>
+
+<span class="Estilo1">
+	<?php
+	echo validation_errors();
+	?>
+</span>
+
+<?php
 foreach ($rate as $row)
 {
 	$rateId = $row['id_rate'];
 }
 
-
-echo 'EDITAR TARIFA'."<br><br>";
-
-echo validation_errors();
-
-echo form_open(base_url().'rates/editRate/'.$rateId);
+echo form_open('rates/editRate/'.$rateId);
 
 foreach ($rate as $row) {
 ?>
@@ -23,13 +31,18 @@ foreach ($rate as $row) {
     </p>
 	
     <p> Descripción: </p>
-	<p><textarea name="rate_description" rows="3" id="rate_description"><?php echo $row['description'];  ?></textarea></p>  
+	<p><textarea name="rate_description" rows="3" id="rate_description"><?php echo $row['description']; ?></textarea></p>  
    
 <?php
 }
-
-echo form_submit('sumit', 'Enviar');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea guardar?')"
+);
+echo form_submit($att, 'Guardar');
 echo form_close();
+
+echo anchor('rates/viewRates', 'Volver');
 ?>
 
-<a href="<?php echo base_url().'rates/viewRates'?>">Volver</a>

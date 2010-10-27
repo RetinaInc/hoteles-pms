@@ -10,7 +10,7 @@ class Plans_model extends Model
 	
 /*	function getPlanInfo($hotel, $field, $value)
 	{
-		if ($field != null and $value != null) {
+		if ($field != null && $value != null) {
 		
   			$this->db->where($field, $value);
   		}

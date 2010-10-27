@@ -76,6 +76,58 @@ function getInfo($hotel, $table, $field, $value, $order, $lim1, $lim2, $disable)
 }
 
 
+function getReservationInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('reservations_model');
+	
+	$result = $CI->reservations_model->getReservationInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable);
+		
+	return $result;
+}
+
+
+function getRoomTypes($hotel, $totalPers)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('rooms_model');
+	
+	$result = $CI->rooms_model->getRoomTypes($hotel, $totalPers);
+		
+	return $result;
+}
+
+
+/*
+function getGuestInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('guests_model');
+	
+	$result = $CI->guests_model->getGuestInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable);
+		
+	return $result;
+}
+*/
+
+
+/*
+function getName($hotel, $table, $field1, $value1, $field2, $value2)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('general_model');
+	
+	$result = $CI->general_model->getName($hotel, $table, $field1, $value1, $field2, $value2);
+		
+	return $result;
+}
+*/
+
+
 function getNick($string)
 {
 	$string = htmlentities(strtolower(trim($string))); //Chages accented letters with html format &xacute; style

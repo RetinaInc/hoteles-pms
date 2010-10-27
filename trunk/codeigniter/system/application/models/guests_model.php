@@ -10,7 +10,7 @@ class Guests_model extends Model
 	
 	function getGuestInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable)
 	{
-		if ($field != null and $value != null) {
+		if ($field != null && $value != null) {
 		
   			$this->db->where($field, $value);
   		}
@@ -25,8 +25,8 @@ class Guests_model extends Model
 			$this->db->where('G.disable', 1);
 		}
 
-	    $this->db->select('DISTINCT(G.id_guest), G.ci, G.name, G.name2, G.lastName, G.lastName2, G.telephone, G.email, G.address, G.disable');
-		$this->db->where('G.id_guest = RE.fk_guest and RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+	    $this->db->select('DISTINCT(G.id_guest), G.idType, G.idNum, G.name, G.name2, G.lastName, G.lastName2, G.telephone, G.email, G.address, G.disable');
+		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
 	
 		$query = $this->db->get('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT', $lim1, $lim2);
@@ -36,12 +36,12 @@ class Guests_model extends Model
 	
 	function getOtherGuestInfo($hotel, $field1, $value1, $field2, $value2, $order)
 	{
-		if ($field1 != null and $value1 != null) {
+		if ($field1 != null && $value1 != null) {
 		
   			$this->db->where($field1, $value1);
   		}
 		
-		if ($field2 != null and $value2 != null) {
+		if ($field2 != null && $value2 != null) {
 		
   			$this->db->where($field2, $value2);
   		}
@@ -52,7 +52,7 @@ class Guests_model extends Model
   		}
 
 	    $this->db->select('DISTINCT(OG.id_other_guest), OG.*');
-		$this->db->where('OG.fk_reservation = RE.id_reservation and RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+		$this->db->where('OG.fk_reservation = RE.id_reservation AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
 	
 		$query = $this->db->get('OTHER_GUEST OG, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
@@ -60,16 +60,65 @@ class Guests_model extends Model
 	}
 	
 	
-	function autocompleteGetGuestNames($hotel)
+	function getTotalRowsGuests($hotel, $field, $value, $disable)
 	{
-		$this->db->select('DISTINCT(G.id_guest), G.name, G.name2, G.lastName, G.lastName2');
-		$this->db->where('G.disable', 1);
-		$this->db->where('G.id_guest = RE.fk_guest and RE.id_reservation = RR.fk_reservation and RR.fk_room = RO.id_room and RO.fk_room_type = RT.id_room_type');
+		if ($field != null && $value != null)
+		{
+  			$this->db->where($field, $value);
+  		}
+		
+		if ($disable != null) {
+		
+			$this->db->where('G.disable', 1);
+		}
+		
+		$this->db->select('DISTINCT(G.id_guest)');
+		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
-		$query = $this->db->get('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT', $lim1, $lim2);
+		$this->db->from('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
+		
+		$query = $this->db->get();
+		
+		$rows = count($query->result_array());
+		
+		return $rows;
+	}
+	
+	
+	function autocompleteGetGuestNames($hotel, $disable)
+	{
+		$this->db->select('DISTINCT(G.id_guest), G.idType, G.idNum, G.name, G.name2, G.lastName, G.lastName2');
+		$this->db->where('G.disable', $disable);
+		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.fk_hotel', $hotel);
+		$query = $this->db->get('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
 		return $query->result_array();
 	}
-
+	
+	
+	function validationCheckGuest($hotel, $field1, $value1, $field2, $value2, $disable)
+	{
+		if ($field1 != null && $value1 != null) {
+		
+  			$this->db->where($field1, $value1);
+  		}
+		
+		if ($field2 != null && $value2 != null) {
+		
+  			$this->db->where($field2, $value2);
+  		}
+		
+		if ($disable != null) {
+		
+			$this->db->where('G.disable', 1); 
+		}
+		 
+		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.fk_hotel', $hotel); 
+		$query = $this->db->get('GUEST G, RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
+		return $query->result_array();
+	}
+	
 	
 	function getSearchGuest($hotel, $search_string, $page=-1)
     {	
@@ -162,10 +211,9 @@ class Guests_model extends Model
 		$name2_like_string = "'%" . implode("%' OR G.name2 LIKE '%",$allNames) . "%'";
 		$last_name_like_string = "'%" . implode("%' OR G.lastName LIKE '%",$allNames) . "%'";
 		$last_name2_like_string = "'%" . implode("%' OR G.lastName2 LIKE '%",$allNames) . "%'";
-		$ci_like_string = "'%" . implode("%' OR G.ci LIKE '%",$allNames) . "%'";
+		$ci_like_string = "'%" . implode("%' OR G.idNum LIKE '%",$allNames) . "%'";
 				
 		$nameCount = count($allNames);
-		echo 'COUNT: ', $nameCount;
 		
 		if ($nameCount == 1) {
 			
@@ -173,7 +221,7 @@ class Guests_model extends Model
 						       (G.name2 like $name2_like_string) OR 
 							   (G.lastName like $last_name_like_string) OR
 						       (G.lastName2 like $last_name2_like_string) OR
-						       (G.ci like $ci_like_string)
+						       (G.idNum like $ci_like_string)
 						     )";
 		}
 		
@@ -208,7 +256,7 @@ class Guests_model extends Model
 		
 		
 		$this->db->select('DISTINCT(G.id_guest), G.*');
-		$this->db->where('G.disable', 1);
+		//$this->db->where('G.disable', 1);
 		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
         $this->db->where($where_string);

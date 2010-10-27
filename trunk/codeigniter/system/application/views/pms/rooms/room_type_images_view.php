@@ -1,21 +1,30 @@
 
-
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
+<h3>Imágenes Tipo de Habitación</h3>
+
+<?php
 foreach ($roomType as $row) {
 
+	$roomTypeId   = $row['id_room_type'];
 	$roomTypeName = $row['name']."<br>";
 }	
 	
-echo 'Imagenes Tipo de Habitación: '.$roomTypeName."<br><br>";
+echo 'Tipo de Habitación: '.$roomTypeName."<br><br>";
 	
 foreach ($roomTypeImages as $row) {
 		
-	?><img src="<?php echo base_url() . "assets/images/" .$row['image']; ?>"/><?php 
+	$imageId = $row['id_image'];
+	?>
+    <img src="<?php echo base_url() . "assets/images/" .$row['image']; ?>"/>
+	<?php 
+	echo anchor('rooms/deleteRoomTypeImage/'.$imageId, 'Eliminar', array('onClick' => "return confirm('Seguro que desea eliminar?')"));	
+	echo "<br><br>";
 }
-		
+	
+echo "<br><br>";
+echo anchor('rooms/infoRoomType/'.$roomTypeId, 'Volver');	
 		
 ?>
-<p><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver</a></p>

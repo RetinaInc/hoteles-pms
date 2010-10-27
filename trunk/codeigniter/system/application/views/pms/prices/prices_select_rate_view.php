@@ -7,18 +7,28 @@ $this->load->view('pms/header');
 
 <?php
 foreach ($season as $row) {
-	echo 'Temporada: ',$row['name']."<br><br>";
+
 	$seasonId = $row['id_season'];
+	echo 'Temporada: ', $row['name']."<br><br>";
 }
 
+if ($rates) {
 
-foreach ($rates as $row) { 
+	foreach ($rates as $row) { 
 		
-	echo anchor(base_url().'prices/selectPlanPrices/'.$seasonId.'/'.$row['id_rate'], $row['name'])."<br>";
+		echo anchor('prices/selectPlanPrices/'.$seasonId.'/'.$row['id_rate'], $row['name'])."<br><br>";
+	}
+
+} else {
+
+	echo 'No existen tarifas!';
 }
+
+echo $this->pagination->create_links();
+
+echo "<br><br>";
+echo anchor('prices/selectSeasonPrices', 'Volver');
+
 ?>
-	
-<p><a href="<?php echo base_url().'prices/selectSeasonPrices'?>">Volver</a></p>
- 
 
 

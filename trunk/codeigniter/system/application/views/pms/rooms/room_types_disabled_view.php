@@ -9,69 +9,101 @@ $this->load->view('pms/header');
 
 if ($roomTypes) {
 
-	echo "<br><br>".'Total tipos de habitaciones deshabilitadas: ', $roomTypesCount."<br><br>";
+	echo 'Total tipos de habitaciones deshabilitadas: ', $roomTypesCount."<br><br>";
 	?>
 
-	<table width="499" border="1">
+	<table width="650" border="1">
 	  <tr>
-    	<td width="135">
-		<?php 
-		echo form_open(base_url().'rooms/viewRoomTypes');
-		echo form_hidden('order', 'name');
-		echo 'Nombre ', form_submit('sumit', '^');
-        echo form_close();
-		?>   	
-        </td>
+      	<td width="40">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/scale', 'Nivel');
+			?>        </td>
         
-   	 	<td width="60">Abrev</td>
+   	  <td width="135">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/name', 'Nombre');
+			?>        </td>
         
-  		<td width="90">
-		<?php 
-		echo form_open(base_url().'rooms/viewRoomTypes');
-		echo form_hidden('order', 'paxStd');
-		echo 'Pax estándar ', form_submit('sumit', '^');
-        echo form_close();
-		?>    
-        </td>
+ 	  <td width="60">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/abrv', 'Abrev');
+			?>        </td>
         
-  		<td width="90">
-		<?php 
-		echo form_open(base_url().'rooms/viewRoomTypes');
-		echo form_hidden('order', 'paxMax');
-		echo 'Pax máximo ', form_submit('sumit', '^');
-        echo form_close();
-		?>    
-        </td>
+	  <td width="125">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/paxStd', 'Pax estándar');
+			?>        </td>
         
-  		<td width="90">
-		<?php 
-		echo form_open(base_url().'rooms/viewRoomTypes');
-		echo form_hidden('order', 'beds');
-		echo 'Camas ', form_submit('sumit', '^');
-        echo form_close();
-		?>   
-        </td>
+	  <td width="125">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/paxMax', 'Pax máximo');
+			?>        </td>
+        
+	  <td width="125">
+        	<?php
+        	echo anchor('rooms/viewDisabledRoomTypes/beds', 'Camas');
+			?>        </td>
 	  </tr>
 
 	  <?php
 	  foreach ($roomTypes as $row) {	?>
-	  <tr>
-    	<td><?php echo anchor(base_url().'rooms/infoRoomType/'.$row['id_room_type'],$row['name']);?></td>
-		<td><?php echo $row['abrv'];?></td>
-    	<td><?php echo $row['paxStd'];?><br></td>
-    	<td><?php echo $row['paxMax'];?><br></td>
-    	<td><?php echo $row['beds'];?> </td>
-  	  </tr>
-	  <?php
+          <tr>
+          	<td>
+                <?php 
+                echo $row['scale'];
+                ?>
+            </td>
+            
+            <td>
+                <?php 
+                echo anchor('rooms/infoRoomType/'.$row['id_room_type'],$row['name']);
+                ?>
+            </td>
+            
+            <td>
+                <?php 
+                echo $row['abrv'];
+                ?>
+            </td>
+            
+            <td>
+                <?php 
+                echo $row['paxStd'];
+                ?>
+            </td>
+            
+            <td>
+                <?php 
+                echo $row['paxMax'];
+                ?>
+            </td>
+            
+            <td>
+                <?php 
+                echo $row['beds'];
+                ?> 
+            </td>
+            
+          </tr>
+          <?php
 	  }
 	  ?>
 	</table>
+    
+<br />
 
-<?php
+	<?php
+
+	echo $this->pagination->create_links();
+
 } else {
 	
-	echo "<br><br>".'No existen tipos de habitaciones deshabilitadas!';
+	echo "<br><br>";
+	echo 'No existen tipos de habitaciones deshabilitadas!';
 }
+
+echo "<br><br>";
+echo anchor ('rooms/viewRoomTypes/name', 'Volver a Tipos de Habitaciones');
+
 ?>
 
-<p><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver a Tipos de Habitaciones</a></p>

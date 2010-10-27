@@ -1,24 +1,35 @@
-<head>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/"?>popcalendar.js"></script>
-<script language='javascript' src="<?php echo base_url() . "assets/calendario/images"?>"></script>
-</head>
 
 <?php 
-
 $this->load->view('pms/header'); 
+?>
+
+<h3>Editar Temporada</h3>
+
+<span class="Estilo2">
+	(*)Campos obligatorios
+</span>
+
+<span class="Estilo1">
+	<?php
+	echo validation_errors();
+	?>
+</span>
+
+<?php
+if (isset($error)) {
+	
+	echo "<br><br>";
+	echo "<span class='Estilo1'>".$error."</span>";
+}
 
 foreach ($season as $row)
 {
 	$seasonId = $row['id_season'];
 }
 
-echo 'EDITAR TEMPORADA'."<br><br>";
-
-echo validation_errors();
 
 $attributes = array('name' => 'form1', 'id' => 'form1');
-
-echo form_open(base_url().'seasons/editSeason/'.$seasonId, $attributes);
+echo form_open('seasons/editSeason/'.$seasonId, $attributes);
 
 foreach ($season as $row) {
 
@@ -35,52 +46,39 @@ foreach ($season as $row) {
 	$month    = $dE_array[1];
 	$day      = $dE_array[2];
     $dateEnd  = $day.'-'.$month.'-'.$year;
-?>
+	?>
 
 	<p>* Nombre:
-      <input name="season_name" type="text" id="season_name" value="<?php echo $row['name']; ?>" size="50" maxlength="300" />
+    	<input name="season_name" type="text" id="season_name" value="<?php echo $row['name']; ?>" size="50" maxlength="300" />
     </p>
 	
    	<p>* Fecha inicio:			
-	<input name="season_dateStart" type="text" id="season_dateStart" value="<?php echo $dateStart; ?>" onClick="popUpCalendar(this, form1.season_dateStart, 'dd-mm-yyyy');" size="10" maxlength="10">
+        <input name="season_dateStart" type="text" id="season_dateStart" value="<?php echo $dateStart; ?>" 
+        onClick="popUpCalendar(this, form1.season_dateStart, 'dd-mm-yyyy');" onKeyPress="return rifnumbers(this, event)" size="10" maxlength="10">
+        <span class="Estilo2">(dd - mm - yyyy)</span> 
+        <br />
+        <span class="Estilo2">(Incluye esa noche)</span>
     </p>
     
 	<p>* Fecha fin:
-    <input name="season_dateEnd" type="text" id="season_dateEnd" onClick="popUpCalendar(this, form1.season_dateEnd, 'dd-mm-yyyy');" value="<?php echo $dateEnd; ?>" size="10" maxlength="10">			
+        <input name="season_dateEnd" type="text" id="season_dateEnd"  value="<?php echo $dateEnd; ?>" 
+        onClick="popUpCalendar(this, form1.season_dateEnd, 'dd-mm-yyyy');" onKeyPress="return rifnumbers(this, event)" size="10" maxlength="10">	
+        <span class="Estilo2">(dd - mm - yyyy)</span> 
+        <br />
+        <span class="Estilo2">(Incluye esa noche)</span>		
 	</p>
     
-     <p>Temporada a la que pertenece:
-     
-      <select name="season_season" id="season_season">
-          <option value= "NULL" selected>Ninguna</option>
-    	<?php
-        foreach ($seasons as $row1) {
-		
-	        if ($row1['id_season'] == $row['fk_season']) {
-				
-		        ?><option value="<?php echo $row1['id_season']?>" selected><?php echo $row1['name']; ?></option><?php
-				
-			} else {
-				
-				if (($row1['id_season'] != $row['id_season']) && ($row1['fk_season'] != $row['id_season'])) {
-				
-				?><option value="<?php echo $row1['id_season']?>"><?php echo $row1['name']; ?></option><?php
-				
-				}
-			}
-        }
-		?>
-        </select>
-  
-    </p>
-    
-    
-   
 <?php
 }
 
-echo form_submit('sumit', 'Enviar');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea guardar?')"
+);
+echo form_submit($att, 'Guardar');
 echo form_close();
-?>
 
-<a href="<?php echo base_url().'seasons/infoSeason/'.$seasonId?>">Volver</a>
+echo anchor('seasons/infoSeason/'.$seasonId, 'Volver', array('onClick' => "return confirm('Seguro que desea volver? Se perderá la información')"));
+
+?>

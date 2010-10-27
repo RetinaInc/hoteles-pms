@@ -1,17 +1,17 @@
 
-
 <?php 
-
 $this->load->view('pms/header'); 
+?>
 
+<h3>Información Tipo de Habitación</h3>
+
+<?php
 foreach ($roomType as $row) {
 
 	$roomTypeId   = $row['id_room_type'];
 	$roomTypeName = $row['name'];
 }
-
-echo 'INFO HABITACIONES TIPO "'.$roomTypeName.'"'."<br><br>";
-
+        
 foreach ($roomType as $row) {
 
 	echo 'Nombre: ', $row['name']."<br>";
@@ -27,150 +27,66 @@ foreach ($roomType as $row) {
 	
 	echo 'Camas: ', $row['beds']."<br>";
 	
+	echo 'Nivel: ', $row['scale']."<br>";
+	
 	if ($row['description'] != NULL) {
 	
 		echo 'Descripción: ', $row['description']."<br>";
 	}
 	
-	if ($row['disable'] == 1) {
+	echo "<br>";
 	
-    	if ($roomTypeImages) {
-			?>
-			<a href="<?php echo base_url().'rooms/imagesRoomType/'.$roomTypeId ?>">Ver Imagenes</a><br />
-            <?php
+	if ($row['disable'] == 1) {
+		
+		echo anchor('rooms/editRoomType/'.$roomTypeId, 'Editar Info')."<br>";
+		
+		if ($roomTypeImages) {
+			
+			 echo anchor('rooms/viewImagesRoomType/'.$roomTypeId, 'Ver Imagenes')."<br>";
 		}
-		?>
-        <a href="<?php echo base_url().'rooms/editRoomType/'.$roomTypeId ?>">Editar Info</a><br />
-        <a href="<?php echo base_url().'rooms/addRoomTypeImage/'.$roomTypeId ?>">Agregar Imagen</a><br />
-    	<a href="<?php echo base_url().'rooms/disableRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar tipo de habitación</a><br />
-	<?php
+		
+		echo anchor('rooms/addRoomTypeImage/'.$roomTypeId, 'Agregar Imagen')."<br>";
+		echo anchor('rooms/disableRoomType/'.$roomTypeId, 'Deshabilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"));
+		echo "<br><br>";
 	
 	} else if ($row['disable'] == 0) {
-	?>	
-		<a href="<?php echo base_url().'rooms/enableRoomType/'.$roomTypeId ?>" onClick="return confirm('Seguro que desea habilitar?')">Habilitar tipo de habitación</a><br />
-    <?php
+		
+		echo anchor('rooms/enableRoomType/'.$roomTypeId, 'Habilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea Habilitar?')"));
+		echo "<br><br>";
 	}
 }
 
-?>
-<p>
-<?php 
-echo 'Total habitaciones tipo '.$roomTypeName.': ', $roomTypeRoomCount."<br>";
-echo 'Total habitaciones en funcionamiento: ', $roomTypeRoomCountRunning."<br>";
-echo 'Total habitaciones fuera de servicio: ', $roomTypeRoomCountOos."<br><br>";
-echo 'RESERVACIONES';
-?>
-</p>
+echo 'Total habitaciones tipo '.$roomTypeName.': ', $roomTypeRoomCount."<br>"; 
+echo 'En funcionamiento: ', $roomTypeRoomCountRunning."<br>";  
+echo 'Fuera de servicio: ', $roomTypeRoomCountOos."<br><br>"; 
 
-<?php 
-if ($roomTypeReservations) { ?>
+if ($roomTypeRooms) { 
+	
+	echo 'Habitaciones tipo "'.$roomTypeName.'" existentes: '."<br>"; 
+	
+	foreach ($roomTypeRooms as $row) {
+		
+		echo anchor('rooms/infoRoom/'.$row['id_room'].'/checkIn','# '.$row['number']).' ';
+	}
 
-  <table width="831" border="1">
-    <tr>
-      <td width="102">
-    	<?php
-		echo '# Confirmación';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'RE.id_reservation');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-     <td width="85">
-    	<?php
-		echo '# Habitación';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'RO.number');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-    <td width="98">
-    	<?php
-		echo 'Check-In';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'RE.checkIn DESC');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-    <td width="101">
-    	<?php
-		echo 'Check-Out';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'RE.checkOut DESC');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-    <td width="167">
-    	<?php
-		echo 'Nombre Cliente';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'G.lastName');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-    <td width="89">
-    	<?php
-		echo 'Estado';
-        echo form_open(base_url().'rooms/infoRoomType/'.$roomTypeId);
-		echo form_hidden('order', 'RE.status');
-		echo form_submit('sumit', '^');
-        echo form_close();
-		?>    </td>
-    <td width="54">Adultos</td>
-    <td width="41">Niños</td>
-    <td width="36">Pago</td>
-  </tr>
- 
- <?php 
- foreach ($roomTypeReservations as $row) { ?>
-  <tr>
-    <td><?php echo anchor(base_url().'reservations/infoReservation/'.$row['id_reservation'],$row['id_reservation']);?></td>
-    <td><?php echo anchor(base_url().'rooms/infoRoom/'.$row['id_room'],$row['number']);?></td>
-    <td>
-	<?php 
-		$checkIn       = $row['checkIn'];
-		$checkIn_array = explode (' ',$checkIn);
-		$date          = $checkIn_array[0];
-		$date_array    = explode ('-',$date);
-		$year          = $date_array[0];
-		$month         = $date_array[1];
-		$day           = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-	?>
-    </td>
-    <td>
-	<?php 
-		$checkOut       = $row['checkOut'];
-		$checkOut_array = explode (' ',$checkOut);
-		$date           = $checkOut_array[0];
-		$date_array     = explode ('-',$date);
-		$year           = $date_array[0];
-		$month          = $date_array[1];
-		$day            = $date_array[2];
-		echo $day.'-'.$month.'-'.$year;
-	?>
-    </td>
-    <td>
-	<?php echo anchor(base_url().'guests/infoGuestReservations/'.$row['fk_guest'],$row['lastName'].', '.$row['name']);
-	?>    
-    </td>
-    <td><?php echo lang($row['restatus']);?></td>
-    <td><?php echo $row['adults'];?></td>
-    <td><?php echo $row['children'];?></td>
-    <td>&nbsp;</td>
-  </tr>
-  <?php
-  }
-  ?>
-</table>
-<?php
- 
+	echo "<br><br>";
+	
+} else {
+
+	echo 'No existen habitaciones habilitadas de este tipo de habitación!';
+	echo "<br><br>";
+}
+
+if ($roomTypeReservations) { 
+	
+	echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/checkIn', 'VER RESERVACIONES');
+	echo "<br><br>";
+
 } else {
 
 	echo 'No existen reservaciones en este tipo de habitación!';
 }
+
+echo anchor('rooms/viewRoomTypes/', 'Volver a tipos de habitaciones');
+
 ?>
-
-<br /><br /><a href="<?php echo base_url().'rooms/viewRoomTypes/'?>">Volver</a>
-
-<img src="<?php echo base_url() . "assets/images/habitacion_doble5.jpg" ?>"/><?php
-?><img src="<?php echo base_url() . "assets/images/"; ?>habitacion_doble5.jpg"/><?php

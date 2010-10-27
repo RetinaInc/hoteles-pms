@@ -1,59 +1,96 @@
+
 <?php
-
 $this->load->view('pms/header'); 
+?>
 
-echo "<br>".'DISPONIBILIDAD'."<br><br>";
+<h3>Disponibilidad</h3>
 
+<?php
+if (isset($error)) {
+
+	echo "<span class='Estilo1'>".$error."</span>";
+	echo "<br><br>";
+}
 ?>
 
 <table width="289" border="0">
+
   <tr>
     <td width="96">Tarifa</td>
     <td width="183">
-	<?php 
+		<?php 
 		foreach ($rate as $row) {
+		
 			echo $row['name'];
 		}
-	?>
+		?>
     </td>
   </tr>
+  
   <tr>
     <td width="96">Plan</td>
     <td width="183">
-    <?php 
+    	<?php 
 		foreach ($plan as $row) {
+		
 			echo $row['name'];
 		}
-	?>
+		?>
 	</td>
   </tr>
+  
   <tr>
     <td width="96">Llegada</td>
-    <td width="183"><?php echo $checkIn; ?></td>
+    <td width="183">
+		<?php 
+        echo $checkIn; 
+        ?>
+    </td>
   </tr>
+  
   <tr>
     <td>Salida</td>
-    <td><?php echo $checkOut; ?></td>
+    <td>
+		<?php 
+        echo $checkOut; 
+        ?>
+    </td>
   </tr>
+  
    <tr>
     <td>Noches</td>
-    <td><?php echo $nights; ?></td>
+    <td>
+		<?php 
+        echo $nights; 
+        ?>
+    </td>
   </tr>
+  
   <tr>
     <td>Habitaciones</td>
-    <td><?php echo $roomCount.' ('.$totalP.' pers.) '; ?></td>
+    <td>
+		<?php 
+        echo $roomCount.' ('.$totalP.' pers.) '; 
+        ?>
+    </td>
   </tr>
+  
   <tr>
     <td>Total</td>
-    <td><?php echo $totalPrice; ?> Bs.F.</td>
+    <td>
+		<?php 
+        echo $totalPrice; 
+        ?> 
+        Bs.F.
+    </td>
   </tr>
+  
 </table>
+
 <br /><br />
+
 <?php
-echo $error;
+echo anchor('reservations/createReservation1', 'Volver');
 ?>
 
-<br />
-<br />
-<a href="<?php echo base_url().'reservations/createReservation1'?>">Volver</a>
 

@@ -8,20 +8,15 @@ class Prices extends Controller
         $this->load->model('general_model','GNM');
 		$this->load->model('prices_model','PRM');
         $this->lang->load ('form_validation','spanish');
-        //$this->load->library('form_validation');
+		$this->load->library('pagination');
 		$this->load->library('session');
         $this->load->helper('hoteles');
         $this->load->helper('language');
+		$this->load->helper('date');
         $this->load->helper('form');
         $this->load->helper('url');
 	}
-	
-	/*
-	function selectViewPrices()
-	{	
-		$this->load->view('pms/prices/prices_select_view');
-	}
-	*/
+
 	
 	function selectSeasonPrices()
 	{
@@ -30,8 +25,19 @@ class Prices extends Controller
 		if ($userId) {
 		
 			$hotel = $this->session->userdata('hotelid');
-				
-			$seasons   = $this->GNM->getInfo($hotel, 'SEASON',  null, null, null, null, null, 1);
+			
+			$lim2      = $this->uri->segment(3);
+			
+			$totalRows = $this->GNM->getTotalRows($hotel, 'SEASON', null, null, 1);
+			
+			$config['base_url'] = base_url().'prices/selectSeasonPrices/';
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '6';
+			$config['num_links'] = '50';
+		
+			$this->pagination->initialize($config);
+			
+			$seasons   = $this->GNM->getInfo($hotel, 'SEASON',  null, null, 'dateStart', $config['per_page'], $lim2, 1);
 			$rates     = $this->GNM->getInfo($hotel, 'RATE',    null, null, null, null, null, 1);
 			$plans     = $this->GNM->getInfo($hotel, 'PLAN',    null, null, null, null, null, 1);
 			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
@@ -58,9 +64,22 @@ class Prices extends Controller
 		if ($userId) {
 		
 			$hotel = $this->session->userdata('hotelid');
+			
+			$seasonId  = $this->uri->segment(3);
+			$lim2      = $this->uri->segment(4);
+			
+			$totalRows = $this->GNM->getTotalRows($hotel, 'RATE', null, null, 1);
+			
+			$config['base_url'] = base_url().'prices/selectRatePrices/'.$seasonId;
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '8';
+			$config['num_links'] = '50';
+			$config['uri_segment'] = 4;
+			
+			$this->pagination->initialize($config);
 				
-			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, 1);
-			$rates  = $this->GNM->getInfo($hotel, 'RATE',      null, null, null, null, null, 1);
+			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null,   null,                null,  1);
+			$rates  = $this->GNM->getInfo($hotel, 'RATE',   null,        null,      'name', $config['per_page'], $lim2, 1);
 			
 			$data['season'] = $season;
 			$data['rates']  = $rates;
@@ -81,14 +100,25 @@ class Prices extends Controller
 		
 		if ($userId) {
 		
+			$hotel = $this->session->userdata('hotelid');
+			
 			$seasonId = $this->uri->segment(3);
 			$rateId   = $this->uri->segment(4);
+			$lim2     = $this->uri->segment(5);
 			
-			$hotel = $this->session->userdata('hotelid');
+			$totalRows = $this->GNM->getTotalRows($hotel, 'PLAN', null, null, 1);
+			
+			$config['base_url'] = base_url().'prices/selectPlanPrices/'.$seasonId.'/'.$rateId;
+			$config['total_rows'] = $totalRows;
+			$config['per_page'] = '8';
+			$config['num_links'] = '50';
+			$config['uri_segment'] = 5;
+			
+			$this->pagination->initialize($config);
 				
-			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, 1);
-			$rate   = $this->GNM->getInfo($hotel, 'RATE',   'id_rate',   $rateId,   null, null, null, 1);
-			$plans  = $this->GNM->getInfo($hotel, 'PLAN',    null,        null,     null, null, null, 1);
+			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null,   null,                null,  1);
+			$rate   = $this->GNM->getInfo($hotel, 'RATE',   'id_rate',   $rateId,   null,   null,                null,  1);
+			$plans  = $this->GNM->getInfo($hotel, 'PLAN',    null,        null,     'name', $config['per_page'], $lim2, 1);
 			
 			$data['season'] = $season;
 			$data['rate']  = $rate;
@@ -193,6 +223,11 @@ class Prices extends Controller
 				} 
 			}
 			
+			if ($_POST['pricepn_children'] == NULL) {
+				
+				$complete = 'No';
+			} 
+			
 			if ($complete == 'No') {
 	
 				$type  = 'noWeekdays';
@@ -236,17 +271,7 @@ class Prices extends Controller
 					$this->GNM->insert('PRICE', $data);  
 				}
 				
-				if ($_POST['pricepn_children'] == NULL) {
-					$pricePerNightChildren = NULL;
-				} else {
-					$pricePerNightChildren = $_POST['pricepn_children'];
-				}
-				
-				if ($_POST['pricepn_seniors'] == NULL) {
-					$pricePerNightSeniors = NULL;
-				} else {
-					$pricePerNightSeniors = $_POST['pricepn_seniors'];
-				}
+				$pricePerNightChildren = $_POST['pricepn_children'];
 				
 					$data = array(
 						'pricePerNight' => $pricePerNightChildren,
@@ -266,25 +291,6 @@ class Prices extends Controller
 						);
 				
 					$this->GNM->insert('PRICE', $data);  
-					
-					$data = array(
-						'pricePerNight' => $pricePerNightSeniors,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Seniors',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-						);
-				
-					$this->GNM->insert('PRICE', $data);
 			
 				$this->checkPrices($seasonId, $rateId, $planId);
 			}
@@ -348,6 +354,13 @@ class Prices extends Controller
 				} 
 			}
 			
+			if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
+			   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
+			   ($_POST['sun_price_children'] == NULL)) {
+			   	
+				$complete = 'No';
+			}					
+				
 			if ($complete == 'No') {
 			
 				$type  = 'hasWeekdays';
@@ -409,47 +422,13 @@ class Prices extends Controller
 					$this->GNM->insert('PRICE', $data);  
 				}
 				
-				if ($_POST['mon_price_children'] == NULL) {
-					$childrenMon = NULL;
-				} else {
-					$childrenMon = $_POST['mon_price_children'];
-				}
-				
-				if ($_POST['tue_price_children'] == NULL) {
-					$childrenTue = NULL;
-				} else {
-					$childrenTue = $_POST['tue_price_children'];
-				}
-				
-				if ($_POST['wed_price_children'] == NULL) {
-					$childrenWed = NULL;
-				} else {
-					$childrenWed = $_POST['wed_price_children'];
-				}
-				
-				if ($_POST['thu_price_children'] == NULL) {
-					$childrenThu = NULL;
-				} else {
-					$childrenThu = $_POST['thu_price_children'];
-				}
-				
-				if ($_POST['fri_price_children'] == NULL) {
-					$childrenFri = NULL;
-				} else {
-					$childrenFri = $_POST['fri_price_children'];
-				}
-				
-				if ($_POST['sat_price_children'] == NULL) {
-					$childrenSat = NULL;
-				} else {
-					$childrenSat = $_POST['sat_price_children'];
-				}
-				
-				if ($_POST['sun_price_children'] == NULL) {
-					$childrenSun = NULL;
-				} else {
-					$childrenSun = $_POST['sun_price_children'];
-				}
+				$childrenMon = $_POST['mon_price_children'];
+				$childrenTue = $_POST['tue_price_children'];
+				$childrenWed = $_POST['wed_price_children'];
+				$childrenThu = $_POST['thu_price_children'];
+				$childrenFri = $_POST['fri_price_children'];
+				$childrenSat = $_POST['sat_price_children'];
+				$childrenSun = $_POST['sun_price_children'];
 				
 				$data = array(
 						'pricePerNight' => NULL,
@@ -469,68 +448,6 @@ class Prices extends Controller
 					);
 				
 				$this->GNM->insert('PRICE', $data);  
-				
-				
-				if ($_POST['mon_price_seniors'] == NULL) {
-					$seniorsMon = NULL;
-				} else {
-					$seniorsMon = $_POST['mon_price_seniors'];
-				}
-				
-				if ($_POST['tue_price_seniors'] == NULL) {
-					$seniorsTue = NULL;
-				} else {
-					$seniorsTue = $_POST['tue_price_seniors'];
-				}
-				
-				if ($_POST['wed_price_seniors'] == NULL) {
-					$seniorsWed = NULL;
-				} else {
-					$seniorsWed = $_POST['wed_price_seniors'];
-				}
-				
-				if ($_POST['thu_price_seniors'] == NULL) {
-					$seniorsThu = NULL;
-				} else {
-					$seniorsThu = $_POST['thu_price_seniors'];
-				}
-				
-				if ($_POST['fri_price_seniors'] == NULL) {
-					$seniorsFri = NULL;
-				} else {
-					$seniorsFri = $_POST['fri_price_seniors'];
-				}
-				
-				if ($_POST['sat_price_seniors'] == NULL) {
-					$seniorsSat = NULL;
-				} else {
-					$seniorsSat = $_POST['sat_price_seniors'];
-				}
-				
-				if ($_POST['sun_price_seniors'] == NULL) {
-					$seniorsSun = NULL;
-				} else {
-					$seniorsSun = $_POST['sun_price_seniors'];
-				}
-				
-				$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $seniorsMon,
-						'tuePrice'  => $seniorsTue,
-						'wedPrice'  => $seniorsWed,
-						'thuPrice'  => $seniorsThu,
-						'friPrice'  => $seniorsFri,
-						'satPrice'  => $seniorsSat,
-						'sunPrice'  => $seniorsSun,
-						'persType'  => 'Seniors',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-					);
-				
-				$this->GNM->insert('PRICE', $data);
 				
 				$this->checkPrices($seasonId, $rateId, $planId);
 			}
@@ -620,6 +537,11 @@ class Prices extends Controller
 				} 
 			}
 			
+			if ($_POST['pricepn_children'] == NULL) {
+				
+				$complete = 'No';
+			} 
+			
 			if ($complete == 'No') {
 	
 				$type  = 'noWeekdays';
@@ -664,17 +586,7 @@ class Prices extends Controller
 					$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);  
 				}
 				
-				if ($_POST['pricepn_children'] == NULL) {
-					$pricePerNightChildren = NULL;
-				} else {
-					$pricePerNightChildren = $_POST['pricepn_children'];
-				}
-				
-				if ($_POST['pricepn_seniors'] == NULL) {
-					$pricePerNightSeniors = NULL;
-				} else {
-					$pricePerNightSeniors = $_POST['pricepn_seniors'];
-				}
+				$pricePerNightChildren = $_POST['pricepn_children'];
 				
 				if ($pricePerNightChildren != NULL) {
 				
@@ -707,37 +619,6 @@ class Prices extends Controller
 					}
 				}
 				
-				if ($pricePerNightSeniors != NULL) {
-					
-					$data = array(
-						'pricePerNight' => $pricePerNightSeniors,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Seniors',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-						);
-				
-					$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Seniors');
-					
-					if ($exPrice) {
-					
-						$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Seniors', $data); 
-						
-					} else {
-					
-						$this->GNM->insert('PRICE', $data);
-					}
-				}
-			
 				$this->checkPrices($seasonId, $rateId, $planId);
 			}
 			
@@ -802,6 +683,13 @@ class Prices extends Controller
 				} 
 			}
 			
+			if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
+			   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
+			   ($_POST['sun_price_children'] == NULL)) {
+			   	
+				$complete = 'No';
+			}	
+			
 			if ($complete == 'No') {
 			
 				$type  = 'hasWeekdays';
@@ -864,49 +752,13 @@ class Prices extends Controller
 					$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);   
 				}
 				
-				
-				if ($_POST['mon_price_children'] == NULL) {
-					$childrenMon = NULL;
-				} else {
-					$childrenMon = $_POST['mon_price_children'];
-				}
-				
-				if ($_POST['tue_price_children'] == NULL) {
-					$childrenTue = NULL;
-				} else {
-					$childrenTue = $_POST['tue_price_children'];
-				}
-				
-				if ($_POST['wed_price_children'] == NULL) {
-					$childrenWed = NULL;
-				} else {
-					$childrenWed = $_POST['wed_price_children'];
-				}
-				
-				if ($_POST['thu_price_children'] == NULL) {
-					$childrenThu = NULL;
-				} else {
-					$childrenThu = $_POST['thu_price_children'];
-				}
-				
-				if ($_POST['fri_price_children'] == NULL) {
-					$childrenFri = NULL;
-				} else {
-					$childrenFri = $_POST['fri_price_children'];
-				}
-				
-				if ($_POST['sat_price_children'] == NULL) {
-					$childrenSat = NULL;
-				} else {
-					$childrenSat = $_POST['sat_price_children'];
-				}
-				
-				if ($_POST['sun_price_children'] == NULL) {
-					$childrenSun = NULL;
-				} else {
-					$childrenSun = $_POST['sun_price_children'];
-				}
-				
+				$childrenMon = $_POST['mon_price_children'];
+				$childrenTue = $_POST['tue_price_children'];
+				$childrenWed = $_POST['wed_price_children'];
+				$childrenThu = $_POST['thu_price_children'];
+				$childrenFri = $_POST['fri_price_children'];
+				$childrenSat = $_POST['sat_price_children'];
+				$childrenSun = $_POST['sun_price_children'];
 				
 				$data = array(
 						'pricePerNight' => NULL,
@@ -936,77 +788,6 @@ class Prices extends Controller
 					$this->GNM->insert('PRICE', $data);
 				} 
 				
-				
-				if ($_POST['mon_price_seniors'] == NULL) {
-					$seniorsMon = NULL;
-				} else {
-					$seniorsMon = $_POST['mon_price_seniors'];
-				}
-				
-				if ($_POST['tue_price_seniors'] == NULL) {
-					$seniorsTue = NULL;
-				} else {
-					$seniorsTue = $_POST['tue_price_seniors'];
-				}
-				
-				if ($_POST['wed_price_seniors'] == NULL) {
-					$seniorsWed = NULL;
-				} else {
-					$seniorsWed = $_POST['wed_price_seniors'];
-				}
-				
-				if ($_POST['thu_price_seniors'] == NULL) {
-					$seniorsThu = NULL;
-				} else {
-					$seniorsThu = $_POST['thu_price_seniors'];
-				}
-				
-				if ($_POST['fri_price_seniors'] == NULL) {
-					$seniorsFri = NULL;
-				} else {
-					$seniorsFri = $_POST['fri_price_seniors'];
-				}
-				
-				if ($_POST['sat_price_seniors'] == NULL) {
-					$seniorsSat = NULL;
-				} else {
-					$seniorsSat = $_POST['sat_price_seniors'];
-				}
-				
-				if ($_POST['sun_price_seniors'] == NULL) {
-					$seniorsSun = NULL;
-				} else {
-					$seniorsSun = $_POST['sun_price_seniors'];
-				}
-				
-				$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $seniorsMon,
-						'tuePrice'  => $seniorsTue,
-						'wedPrice'  => $seniorsWed,
-						'thuPrice'  => $seniorsThu,
-						'friPrice'  => $seniorsFri,
-						'satPrice'  => $seniorsSat,
-						'sunPrice'  => $seniorsSun,
-						'persType'  => 'Seniors',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-					);
-				
-				$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Seniors');
-					
-				if ($exPrice) {
-					
-					$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Seniors', $data); 
-						
-				} else {
-					
-					$this->GNM->insert('PRICE', $data);
-				}
-				
 				$this->checkPrices($seasonId, $rateId, $planId);
 			}
 			
@@ -1018,21 +799,7 @@ class Prices extends Controller
 	}
 	
 	
-	/*function viewPrices2()
-	{
-		$hotel = $this->session->userdata('hotelid');
-			
-		$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
-		$seasons   = $this->GNM->getInfo($hotel, 'SEASON',    null, null, null, null, null, 1);
-		$rates     = $this->GNM->getInfo($hotel, 'RATE',      null, null, null, null, null, 1);
-		$plans     = $this->GNM->getInfo($hotel, 'PLAN',      null, null, null, null, null, 1);
-		
-		$data['roomTypes'] = $roomTypes;
-		$data['seasons']  = $seasons;
-		$data['rates']    = $rates;
-		$data['plans']    = $plans;
-		
-		$this->load->view('pms/prices/prices_view', $data);
-	}*/
+	
+	
 }
 ?>

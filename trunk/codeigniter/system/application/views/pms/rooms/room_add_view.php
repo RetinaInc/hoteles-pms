@@ -1,20 +1,28 @@
 
 <?php 
-
 $this->load->view('pms/header'); 
-
-
-echo 'NUEVA HABITACIÓN';?><br /><br /><?php
-
-echo validation_errors();
-
-echo form_open(base_url().'rooms/addRoom/');
-
-foreach ($maxRoomNumber as $row) {
-
-	$nextRoom = $row['number'] + 1;
-}
 ?>
+
+<h3>Nueva Habitación</h3>
+
+<span class="Estilo2">
+	(*)Campos obligatorios
+</span>
+
+<span class="Estilo1">
+	<?php
+	echo validation_errors();
+	?>
+</span>
+
+<?php
+echo form_open('rooms/addRoom');
+
+	foreach ($maxRoomNumber as $row) {
+
+		$nextRoom = $row['number'] + 1;
+	}
+	?>
 
 	<p>* Número:
       <input name="room_number" type="text" id="room_number" value="<?php echo $nextRoom; ?>" size="5" maxlength="20" />
@@ -32,19 +40,25 @@ foreach ($maxRoomNumber as $row) {
     </p>
                 
 	 <p>* Tipo de habitación:
-       <select name="room_room_type" id="room_room_type"><?php
-	foreach ($roomTypes as $row) { 
-	
-	    ?><option value="<?php echo $row['id_room_type']; ?>" <?php echo set_select('room_room_type', $row['id_room_type']); ?> ><?php echo $row['name']; ?></option><?php 
-		
-	}
+     <select name="room_room_type" id="room_room_type"><?php
+		foreach ($roomTypes as $row) { 
+			?>
+            <option value="<?php echo $row['id_room_type']; ?>" <?php echo set_select('room_room_type', $row['id_room_type']); ?> ><?php echo $row['name']; ?></option>
+			<?php 
+		}
 	?>
 	</select>
     </p>
-   
+ 
 <?php
-echo form_submit('sumit', 'Enviar');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea guardar?')"
+);
+echo form_submit($att, 'Guardar');
 echo form_close();
+
+echo anchor('rooms/viewRooms', 'Cancelar', array('onClick' => "return confirm('Seguro que desea cancelar? Se perderá la información')"));
 ?>
 
-<a href="<?php echo base_url().'rooms/viewRooms'?>" onClick="return confirm('Seguro que desea cancelar? Se perderá la información')">Cancelar</a>

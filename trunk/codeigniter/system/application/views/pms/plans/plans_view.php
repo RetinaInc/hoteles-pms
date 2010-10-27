@@ -6,7 +6,15 @@ $this->load->view('pms/header');
 <h3>Planes</h3>
 
 <?php
-echo anchor(base_url().'plans/addPlan/','Agregar Nuevo Plan')."<br><br>";
+echo anchor('plans/addPlan/','Agregar Nuevo Plan')."<br>";
+
+if ($plansDis) {
+
+	echo anchor('plans/viewDisabledPlans/', 'Ver Planes Deshabilitados');
+	echo "<br>";
+}
+
+echo "<br>";
 
 if ($plans) {
 
@@ -19,21 +27,15 @@ if ($plans) {
     		echo 'Descripcion: ', $row['description']."<br>";
 		}
 
-		echo anchor(base_url().'plans/editPlan/'.$row['id_plan'],'Editar')."<br>";
-		?>
-        <a href="<?php echo base_url().'plans/disablePlan/'.$row['id_plan'] ?>" onClick="return confirm('Seguro que desea deshabilitar?')">Deshabilitar</a><br /><br /><br />
-        <?php
+		echo anchor('plans/editPlan/'.$row['id_plan'],'Editar')."<br>";
+		echo anchor('plans/disablePlan/'.$row['id_plan'], 'Deshabilitar', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>";
 	}
+	
+	echo $this->pagination->create_links();
 	
 } else {
 	
-	echo 'No existen planes!'."<br><br>";
-
+	echo 'No existen planes!';
 } 
 
-
-if ($plansDis) {
-
-	echo "<br>".anchor(base_url().'plans/viewDisabledPlans/', 'Ver Planes Deshabilitados');
-}
 ?>

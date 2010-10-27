@@ -17,16 +17,16 @@ if ($ratesDis) {
 			echo 'Descripción: '.$row['description']."<br>";
 		}
 		
-		?>
-        <a href="<?php echo base_url().'rates/enableRate/'.$row['id_rate'] ?>" onClick="return confirm('Seguro que desea habilitar?')">Habilitar</a><br /><br /><br />
-        <?php
+		echo anchor('rates/enableRate/'.$row['id_rate'], 'Habilitar', array('onClick' => "return confirm('Seguro que desea habilitar?')"))."<br><br>";
 	}
+	
+	echo $this->pagination->create_links();
 	  
 } else {
 	
 	echo 'No existen tarifas deshabilitadas!'."<br>";
 }
 
-echo "<br>".anchor(base_url().'rates/viewRates/', 'Volver a Tarifas');
+echo "<br><br>".anchor('rates/viewRates/', 'Volver a Tarifas');
 
 ?>
