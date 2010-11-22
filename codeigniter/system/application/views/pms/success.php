@@ -20,6 +20,11 @@ if ($type == 'hotels') {
 	echo anchor('users/userSignIn', 'Iniciar Sesión');
 }
 
+if ($type == 'hotel_image') {
+	
+	echo anchor('hotels/infoHotel/'.$hotelId, 'Volver a info');
+}
+
 if ($type == 'users') {
 	
 	echo anchor('users/viewUsers', 'Volver a usuarios');

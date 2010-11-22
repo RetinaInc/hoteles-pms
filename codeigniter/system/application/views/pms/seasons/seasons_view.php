@@ -6,7 +6,12 @@ $this->load->view('pms/header');
 <h3>Temporadas</h3>
 
 <?php
-echo anchor('seasons/addSeason/','Agregar Nueva Temporada')."<br>";
+$userRole = $this->session->userdata('userrole');
+
+if ($userRole != 'Employee') {
+
+	echo anchor('seasons/addSeason/','Agregar Nueva Temporada')."<br>";
+}
 
 if ($seasonsDis) {
 

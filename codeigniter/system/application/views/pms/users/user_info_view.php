@@ -11,15 +11,16 @@ $sessionUserId   = $this->session->userdata('userid');
 
 foreach ($user as $row) {
 
-	$userId = $row['id_user'];
+	$userId   = $row['id_user'];
+	$userRole = $row['role'];
 	
-	if (($sessionUserRole == 'Master') || ($sessionUserId == $row['id_user'])) {
+	if (($sessionUserRole != 'Employee') || ($sessionUserId == $userId)) {
 		
 		if ($row['disable'] == 1) {
 		
 			echo anchor('users/editUser/'.$row['id_user'],'Editar')."<br>";
 			
-			if (($sessionUserRole == 'Master') && ($row['role'] != 'Master')) {
+			if (($sessionUserRole == 'Master') && ($userRole != 'Master')) {
 			
 				echo anchor('users/disableUser/'.$userId, 'Deshabilitar', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"));  
 				echo "<br>";

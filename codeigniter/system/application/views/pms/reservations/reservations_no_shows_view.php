@@ -59,14 +59,26 @@ echo 'Total reservaciones olvidadas: ', $total;
 	  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
 	  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
 	  $payments              = getPaymentInfo($hotel, null, null, $row['id_reservation']);
-		  
-	  $total = 0;
-	  foreach ($reservationRoomInfo as $row1) {
 	  
-		  $total = $total + $row1['total'];
+	  $status   = $row['status'];
+	  $totalFee = $row['totalFee'];
+	
+	  $total = 0;
+	  
+	  if ($row['status'] == 'No Show') {
+	
+		$total = $totalFee;
+		
+	  } else {
+	
+	  	  foreach ($reservationRoomInfo as $row1) {
+		
+		  	  $total = $total + $row1['total'];
+		  }
 	  }
 		
 	  $paid = 0;
+	  
 	  foreach ($payments as $row1) {
 	  
 	  	  $paid = $paid + $row1['amount'];
@@ -155,10 +167,17 @@ echo 'Total reservaciones olvidadas: ', $total;
     </td>
     
     <td>
-		<?php 
-        echo $toPay;
+    	<?php 
+		if (($status == 'No Show') && ($toPay != 0)) { 
+			
+			echo "<span class='Estilo3'>".$toPay.' Bs.F. '."</span>";
+			
+		} else {
+			
+			echo $toPay.' Bs.F.';
+		}
+        
         ?> 
-        Bs.F.
     </td>
   </tr>
   <?php

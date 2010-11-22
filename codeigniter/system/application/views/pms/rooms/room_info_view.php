@@ -22,7 +22,7 @@ foreach ($room as $row) {
 		echo 'Nombre: ', $row['name']."<br>";
 	}
 	
-	echo 'Estado: ', lang($row['status'])."<br>";
+	//echo 'Estado: ', lang($row['status'])."<br>";
 	
 	echo 'Tipo de habitación: ', $row['rtabrv']."<br>";
 	
@@ -35,9 +35,14 @@ foreach ($room as $row) {
 	
 	if ($row['disable'] == 1) {
 	
-	    echo anchor('rooms/editRoom/'.$roomId,'Editar Info')."<br>";
-		echo anchor('rooms/disableRoom/'.$roomId, 'Deshabilitar Habitación', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>";
-	
+		$userRole = $this->session->userdata('userrole');
+
+		if ($userRole != 'Employee') {
+
+			echo anchor('rooms/editRoom/'.$roomId,'Editar Info')."<br>";
+			echo anchor('rooms/disableRoom/'.$roomId, 'Deshabilitar Habitación', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>";
+		}
+		
 	} else if ($row['disable'] == 0){
 		
 		echo anchor('rooms/enableRoom/'.$roomId, 'Habilitar Habitación', array('onClick' => "return confirm('Seguro que desea habilitar?')"))."<br><br>"; 
@@ -48,39 +53,33 @@ if ($roomReservations) {
 
 	echo 'RESERVACIONES'."<br><br>";
 	?>
-	<table width="892" border="1">
+	<table width="854" border="1">
    	  <tr>
     	<td width="110">
     		<?php
 			echo anchor('rooms/infoRoom/'.$roomId.'/id_reservation', '# Confirmación');
 			?>    	</td>
         
-   	  <td width="115">
+   	  <td width="130">
     		<?php
 			echo anchor('rooms/infoRoom/'.$roomId.'/checkIn', 'Fecha Check In');
 			?>    	</td>
         
-  <td width="110">
+  <td width="130">
 			<?php
 			echo anchor('rooms/infoRoom/'.$roomId.'/checkOut', 'Fecha Check Out');
 			?>   	 	</td>
         
-  <td width="200">
+<td width="300">
             <?php
 			echo anchor('rooms/infoRoom/'.$roomId.'/lastName', 'Cliente');
 			?>        </td>
         
-  <td width="105">
+<td width="150">
             <?php
 			echo anchor('rooms/infoRoom/'.$roomId.'/restatus', 'Estado');
 			?>        </td>
-        
-        <td width="60">Adultos</td>
-        
-        <td width="60">Niños</td>
-        
-        <td width="80">Pago</td>
-  	  </tr>
+      </tr>
  
 	  <?php 
       foreach ($roomReservations as $row) { ?>
@@ -88,8 +87,7 @@ if ($roomReservations) {
 		<td>
 			<?php 
 			echo anchor('reservations/infoReservation/'.$row['id_reservation'].'/n/', $row['id_reservation']);
-			?>
-        </td>
+			?>        </td>
         
         <td>
 			<?php 
@@ -101,8 +99,7 @@ if ($roomReservations) {
             $month         = $date_array[1];
             $day           = $date_array[2];
             echo $day.'-'.$month.'-'.$year;
-            ?>
-        </td>
+            ?>        </td>
         
         <td>
 			<?php 
@@ -114,42 +111,24 @@ if ($roomReservations) {
             $month          = $date_array[1];
             $day            = $date_array[2];
             echo $day.'-'.$month.'-'.$year;
-            ?>
-        </td>
+            ?>        </td>
         
         <td>
 			<?php 
 			echo anchor('guests/infoGuestReservations/'.$row['fk_guest'], $row['lastName'].', '.$row['name']);
-			?>
-        </td>
+			?>        </td>
         
         <td>
 			<?php 
             echo lang($row['restatus']);
-            ?>
-        </td>
-        
-        <td>
-			<?php 
-            echo $row['adults'];
-            ?>
-        </td>
-        
-        <td>
-			<?php 
-            echo $row['children'];
-            ?>
-        </td>
-        
-        <td>&nbsp;</td>
-        
+            ?>        </td>
       </tr>
       <?php
       }
       ?>
 	</table>
     
-	<br />
+<br />
     
 	<?php 
     

@@ -217,11 +217,6 @@ foreach ($reservationRoomInfo as $row) {
 	echo "<br><br>";
 }
 
-$att = array(
-	'name'        => 'submit',
-    'id'          => 'submit',
-    'onClick'     => "return confirm('Seguro que desea guardar?')"
-);
 echo form_submit($att, 'Buscar Disponibilidad');
 echo form_close();
 

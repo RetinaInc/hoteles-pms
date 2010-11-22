@@ -40,6 +40,13 @@ foreach ($guest as $row) {
 	
 		echo 'Dirección: ', $row['address']."<br>";
 	}
+	
+	if ($row['corpRif'] != NULL) {
+	
+		echo "<strong>".'Información corporación: '."</strong><br>";
+		echo 'Rif: ', $row['corpRif']."<br>";
+		echo 'Nombre: ', $row['corpName']."<br>";
+	}
 }
 
 

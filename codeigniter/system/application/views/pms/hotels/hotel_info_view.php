@@ -29,20 +29,26 @@ foreach ($hotelInfo as $row) {
 		if ($row['disable'] == 1) {
 		
 			echo anchor('hotels/editHotel/'.$row['id_hotel'],'Editar Información Hotel')."<br>";
+			
+			if ($hotelImages) {
+			
+				echo anchor('hotels/viewImagesHotel/'.$row['id_hotel'], 'Ver Imagenes')."<br>";
+			}
+			
+			echo anchor('hotels/addHotelImage/'.$row['id_hotel'], 'Agregar Imagen')."<br>";
 		} 
 		
 		echo anchor('hotels/cancelHotelAccount/'.$row['id_hotel'],'Cancelar Cuenta Hotel', array('onClick' => "return confirm('Seguro que desea cancelar la cuenta? Se eliminará toda la información del hotel')"))."<br><br>";
 	}
 	
 	?>
-	<table width="460" border="2">
+	<table width="568" border="2">
 	  <tr>
 		<td width="150" height="45"><strong>Nombre</strong></td>
-		<td width="300">
+		<td width="400">
 			<?php
 			echo $row['name'];
-			?>      	
-        </td>
+			?>        </td>
 	  </tr>
 	  
 	  <tr>
@@ -140,13 +146,39 @@ foreach ($hotelInfo as $row) {
           <?php
 	  }
 	  
-	   if ($row['cancelInfo'] != NULL) {
+	   if ($row['info'] != NULL) {
 		  ?>
 		  <tr>
-			<td height="45"><strong>Información cancelación</strong></td>
+			<td height="45"><strong>Información</strong></td>
 			<td>
 				<?php
-				echo $row['cancelInfo']; 
+				echo $row['info']; 
+				?>
+			</td>
+		  </tr>
+		  <?php
+	  }
+	  
+	  if ($row['cancelHours'] != NULL) {
+		  ?>
+		  <tr>
+			<td height="45"><strong>Política de cancelación</strong></td>
+			<td>
+				<?php
+				echo 'Cancelar '.$row['cancelHours'].' horas antes para evitar recargo'; 
+				?>
+			</td>
+		  </tr>
+		  <?php
+	  }
+	  
+	  if ($row['cancelFee'] != NULL) {
+		  ?>
+		  <tr>
+			<td height="45"><strong>Recargo</strong></td>
+			<td>
+				<?php
+				echo 'Recargo del '.$row['cancelFee'].'% por cancelación tardía o falta de presencia''; 
 				?>
 			</td>
 		  </tr>
@@ -154,7 +186,7 @@ foreach ($hotelInfo as $row) {
 	  }
 	  ?>
 	</table>
-    <?php
+<?php
 }
 ?>
 

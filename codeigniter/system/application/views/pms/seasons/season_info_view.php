@@ -38,8 +38,13 @@ foreach ($season as $row) {
 	
 	if ($row['disable'] == 1) {
 	
-	    echo anchor('seasons/editSeason/'.$row['id_season'],'Editar')."<br>";
-		echo anchor('seasons/disableSeason/'.$seasonId, 'Deshabilitar', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>"; 
+		$userRole = $this->session->userdata('userrole');
+
+		if ($userRole != 'Employee') {
+
+			echo anchor('seasons/editSeason/'.$row['id_season'],'Editar')."<br>";
+			echo anchor('seasons/disableSeason/'.$seasonId, 'Deshabilitar', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"))."<br><br>"; 
+		}
 	
 	} else if ($row['disable'] == 0) {
 	

@@ -7,19 +7,27 @@ $this->load->view('pms/header');
 
 <?php
 
-if ($roomTypes) {
+$userRole = $this->session->userdata('userrole');
 
-	echo anchor('rooms/addRoom/','Agregar Nueva Habitación')."<br>";
-} 
+if ($userRole != 'Employee') {
+
+	if ($roomTypes) {
+	
+		echo anchor('rooms/addRoom/','Agregar Nueva Habitación')."<br>";
+	} 
+}
 
 if ($roomsDis) {
 	
-	echo anchor('rooms/viewDisabledRooms/number','Ver Habitaciones Deshabilitadas')."<br><br>";
+	echo anchor('rooms/viewDisabledRooms/number','Ver Habitaciones Deshabilitadas')."<br>";
 }
 
 if ($rooms) {
 	
 	?>
+    
+    <br />
+    
 	<table width="464" border="0">
     
       <tr>
@@ -29,6 +37,7 @@ if ($rooms) {
             ?>
         </td>
         
+        <!--
     	<td width="150">
 			<?php 
             echo 'En funcionamiento: ', $roomsCountRunning; 
@@ -40,13 +49,14 @@ if ($rooms) {
             echo 'Fuera de servicio: ', $roomsCountOos; 
             ?>
         </td>
+        -->
       </tr>
       
 	</table>
 
 	<br />
 
-	<table width="498" border="1">
+	<table width="352" border="1">
     
 	  <tr>
     	<td width="80">
@@ -70,8 +80,7 @@ if ($rooms) {
         	<td width="150">
 				<?php 
 				echo anchor('rooms/viewRooms/name', 'Nombre');
-				?>            	
-           	</td>
+				?>           	</td>
 		<?php
 		}
 		?>
@@ -79,14 +88,15 @@ if ($rooms) {
 		<td width="100">
     		<?php 
 			echo anchor('rooms/viewRooms/rtabrv', 'Tipo');
-			?>			
-       	</td>
-            
+			?>       	</td>
+           
+        <!-- 
 		<td width="140">
 			<?php 
         	echo anchor('rooms/viewRooms/status', 'Estado');
             ?>           
        	</td>
+        -->
   	  </tr>
 	
 	  <?php
@@ -120,18 +130,20 @@ if ($rooms) {
                 ?>
             </td>
             
+            <!--
             <td>
                 <?php 
                 echo lang($row['status']);
                 ?>
            </td>
+           -->
   	  	</tr>
 	  <?php
 	  }
 	  ?>
 	</table>
 
-	<br />
+<br />
     
 	<?php
 

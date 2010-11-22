@@ -62,19 +62,19 @@ class Rooms extends Controller
 				$order = 'number';
 			}
 			
-			$rooms             = $this->ROM->getRoomInfo($hotel, null,     null, $order, $config['per_page'], $lim2, 1);
-			$roomsDis          = $this->ROM->getRoomInfo($hotel, 'RO.disable', '0',  null,   null,                null,  null);
+			$rooms             = $this->ROM->getRoomInfo($hotel, null, null, $order, $config['per_page'], $lim2, 1);
+			$roomsDis          = $this->ROM->getRoomInfo($hotel, 'RO.disable', '0',  null, null,  null, null);
 			$roomsCount        = $this->ROM->getRoomCount($hotel, null,     null,             null, null, 1);
-			$roomsCountRunning = $this->ROM->getRoomCount($hotel, 'status', 'Running',        null, null, 1);
-			$roomsCountOos     = $this->ROM->getRoomCount($hotel, 'status', 'Out of service', null, null, 1);
+			//$roomsCountRunning = $this->ROM->getRoomCount($hotel, 'status', 'Running',        null, null, 1);
+			//$roomsCountOos     = $this->ROM->getRoomCount($hotel, 'status', 'Out of service', null, null, 1);
 			$roomTypes         = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
 			
 			$data['order']             = $order;
 			$data['rooms']             = $rooms;
 			$data['roomsDis']          = $roomsDis;
 			$data['roomsCount']        = $roomsCount;
-			$data['roomsCountOos']     = $roomsCountOos;
-			$data['roomsCountRunning'] = $roomsCountRunning;
+			//$data['roomsCountOos']     = $roomsCountOos;
+			//$data['roomsCountRunning'] = $roomsCountRunning;
 			$data['roomTypes']         = $roomTypes;
 			
 			$this->load->view('pms/rooms/rooms_view', $data);
@@ -360,7 +360,7 @@ class Rooms extends Controller
 	{	
 		$this->form_validation->set_rules('room_number', 'lang:number', 'trim|xss_clean|required|max_length[20]|callback_checkRoomNumber');
 		$this->form_validation->set_rules('room_name', 'lang:name', 'trim|xss_clean|max_length[50]');
-		$this->form_validation->set_rules('room_status', 'lang:status', 'trim|xss_clean|required|max_length[20]');
+		//$this->form_validation->set_rules('room_status', 'lang:status', 'trim|xss_clean|required|max_length[20]');
 		$this->form_validation->set_rules('room_room_type','lang:room_type','trim|xss_clean|required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
@@ -369,15 +369,27 @@ class Rooms extends Controller
 		
 			if ($userId) {
 			
-				$hotel = $this->session->userdata('hotelid');
+				$userRole = $this->session->userdata('userrole');
 				
-				$maxRoomNumber = $this->ROM->getMaxRoomNumber($hotel, null);
-				$roomTypes     = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+				if ($userRole != 'Employee') {
 			
-				$data['maxRoomNumber'] = $maxRoomNumber;
-				$data['roomTypes']     = $roomTypes;
-			
-				$this->load->view('pms/rooms/room_add_view', $data);
+					$hotel = $this->session->userdata('hotelid');
+					
+					$maxRoomNumber = $this->ROM->getMaxRoomNumber($hotel, null);
+					$roomTypes     = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+				
+					$data['maxRoomNumber'] = $maxRoomNumber;
+					$data['roomTypes']     = $roomTypes;
+				
+					$this->load->view('pms/rooms/room_add_view', $data);
+					
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 			
@@ -389,13 +401,13 @@ class Rooms extends Controller
 		
 			$roomNumber   = set_value('room_number');
 			$roomName     = set_value('room_name');
-			$roomStatus   = set_value('room_status');
+			//$roomStatus   = set_value('room_status');
 			$roomRoomType = set_value('room_room_type');
 			
 			$data = array(
 			    'name'         => ucwords(strtolower($roomName)),
 				'number'       => $roomNumber,
-				'status'       => $roomStatus,
+				'status'       => 'Running',
 				'fk_room_type' => $roomRoomType
 				);
 			
@@ -427,8 +439,20 @@ class Rooms extends Controller
 		
 			if ($userId) {
 			
-				$data['error'] = NULL;
-				$this->load->view('pms/rooms/room_type_add_view', $data);
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+				
+					$data['error'] = NULL;
+					$this->load->view('pms/rooms/room_type_add_view', $data);
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 			
 			} else {
 			
@@ -490,7 +514,7 @@ class Rooms extends Controller
 		
 		$this->form_validation->set_rules('room_number','lang:number','trim|xss_clean|required|max_length[20]|callback_checkRoomNumber');
 		$this->form_validation->set_rules('room_name','lang:name','trim|xss_clean|max_length[50]');
-		$this->form_validation->set_rules('room_status','lang:status','trim|xss_clean|required|max_length[20]');
+		//$this->form_validation->set_rules('room_status','lang:status','trim|xss_clean|required|max_length[20]');
 		$this->form_validation->set_rules('room_room_type','lang:room_type','trim|xss_clean|required|max_length[20]');
 		
 		if ($this->form_validation->run() == FALSE) {
@@ -498,14 +522,26 @@ class Rooms extends Controller
 			$userId = $this->session->userdata('userid');
 		
 			if ($userId) {
-
-				$room      = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
-				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
-			
-				$data['room']      = $room;
-				$data['roomTypes'] = $roomTypes;
-			
-				$this->load->view('pms/rooms/room_edit_view', $data);
+				
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+				
+					$room      = $this->ROM->getRoomInfo($hotel, 'id_room', $roomId, null, null, null, 1);
+					$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null, null, null, null, null, 1);
+				
+					$data['room']      = $room;
+					$data['roomTypes'] = $roomTypes;
+				
+					$this->load->view('pms/rooms/room_edit_view', $data);
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 			
 			} else {
 				
@@ -517,13 +553,13 @@ class Rooms extends Controller
 		
 			$roomNumber   = set_value('room_number');
 			$roomName     = set_value('room_name');
-			$roomStatus   = set_value('room_status');
+			//$roomStatus   = set_value('room_status');
 			$roomRoomType = set_value('room_room_type');
 			
 			$data = array(
 				'name'         => ucwords(strtolower($roomName)),
 				'number'       => $roomNumber,
-				'status'       => $roomStatus,
+				'status'       => 'Running',
 				'fk_room_type' => $roomRoomType
 				);
 			
@@ -552,13 +588,25 @@ class Rooms extends Controller
 		
 			if ($userId) {
 	
-				$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
-				$error = NULL;
+				$userRole = $this->session->userdata('userrole');
 				
-				$data['error'] = $error;
-				$data['roomType'] = $roomType;
+				if ($userRole != 'Employee') {
 				
-				$this->load->view('pms/rooms/room_type_edit_view', $data);
+					$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+					$error = NULL;
+					
+					$data['error'] = $error;
+					$data['roomType'] = $roomType;
+					
+					$this->load->view('pms/rooms/room_type_edit_view', $data);
+					
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 				
@@ -622,52 +670,64 @@ class Rooms extends Controller
 		
 		if ($userId) {
 
-			$hotel  = $this->session->userdata('hotelid');
-			
-			$roomReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, null, null, null);
-			
-			$datestring = "%Y-%m-%d  %h:%i %a";
-			$time       = time();
-			$date       = mdate($datestring, $time);
-			
-			$disable    = 'Yes';
-			$iniResNum = array();
-			
-			foreach ($roomReservation as $row) {
-			
-				$resNum   = $row['id_reservation'];
-				$checkIn  = $row['checkIn'];
-				$checkOut = $row['checkOut'];
-				$status   = $row['status'];
+			$userRole = $this->session->userdata('userrole');
 				
-				if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')){
+			if ($userRole != 'Employee') {
 				
-					$disable = 'No';
+				$hotel  = $this->session->userdata('hotelid');
+				
+				$roomReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RO.id_room', $roomId, null, null, null);
+				
+				$datestring = "%Y-%m-%d  %h:%i %a";
+				$time       = time();
+				$date       = mdate($datestring, $time);
+				
+				$disable    = 'Yes';
+				$iniResNum = array();
+				
+				foreach ($roomReservation as $row) {
+				
+					$resNum   = $row['id_reservation'];
+					$checkIn  = $row['checkIn'];
+					$checkOut = $row['checkOut'];
+					$status   = $row['status'];
 					
-					$newResNum = array ($resNum);
-					$result    = array_merge($iniResNum, $newResNum);
-					$iniResNum = $result;
+					if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')){
+					
+						$disable = 'No';
+						
+						$newResNum = array ($resNum);
+						$result    = array_merge($iniResNum, $newResNum);
+						$iniResNum = $result;
+					}
 				}
-			}
+				
+				if ($disable == 'No') {
+					
+					$result = array_unique ($result); 
+					
+					$data['error']  = lang("errorPendingReservation");
+					$data['result'] = $result;
+					$data['type']   = 'error_room';
+					
+					$this->load->view('pms/error', $data);
+					
+				} else {
+				
+					$this->GNM->disable('ROOM', 'id_room', $roomId);  
+					
+					$data['message'] = lang("disableRoomMessage");
+					$data['type'] = 'rooms';
+					
+					$this->load->view('pms/success', $data);
+				}
 			
-			if ($disable == 'No') {
+			} else {
 				
-				$result = array_unique ($result); 
-				
-				$data['error']  = lang("errorPendingReservation");
-				$data['result'] = $result;
-				$data['type']   = 'error_room';
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
 				
 				$this->load->view('pms/error', $data);
-				
-			} else {
-			
-				$this->GNM->disable('ROOM', 'id_room', $roomId);  
-				
-				$data['message'] = lang("disableRoomMessage");
-				$data['type'] = 'rooms';
-				
-				$this->load->view('pms/success', $data);
 			}	
 		
 		} else {
@@ -684,54 +744,66 @@ class Rooms extends Controller
 		
 		if ($userId) {
 		
-			$hotel  = $this->session->userdata('hotelid');
-			
-			$roomTypeReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, null, null, null);
-			
-			$datestring = "%Y-%m-%d  %h:%i %a";
-			$time       = time();
-			$date       = mdate($datestring, $time);
-			
-			$delete    = 'Yes';
-			$iniResNum = array();
-			
-			foreach ($roomTypeReservation as $row) {
-			
-				$resNum   = $row['id_reservation'];
-				$checkIn  = $row['checkIn'];
-				$checkOut = $row['checkOut'];
-				$status   = $row['status'];
+			$userRole = $this->session->userdata('userrole');
 				
-				if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')) {
+			if ($userRole != 'Employee') {
+			
+				$hotel  = $this->session->userdata('hotelid');
+				
+				$roomTypeReservation = $this->ROM->getRoomReservationsGuest($hotel, 'RT.id_room_type', $roomTypeId, null, null, null);
+				
+				$datestring = "%Y-%m-%d  %h:%i %a";
+				$time       = time();
+				$date       = mdate($datestring, $time);
+				
+				$delete    = 'Yes';
+				$iniResNum = array();
+				
+				foreach ($roomTypeReservation as $row) {
+				
+					$resNum   = $row['id_reservation'];
+					$checkIn  = $row['checkIn'];
+					$checkOut = $row['checkOut'];
+					$status   = $row['status'];
 					
-					$delete = 'No';
-					
-					$newResNum = array ($resNum);
-					$result    = array_merge($iniResNum, $newResNum);
-					$iniResNum = $result;
+					if (($checkIn > $date || $checkOut > $date) && ($status != 'Canceled') && ($status != 'No Show')) {
+						
+						$delete = 'No';
+						
+						$newResNum = array ($resNum);
+						$result    = array_merge($iniResNum, $newResNum);
+						$iniResNum = $result;
+					}
 				}
-			}
+				
+				if ($delete == 'No') {
+				
+					$result = array_unique ($result); 
+	
+					$data['error']  = lang("errorPendingReservation");
+					$data['result'] = $result;
+					$data['type']   = 'error_room_type';
+					
+					$this->load->view('pms/error', $data);
+					
+				} else {
+				
+					$this->GNM->disable('ROOM_TYPE', 'id_room_type', $roomTypeId); 
+					$this->GNM->disable('ROOM',      'fk_room_type', $roomTypeId);   
+				
+					$data['message'] = lang("disableRoomTypeMessage");
+					$data['type'] = 'room types';
+					
+					$this->load->view('pms/success', $data);
+				}	
 			
-			if ($delete == 'No') {
-			
-				$result = array_unique ($result); 
-
-				$data['error']  = lang("errorPendingReservation");
-				$data['result'] = $result;
-				$data['type']   = 'error_room_type';
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
 				
 				$this->load->view('pms/error', $data);
-				
-			} else {
-			
-				$this->GNM->disable('ROOM_TYPE', 'id_room_type', $roomTypeId); 
-				$this->GNM->disable('ROOM',      'fk_room_type', $roomTypeId);   
-			
-				$data['message'] = lang("disableRoomTypeMessage");
-				$data['type'] = 'room types';
-				
-				$this->load->view('pms/success', $data);
-			}	
+			}
 		
 		} else {
 			
@@ -747,18 +819,30 @@ class Rooms extends Controller
 		
 		if ($userId) {
 		
-			$hotel = $this->session->userdata('hotelid');
-			
-			$data = array(
-					'disable' => 1
-					);
- 
-			$this->GNM->update('ROOM', 'id_room', $roomId, $data);   
-			
-			$data['message'] = lang("enableRoomMessage");
-			$data['type'] = 'rooms';
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->load->view('pms/success', $data);
+			if ($userRole != 'Employee') {
+			
+				$hotel = $this->session->userdata('hotelid');
+				
+				$data = array(
+						'disable' => 1
+						);
+	 
+				$this->GNM->update('ROOM', 'id_room', $roomId, $data);   
+				
+				$data['message'] = lang("enableRoomMessage");
+				$data['type'] = 'rooms';
+					
+				$this->load->view('pms/success', $data);
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 		
 		} else {
 			
@@ -774,17 +858,29 @@ class Rooms extends Controller
 		
 		if ($userId) {
 		
-			$data = array(
-					'disable' => 1
-					);
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->GNM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data); 
-			$this->GNM->update('ROOM',      'fk_room_type', $roomTypeId, $data);   
+			if ($userRole != 'Employee') {
 			
-			$data['message'] = lang("enableRoomTypeMessage");
-			$data['type'] = 'room types';
+				$data = array(
+						'disable' => 1
+						);
+					
+				$this->GNM->update('ROOM_TYPE', 'id_room_type', $roomTypeId, $data); 
+				$this->GNM->update('ROOM',      'fk_room_type', $roomTypeId, $data);   
 				
-			$this->load->view('pms/success', $data);  
+				$data['message'] = lang("enableRoomTypeMessage");
+				$data['type'] = 'room types';
+					
+				$this->load->view('pms/success', $data); 
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			} 
 		
 		} else {
 			
@@ -824,14 +920,26 @@ class Rooms extends Controller
 		
 		if ($userId) {
 	
-			$hotel = $this->session->userdata('hotelid');
-			
-			$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+			$userRole = $this->session->userdata('userrole');
 				
-			$data['roomType'] = $roomType;
-			$data['error']    = NULL;
+			if ($userRole != 'Employee') {
 			
-			$this->load->view('pms/rooms/room_type_add_image_view', $data);
+				$hotel = $this->session->userdata('hotelid');
+				
+				$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
+					
+				$data['roomType'] = $roomType;
+				$data['error']    = NULL;
+				
+				$this->load->view('pms/rooms/room_type_add_image_view', $data);
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 		
 		} else {
 			
@@ -847,66 +955,78 @@ class Rooms extends Controller
 		
 		if ($userId) {
 		
-			$hotel = $this->session->userdata('hotelid');
+			$userRole = $this->session->userdata('userrole');
+				
+			if ($userRole != 'Employee') {
 			
-			$config['upload_path'] = './assets/images/';
-			$config['allowed_types'] = 'gif|jpg|png';
-			$config['max_size']	= '0';
-			$config['max_width']  = '0';
-			$config['max_height']  = '0';
-			
-			$this->load->library('upload', $config);
-			
-			if ( ! $this->upload->do_upload())
-			{
 				$hotel = $this->session->userdata('hotelid');
-			
-				$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 				
-				$data = array('error' => $this->upload->display_errors());
-				$data['roomType'] = $roomType;
-	
-				$this->load->view('pms/rooms/room_type_add_image_view', $data);
-			}	
-			else
-			{
-				$data = array('upload_data' => $this->upload->data());
+				$config['upload_path'] = './assets/images/';
+				$config['allowed_types'] = 'gif|jpg|png';
+				$config['max_size']	= '0';
+				$config['max_width']  = '0';
+				$config['max_height']  = '0';
 				
-				foreach ($data as $row)
+				$this->load->library('upload', $config);
+				
+				if ( ! $this->upload->do_upload())
 				{
-					$fullPath = $row['full_path'];
-					$filePath = $row['file_path'];
-					$fileName = $row['raw_name'];
-					$fileExt  = $row['file_ext'];
-				}
+					$hotel = $this->session->userdata('hotelid');
 				
-				$newFileName = getNick($fileName);
-			
-				$config['image_library']  = 'gd2';
-				$config['source_image']	  = $fullPath;
-				$config['new_image']      = $filePath.'/'.$hotel.'_'.$roomTypeId.'_'.$newFileName.$fileExt;
-				$config['maintain_ratio'] = TRUE;
-				$config['width']	      = 400;
-				$config['height']	      = 400;
-				
-				$this->load->library('image_lib', $config);
-				$this->image_lib->resize();
-				
-				unlink('./assets/images/'.$fileName.$fileExt);
-				
-				$data = array(
-					'image'        => $hotel.'_'.$roomTypeId.'_'.$newFileName.$fileExt,
-					'fk_hotel'     => $hotel,
-					'fk_room_type' => $roomTypeId
-					);
-				
-				$this->GNM->insert('IMAGE', $data);  
+					$roomType = $this->GNM->getInfo($hotel, 'ROOM_TYPE', 'id_room_type', $roomTypeId, null, null, null, 1);
 					
-				$data['message']    = lang("addImageMessage");
-				$data['type']       = 'room_type_image';
-				$data['roomTypeId'] = $roomTypeId;
+					$data = array('error' => $this->upload->display_errors());
+					$data['roomType'] = $roomType;
+		
+					$this->load->view('pms/rooms/room_type_add_image_view', $data);
+				}	
+				else
+				{
+					$data = array('upload_data' => $this->upload->data());
+					
+					foreach ($data as $row)
+					{
+						$fullPath = $row['full_path'];
+						$filePath = $row['file_path'];
+						$fileName = $row['raw_name'];
+						$fileExt  = $row['file_ext'];
+					}
+					
+					$newFileName = getNick($fileName);
 				
-				$this->load->view('pms/success', $data); 
+					$config['image_library']  = 'gd2';
+					$config['source_image']	  = $fullPath;
+					$config['new_image']      = $filePath.'/'.$hotel.'_'.$roomTypeId.'_'.$newFileName.$fileExt;
+					$config['maintain_ratio'] = TRUE;
+					$config['width']	      = 400;
+					$config['height']	      = 400;
+					
+					$this->load->library('image_lib', $config);
+					$this->image_lib->resize();
+					
+					unlink('./assets/images/'.$fileName.$fileExt);
+					
+					$data = array(
+						'image'        => $hotel.'_'.$roomTypeId.'_'.$newFileName.$fileExt,
+						'fk_hotel'     => $hotel,
+						'fk_room_type' => $roomTypeId
+						);
+					
+					$this->GNM->insert('IMAGE', $data);  
+						
+					$data['message']    = lang("addImageMessage");
+					$data['type']       = 'room_type_image';
+					$data['roomTypeId'] = $roomTypeId;
+					
+					$this->load->view('pms/success', $data); 
+				}
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
 			
 		} else {
@@ -924,24 +1044,36 @@ class Rooms extends Controller
 		
 		if ($userId) {
 			
-			$hotel = $this->session->userdata('hotelid');
-			
-			$image = $this->GNM->getInfo($hotel, 'IMAGE', 'id_image', $imageId, null, null, null, null);
-			
-			$this->GNM->delete('IMAGE', 'id_image', $imageId); 
-		
-			foreach ($image as $row)
-			{
-				$roomTypeId = $row['fk_room_type'];
+			$userRole = $this->session->userdata('userrole');
 				
-				unlink('./assets/images/'.$row['image']); 
-			}
-		
-			$data['message']    = lang("deleteImageMessage");
-			$data['type']       = 'room_type_image';
-			$data['roomTypeId'] = $roomTypeId;
+			if ($userRole != 'Employee') {
 			
-			$this->load->view('pms/success', $data); 
+				$hotel = $this->session->userdata('hotelid');
+				
+				$image = $this->GNM->getInfo($hotel, 'IMAGE', 'id_image', $imageId, null, null, null, null);
+				
+				$this->GNM->delete('IMAGE', 'id_image', $imageId); 
+			
+				foreach ($image as $row)
+				{
+					$roomTypeId = $row['fk_room_type'];
+					
+					unlink('./assets/images/'.$row['image']); 
+				}
+			
+				$data['message']    = lang("deleteImageMessage");
+				$data['type']       = 'room_type_image';
+				$data['roomTypeId'] = $roomTypeId;
+				
+				$this->load->view('pms/success', $data); 
+				
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 		
 		} else {
 			

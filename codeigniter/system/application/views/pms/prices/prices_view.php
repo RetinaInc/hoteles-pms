@@ -342,8 +342,14 @@ foreach ($plan as $row) {
 <br />
 
 <?php
-echo anchor('prices/editPrices/'.$seasonId.'/'.$rateId.'/'.$planId, 'Editar Precios');
-echo "<br><br>";
+$userRole = $this->session->userdata('userrole');
+				
+if ($userRole != 'Employee') {
+
+	echo anchor('prices/editPrices/'.$seasonId.'/'.$rateId.'/'.$planId, 'Editar Precios');
+	echo "<br><br>";
+}
+
 echo anchor('prices/selectPlanPrices/'.$seasonId.'/'.$rateId, 'Volver');
 ?>
 

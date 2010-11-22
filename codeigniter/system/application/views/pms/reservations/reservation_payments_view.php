@@ -137,7 +137,7 @@ echo 'Total por pagar: ', $amountToPay.' Bs.F.'."<br><br>";
 	<td>
 		<?php 
 		$unixDate = human_to_unix($row['date']);
-		echo date ("j/m/Y" , $unixCi); 
+		echo date ("j/m/Y" , $unixDate); 
 		?>    
     </td>
     

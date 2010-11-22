@@ -101,10 +101,10 @@ if ($resIds) {
 	
 	<?php 
 	foreach ($resIds as $row) {
-  
+	
   		$hotel = $this->session->userdata('hotelid');
 		
-  		$reservationInfo = $this->REM->getReservationInfo($hotel, 'id_reservation', $row['id_reservation'], null, null, null, 1);
+  		$reservationInfo = $this->REM->getReservationInfo($hotel, 'id_reservation', $row, null, null, null, 1);
 		
 		foreach ($reservationInfo as $row1) {
 			  

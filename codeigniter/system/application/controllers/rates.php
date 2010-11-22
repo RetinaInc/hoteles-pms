@@ -97,7 +97,19 @@ class Rates extends Controller
 		
 			if ($userId) {
 			
-				$this->load->view('pms/rates/rate_add_view');
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+			
+					$this->load->view('pms/rates/rate_add_view');
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 			
 			} else {
 			
@@ -137,13 +149,25 @@ class Rates extends Controller
 		
 			if ($userId) {
 		
-				$hotel = $this->session->userdata('hotelid');
+				$userRole = $this->session->userdata('userrole');
 				
-				$rate = $this->GNM->getInfo($hotel, 'RATE', 'id_rate', $rateId, null, null, null, 1);
+				if ($userRole != 'Employee') {
 				
-				$data['rate'] = $rate;
-			
-				$this->load->view('pms/rates/rate_edit_view', $data);
+					$hotel = $this->session->userdata('hotelid');
+					
+					$rate = $this->GNM->getInfo($hotel, 'RATE', 'id_rate', $rateId, null, null, null, 1);
+					
+					$data['rate'] = $rate;
+				
+					$this->load->view('pms/rates/rate_edit_view', $data);
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 				
@@ -177,12 +201,24 @@ class Rates extends Controller
 		
 		if ($userId) {
 		
-			$this->GNM->disable('RATE', 'id_rate', $rateId); 
-			
-			$data['message'] = lang("disableRateMessage");
-			$data['type'] = 'rates';
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->load->view('pms/success', $data);
+			if ($userRole != 'Employee') {
+				
+				$this->GNM->disable('RATE', 'id_rate', $rateId); 
+				
+				$data['message'] = lang("disableRateMessage");
+				$data['type'] = 'rates';
+					
+				$this->load->view('pms/success', $data);
+				
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 		
 		} else {
 		
@@ -198,16 +234,28 @@ class Rates extends Controller
 		
 		if ($userId) {
 		
-			$data = array(
-					'disable' => 1
-					);
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
+			if ($userRole != 'Employee') {
 			
-			$data['message'] = lang("enableRateMessage");
-			$data['type'] = 'rates';
+				$data = array(
+						'disable' => 1
+						);
+					
+				$this->GNM->update('RATE', 'id_rate', $rateId, $data);   
 				
-			$this->load->view('pms/success', $data);
+				$data['message'] = lang("enableRateMessage");
+				$data['type'] = 'rates';
+					
+				$this->load->view('pms/success', $data);
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 				
 		} else {
 		

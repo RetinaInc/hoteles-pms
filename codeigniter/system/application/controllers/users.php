@@ -142,11 +142,23 @@ class Users extends Controller
 		
 		if ($this->form_validation->run() == FALSE) {
 		
-			$sessionUserId = $this->session->userdata('userid');
+			$sessionUserId  = $this->session->userdata('userid');
 			
 			if ($sessionUserId) {
 				
-				$this->load->view('pms/users/user_add_view');
+				$sessionUserRole = $this->session->userdata('userrole');
+				
+				if ($sessionUserRole == 'Master') {
+					
+					$this->load->view('pms/users/user_add_view');
+					
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+					
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 	
@@ -231,7 +243,8 @@ class Users extends Controller
 	
 	function editUser($userId)
 	{
-		$sessionUserId = $this->session->userdata('userid');
+		$sessionUserId   = $this->session->userdata('userid');
+		$sessionUserRole = $this->session->userdata('userrole');
 		
 		if ($sessionUserId) {
 		
@@ -254,10 +267,20 @@ class Users extends Controller
 				$user       = $this->GNM->getInfo($hotel, 'USER',      'id_user', $userId, 'lastName', null, null, 1);
 				$telephones = $this->GNM->getInfo(null,   'TELEPHONE', 'fk_user', $userId,  null,      null, null, null);
 				
-				$data['user']       = $user;
-				$data['telephones'] = $telephones;
+				if (($sessionUserRole == 'Employee') && ($sessionUserId != $userId)) {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
 				
-				$this->load->view('pms/users/user_edit_view', $data);
+					$this->load->view('pms/error', $data);
+				
+				} else {
+					
+					$data['user']       = $user;
+					$data['telephones'] = $telephones;
+				
+					$this->load->view('pms/users/user_edit_view', $data);
+				} 
 			
 			} else {
 				
@@ -351,9 +374,19 @@ class Users extends Controller
 				
 				$user = $this->GNM->getInfo($hotel, 'USER', 'id_user', $userId, null, null, null, 1);
 				
-				$data['user'] = $user;
+				if ($sessionUserId != $userId) {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
 				
-				$this->load->view('pms/users/user_modify_password_view', $data);
+					$this->load->view('pms/error', $data);
+				
+				} else {
+					
+					$data['user'] = $user;
+				
+					$this->load->view('pms/users/user_modify_password_view', $data);
+				} 
 			
 			} else {
 			
@@ -406,7 +439,6 @@ class Users extends Controller
 	
 	function forgottenPassword()
 	{
-		
 		$hotel = $this->session->userdata('hotelid');
 	
 		$this->form_validation->set_rules('username','lang:username','trim|xss_clean|required|min_length[6]|max_length[20]');
@@ -485,12 +517,24 @@ class Users extends Controller
 		
 		if ($sessionUserId) {
 			
-			$this->GNM->disable('USER', 'id_user', $userId);
+			$sessionUserRole = $this->session->userdata('userrole');
 				
-			$data['message'] = lang("disableUserMessage");
-			$data['type'] = 'users';
+			if ($sessionUserRole == 'Master') {
+			
+				$this->GNM->disable('USER', 'id_user', $userId);
+					
+				$data['message'] = lang("disableUserMessage");
+				$data['type'] = 'users';
+					
+				$this->load->view('pms/success', $data);
 				
-			$this->load->view('pms/success', $data);
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 			
 		} else {
 		
@@ -506,16 +550,28 @@ class Users extends Controller
 		
 		if ($sessionUserId) {
 		
-			$data = array(
-					'disable' => 1
-					);
+			$sessionUserRole = $this->session->userdata('userrole');
 				
-			$this->GNM->update('USER', 'id_user', $userId, $data);  
+			if ($sessionUserRole == 'Master') {
+			
+				$data = array(
+						'disable' => 1
+						);
+					
+				$this->GNM->update('USER', 'id_user', $userId, $data);  
+					
+				$data['message'] = lang("enableUserMessage");
+				$data['type'] = 'users';
+					
+				$this->load->view('pms/success', $data);
 				
-			$data['message'] = lang("enableUserMessage");
-			$data['type'] = 'users';
+			} else {
 				
-			$this->load->view('pms/success', $data);	
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}	
 		
 		} else {
 		
@@ -540,6 +596,13 @@ class Users extends Controller
 		
 			$username = set_value('username');
 			$password = set_value('password');
+			
+			$encodePassword = $this->encrypt->encode($password);
+			
+		
+/**///			echo 'PASSWORD: ', $password."<br>";
+/**///			echo 'ENCODED: ', $encodePassword."<br>";
+			
 			
 			$user = $this->GNM->getInfo($hotel, 'USER', 'username', $username, null, null, null, 1);
 			

@@ -34,6 +34,7 @@ foreach ($room as $row) {
 	<input name="room_name" type="text" id="room_name" value="<?php echo $row['name']; ?>" size="30" maxlength="50" />
 	</p>
     
+    <!--
     <p>
     <?php
 	$options = array(
@@ -44,6 +45,7 @@ foreach ($room as $row) {
 	echo '* Estado: ', form_dropdown('room_status', $options, $row['status']);
 	?>
 	</p>
+    -->
     
 	<p>* Tipo de habitación:
     <select name="room_room_type" id="room_room_type">

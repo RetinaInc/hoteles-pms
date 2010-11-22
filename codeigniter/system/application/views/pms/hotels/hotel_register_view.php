@@ -42,28 +42,28 @@ $this->load->view('pms/meta');
 echo form_open('hotels/registerHotel');
 ?>
 
-<table width="825" border="0">
+<table width="840" border="0">
 
   <tr>
-    <td width="140" height="40">* Nombre</td>
+    <td width="140" height="40">* Nombre:</td>
     <td>
       <input name="hotel_name" type="text" value="<?php echo set_value('hotel_name'); ?>" size="100" />  	</td>
   </tr>
   
   <tr>
-    <td height="40">* Tipo</td>
-  	<td width="675">
+    <td height="40">* Tipo:</td>
+  	<td>
    		<input name="hotel_type" type="text" value="<?php echo set_value('hotel_type'); ?>" size="30" maxlength="50" />  	</td>
   </tr>
   
   <tr>
-    <td height="40">* Descripción</td>
+    <td height="40">* Descripción:</td>
   	<td>
     	<textarea name="hotel_description" cols="30" rows="2"><?php echo set_value('hotel_description'); ?></textarea>   	</td>
   </tr>
   
   <tr>
-    <td height="40">* País/Ciudad</td>
+    <td height="40">* País/Ciudad:</td>
     <td>
       País
       <select name="hotel_country" id="hotel_country">
@@ -84,19 +84,19 @@ echo form_open('hotels/registerHotel');
   </tr>
   
   <tr>
-    <td height="40">* Dirección</td>
+    <td height="40">* Dirección:</td>
   	<td>
     	<textarea name="hotel_address" cols="30" rows="2"><?php echo set_value('hotel_address'); ?></textarea>   	</td>
   </tr>
   
   <tr>
-    <td height="40">Referencias direcci&oacute;n</td>
+    <td height="40">Referencias direcci&oacute;n:</td>
   	<td>
     	<textarea name="hotel_ref_address" cols="30" rows="2"><?php echo set_value('hotel_ref_address'); ?></textarea>	</td>
   </tr>
   
   <tr>
-    <td height="40">Teléfonos</td>
+    <td height="40">Teléfonos:</td>
     <td>*
         <select name="hotel_tel_type_1" id="hotel_tel_type_1">
           <option value="Tel" <?php echo set_select('hotel_tel_type_1', 'Tel', TRUE); ?>>Tel</option>
@@ -127,22 +127,39 @@ echo form_open('hotels/registerHotel');
   </tr>
   
   <tr>
-    <td height="40">Página web</td>
+    <td height="40">Página web:</td>
   	<td>
   		<input name="hotel_web_page" type="text" value="<?php echo set_value('hotel_web_page'); ?>" size="42" maxlength="100" />  	</td>
   </tr>
   
   <tr>
-    <td height="40">* Correo electrónico</td>
+    <td height="40">* Correo electrónico:</td>
   	<td>
-    	<input name="hotel_email" type="text" value="<?php echo set_value('hotel_email'); ?>" size="42" maxlength="50" />  	
-  	</td>
+    	<input name="hotel_email" type="text" value="<?php echo set_value('hotel_email'); ?>" size="42" maxlength="50" />   	</td>
   </tr>
   <tr>
-    <td height="40">Informaci&oacute;n cancelaci&oacute;n:</td>
+    <td height="40">Informaci&oacute;n:</td>
     <td>
-    	<textarea name="hotel_cancel_info" cols="40" rows="2"><?php echo set_value('hotel_cancel_info'); ?></textarea>
- 	</td>
+    	<textarea name="hotel_info" cols="40" rows="2"><?php echo set_value('hotel_info'); ?></textarea>  	</td>
+  </tr>
+  <tr>
+    <td height="40" colspan="2">* Política de cancelación: Se debe cancelar 
+      <input name="hotel_cancel_hours" type="text" id="hotel_cancel_hours" value="<?php echo set_value('hotel_cancel_hours'); ?>" size="3" maxlength="3" onKeyPress="return numbersonly(this, event)"/>
+    	<!--
+    	<select name="hotel_cancel_hours" id="hotel_cancel_hours">
+          <option value="24" <?php echo set_select('hotel_cancel_hours', '24'); ?>>24</option>
+          <option value="48" <?php echo set_select('hotel_cancel_hours', '48'); ?>>48</option>
+          <option value="72" <?php echo set_select('hotel_cancel_hours', '72'); ?>>72</option>
+          <option value="96" <?php echo set_select('hotel_cancel_hours', '96'); ?>>96</option>
+          <option value="120" <?php echo set_select('hotel_cancel_hours', '120'); ?>>120</option>
+        </select>
+        -->
+   	horas antes para evitar recargo. 	</td>
+  </tr>
+  <tr>
+    <td height="40" colspan="2">* Recargo por cancelaci&oacute;n tard&iacute;a o falta de presencia:
+      <input name="hotel_cancel_fee" type="text" id="hotel_cancel_fee" value="<?php echo set_value('hotel_cancel_fee'); ?>" size="3" maxlength="3" onkeypress="return numbersonly(this, event)"/>
+    %</td>
   </tr>
 </table>
 

@@ -53,27 +53,40 @@ echo 'Total reservaciones canceladas: ', $total;
 	
   <?php 
   foreach ($reservations as $row) {
+  	
+	$hotel = $this->session->userdata('hotelid');
+	  
+  	$reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
+  	$reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
+  	$payments              = getPaymentInfo($hotel, null, null, $row['id_reservation']);
+	  
+	$status   = $row['status'];
+	$totalFee = $row['totalFee'];
+	
+ 	$total = 0;
   
-	  $hotel = $this->session->userdata('hotelid');
-	  
-	  $reservationRoomsCount = getRRCount($hotel, 'RR.fk_reservation', $row['id_reservation'], null, null);
-	  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
-	  $payments              = getPaymentInfo($hotel, null, null, $row['id_reservation']);
-		  
-	  $total = 0;
-	  foreach ($reservationRoomInfo as $row1) {
-	  
-		  $total = $total + $row1['total'];
-	  }
+  	if ($row['status'] == 'Canceled') {
+	
+		$total = $totalFee;
 		
-	  $paid = 0;
-	  foreach ($payments as $row1) {
-	  
-	  	  $paid = $paid + $row1['amount'];
-	  }
+	} else {
+	
+		foreach ($reservationRoomInfo as $row1) {
 		
-	  $toPay = $total - $paid;
-  	  ?> 
+			$total = $total + $row1['total'];
+		}
+	}
+	
+  	$paid = 0;
+  
+  	foreach ($payments as $row1) {
+  
+		$paid = $paid + $row1['amount'];
+  	}
+	
+  	$toPay = $total - $paid;
+	
+  	?> 
    
   <tr>
     <td>
@@ -156,9 +169,16 @@ echo 'Total reservaciones canceladas: ', $total;
     
     <td>
 		<?php 
-        echo $toPay;
+		if (($status == 'Canceled') && ($toPay != 0)) { 
+			
+			echo "<span class='Estilo3'>".$toPay.' Bs.F. '."</span>";
+			
+		} else {
+			
+			echo $toPay.' Bs.F.';
+		}
+        
         ?> 
-        Bs.F.
     </td>
   </tr>
   <?php
