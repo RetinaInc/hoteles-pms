@@ -148,7 +148,19 @@ class Seasons extends Controller
 		
 			if ($userId) {
 				
-				$this->load->view('pms/seasons/season_add_view');
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+			
+					$this->load->view('pms/seasons/season_add_view');
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 				
@@ -328,11 +340,23 @@ class Seasons extends Controller
 		
 			if ($userId) {
 		
-				$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+				$userRole = $this->session->userdata('userrole');
 				
-				$data['season'] = $season;
+				if ($userRole != 'Employee') {
 				
-				$this->load->view('pms/seasons/season_edit_view', $data);
+					$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
+					
+					$data['season'] = $season;
+					
+					$this->load->view('pms/seasons/season_edit_view', $data);
+					
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 			
 			} else {
 				
@@ -513,105 +537,117 @@ class Seasons extends Controller
 		
 		if ($userId) {
 		
-			$hotel  = $this->session->userdata('hotelid');
-			
-			$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
-			
-			$datestring = "%Y-%m-%d  %h:%i %a";
-			$time       = time();
-			$date       = mdate($datestring, $time);
-			
-			$disable = 'Yes';
-			
-			foreach ($season as $row) {
-			
-				$dateStart  = $row['dateStart'];
-				$dateEnd    = $row['dateEnd'];
-			}
+			$userRole = $this->session->userdata('userrole');
 				
-			if (($dateStart <= $date) && ($date <= $dateEnd)) {
-					
-				$disable = 'No';
-				$error   = lang("errorCurrentSeason");
-			}
+			if ($userRole != 'Employee') {
 			
-			if (($dateStart >= $date) && ($dateEnd >= $date)) {
-			
-				$ds_array = explode ('-',$dateStart);
-				$yearS    = $ds_array[0];
-				$monthS   = $ds_array[1];
-				$dayS     = $ds_array[2];
-			
-				$seaNights = ((strtotime($dateEnd) - strtotime($dateStart)) / (60 * 60 * 24)) + 1;
+				$hotel  = $this->session->userdata('hotelid');
 				
-				$iniResNum = array();
+				$season = $this->GNM->getInfo($hotel, 'SEASON', 'id_season', $seasonId, null, null, null, null);
 				
-				$penReservations = $this->REM->getReservationInfo($hotel, 'RE.status', 'Reserved', null, null, null, 1);
+				$datestring = "%Y-%m-%d  %h:%i %a";
+				$time       = time();
+				$date       = mdate($datestring, $time);
 				
-				foreach ($penReservations as $row) {
+				$disable = 'Yes';
+				
+				foreach ($season as $row) {
+				
+					$dateStart  = $row['dateStart'];
+					$dateEnd    = $row['dateEnd'];
+				}
 					
-					$resNum       = $row['id_reservation'];
-					$fullCheckIn  = $row['checkIn'];
-					$fullCheckOut = $row['checkOut']; 
-					
-					$fci_array  = explode (' ',$fullCheckIn);
-					$checkIn    = $fci_array[0];
-					
-					$ci_array  = explode ('-',$checkIn);
-					$yearI     = $ci_array[0];
-					$monthI    = $ci_array[1];
-					$dayI      = $ci_array[2];
-					
-					$resNights = (strtotime($fullCheckOut) - strtotime($fullCheckIn)) / (60 * 60 * 24);
-					
-					$resDate = $checkIn;
-					$seaDate = $dateStart;
-					
-					for ($i=1; $i<=$resNights; $i++) {	
+				if (($dateStart <= $date) && ($date <= $dateEnd)) {
 						
-						for ($j=1; $j<=$seaNights; $j++) {
-							
-							if ($resDate == $seaDate) {
+					$disable = 'No';
+					$error   = lang("errorCurrentSeason");
+				}
+				
+				if (($dateStart >= $date) && ($dateEnd >= $date)) {
+				
+					$ds_array = explode ('-',$dateStart);
+					$yearS    = $ds_array[0];
+					$monthS   = $ds_array[1];
+					$dayS     = $ds_array[2];
+				
+					$seaNights = ((strtotime($dateEnd) - strtotime($dateStart)) / (60 * 60 * 24)) + 1;
 					
-								$disable = 'No';
-								$error   = lang("errorPenResInSeason");
+					$iniResNum = array();
+					
+					$penReservations = $this->REM->getReservationInfo($hotel, 'RE.status', 'Reserved', null, null, null, 1);
+					
+					foreach ($penReservations as $row) {
+						
+						$resNum       = $row['id_reservation'];
+						$fullCheckIn  = $row['checkIn'];
+						$fullCheckOut = $row['checkOut']; 
+						
+						$fci_array  = explode (' ',$fullCheckIn);
+						$checkIn    = $fci_array[0];
+						
+						$ci_array  = explode ('-',$checkIn);
+						$yearI     = $ci_array[0];
+						$monthI    = $ci_array[1];
+						$dayI      = $ci_array[2];
+						
+						$resNights = (strtotime($fullCheckOut) - strtotime($fullCheckIn)) / (60 * 60 * 24);
+						
+						$resDate = $checkIn;
+						$seaDate = $dateStart;
+						
+						for ($i=1; $i<=$resNights; $i++) {	
+							
+							for ($j=1; $j<=$seaNights; $j++) {
 								
-								$newResNum = array ($resNum);
-								$result    = array_merge($iniResNum, $newResNum);
-								$iniResNum = $result;
+								if ($resDate == $seaDate) {
+						
+									$disable = 'No';
+									$error   = lang("errorPenResInSeason");
+									
+									$newResNum = array ($resNum);
+									$result    = array_merge($iniResNum, $newResNum);
+									$iniResNum = $result;
+								}
+								
+								$seaDateUnix = mktime(0,0,0,date($monthS),date($dayS)+$j,date($yearS));
+								$seaDate = date("Y-m-d", $seaDateUnix);
+					
 							}
 							
-							$seaDateUnix = mktime(0,0,0,date($monthS),date($dayS)+$j,date($yearS));
-							$seaDate = date("Y-m-d", $seaDateUnix);
-				
+							$resDateUnix = mktime(0,0,0,date($monthI),date($dayI)+$i,date($yearI));
+							$resDate = date("Y-m-d", $resDateUnix);
 						}
 						
-						$resDateUnix = mktime(0,0,0,date($monthI),date($dayI)+$i,date($yearI));
-						$resDate = date("Y-m-d", $resDateUnix);
 					}
-					
 				}
-			}
-			
-			if ($disable == 'No') {
-			
-				$result = array_unique ($result); 
 				
-				$data['error']  = $error;
-				$data['result'] = $result;
-				$data['type']   = 'error_season';
+				if ($disable == 'No') {
+				
+					$result = array_unique ($result); 
+					
+					$data['error']  = $error;
+					$data['result'] = $result;
+					$data['type']   = 'error_season';
+					
+					$this->load->view('pms/error', $data);
+					
+				} else {
+				
+					$this->GNM->disable('SEASON', 'id_season', $seasonId); 
+					$this->GNM->disable('SEASON', 'fk_season', $seasonId);   
+					
+					$data['message'] = lang("disableSeasonMessage");
+					$data['type'] = 'seasons';
+					
+					$this->load->view('pms/success', $data);  
+				}
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
 				
 				$this->load->view('pms/error', $data);
-				
-			} else {
-			
-				$this->GNM->disable('SEASON', 'id_season', $seasonId); 
-				$this->GNM->disable('SEASON', 'fk_season', $seasonId);   
-				
-				$data['message'] = lang("disableSeasonMessage");
-				$data['type'] = 'seasons';
-				
-				$this->load->view('pms/success', $data);  
 			}
 			
 		} else {
@@ -628,17 +664,29 @@ class Seasons extends Controller
 		
 		if ($userId) {
 		
-			$data = array(
-					'disable' => 1
-					);
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->GNM->update('SEASON', 'id_season', $seasonId, $data); 
-			$this->GNM->update('SEASON', 'fk_season', $seasonId, $data);   
+			if ($userRole != 'Employee') {
 			
-			$data['message'] = lang("enableSeasonMessage");
-			$data['type'] = 'seasons';
+				$data = array(
+						'disable' => 1
+						);
+					
+				$this->GNM->update('SEASON', 'id_season', $seasonId, $data); 
+				$this->GNM->update('SEASON', 'fk_season', $seasonId, $data);   
 				
-			$this->load->view('pms/success', $data);
+				$data['message'] = lang("enableSeasonMessage");
+				$data['type'] = 'seasons';
+					
+				$this->load->view('pms/success', $data);
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}
 		
 		} else {
 			

@@ -6,7 +6,6 @@ class Hotels_model extends Model
 	{
 		parent::Model();
 	}
-
 	
 	
 }

@@ -19,7 +19,7 @@ foreach ($payment as $row) {
     	<td width="150">
 			<?php 
 			$unixDate = human_to_unix($row['date']);
-			echo date ("j/m/Y" , $unixCi); 
+			echo date ("j/m/Y" , $unixDate); 
 			?>    
 		</td>
 	  </tr>

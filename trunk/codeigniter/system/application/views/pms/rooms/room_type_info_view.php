@@ -38,24 +38,36 @@ foreach ($roomType as $row) {
 	
 	if ($row['disable'] == 1) {
 		
-		echo anchor('rooms/editRoomType/'.$roomTypeId, 'Editar Info')."<br>";
+		$userRole = $this->session->userdata('userrole');
+
+		if ($userRole != 'Employee') {
+		
+			echo anchor('rooms/editRoomType/'.$roomTypeId, 'Editar Info')."<br>";
+		}
 		
 		if ($roomTypeImages) {
 			
 			 echo anchor('rooms/viewImagesRoomType/'.$roomTypeId, 'Ver Imagenes')."<br>";
 		}
 		
-		echo anchor('rooms/addRoomTypeImage/'.$roomTypeId, 'Agregar Imagen')."<br>";
-		echo anchor('rooms/disableRoomType/'.$roomTypeId, 'Deshabilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"));
-		echo "<br><br>";
+		if ($userRole != 'Employee') {
+		
+			echo anchor('rooms/addRoomTypeImage/'.$roomTypeId, 'Agregar Imagen')."<br>";
+			echo anchor('rooms/disableRoomType/'.$roomTypeId, 'Deshabilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea deshabilitar?')"));
+			echo "<br>";
+		}
 	
 	} else if ($row['disable'] == 0) {
 		
-		echo anchor('rooms/enableRoomType/'.$roomTypeId, 'Habilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea Habilitar?')"));
-		echo "<br><br>";
+		if ($userRole != 'Employee') {
+			
+			echo anchor('rooms/enableRoomType/'.$roomTypeId, 'Habilitar tipo de habitación', array('onClick' => "return confirm('Seguro que desea Habilitar?')"));
+			echo "<br>";
+		}
 	}
 }
 
+echo "<br>";
 echo 'Total habitaciones tipo '.$roomTypeName.': ', $roomTypeRoomCount."<br>"; 
 echo 'En funcionamiento: ', $roomTypeRoomCountRunning."<br>";  
 echo 'Fuera de servicio: ', $roomTypeRoomCountOos."<br><br>"; 

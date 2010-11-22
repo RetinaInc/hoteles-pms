@@ -60,13 +60,25 @@ echo 'Total reservaciones: ', $total;
 	  $reservationRoomInfo   = getRRInfo($hotel, 'RR.fk_reservation', $row['id_reservation']);
 	  $payments              = getPaymentInfo($hotel, null, null, $row['id_reservation']);
 		  
-	  $total = 0;
-	  foreach ($reservationRoomInfo as $row1) {
+	  $status   = $row['status'];
+	  $totalFee = $row['totalFee'];
 	  
-		  $total = $total + $row1['total'];
+	  $total = 0;
+	  
+	  if (($status == 'Canceled') || ($status == 'No Show')) {
+		
+		$total = $totalFee;
+		
+	  } else {
+	
+		  foreach ($reservationRoomInfo as $row1) {
+		
+			  $total = $total + $row1['total'];
+		  }
 	  }
 		
 	  $paid = 0;
+	  
 	  foreach ($payments as $row1) {
 	  
 	  	  $paid = $paid + $row1['amount'];
@@ -156,9 +168,15 @@ echo 'Total reservaciones: ', $total;
     
     <td>
 		<?php 
-        echo $toPay;
+        if ((($status == 'Canceled') || ($status == 'No Show')) && ($toPay != 0)) { 
+			
+			echo "<span class='Estilo3'>".$toPay.' Bs.F. '."</span>";
+			
+		} else {
+			
+			echo $toPay.' Bs.F.';
+		}
         ?> 
-        Bs.F.
     </td>
   </tr>
   <?php

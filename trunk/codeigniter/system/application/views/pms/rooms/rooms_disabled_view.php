@@ -13,7 +13,7 @@ if ($roomsDis) {
 
 	<br />
 
-	<table width="448" border="1">
+	<table width="352" border="1">
     
  	  <tr>
     	<td width="80">
@@ -37,8 +37,7 @@ if ($roomsDis) {
         	<td width="150">
 				<?php 
 				echo anchor('rooms/viewDisabledRooms/name', 'Nombre');
-				?>            	
-           	</td>
+				?>           	</td>
 		<?php
 		}
 		?>
@@ -46,14 +45,15 @@ if ($roomsDis) {
 		<td width="100">
     		<?php 
 			echo anchor('rooms/viewDisabledRooms/rtabrv', 'Tipo');
-			?>			
-       	</td>
+			?>       	</td>
             
+        <!--
 		<td width="140">
 			<?php 
         	echo anchor('rooms/viewDisabledRooms/status', 'Estado');
             ?>           
        	</td>
+        -->
         
  	  </tr>
 	
@@ -91,18 +91,21 @@ if ($roomsDis) {
                 ?>
             </td>
             
+            <!--
             <td>
                 <?php 
                 echo lang($row['status']);
                 ?>
             </td>
+            -->
+            
   	  	</tr>
 	  <?php
 	  }
 	  ?>
 	</table>
     
-    <br />
+<br />
     
 	<?php
 

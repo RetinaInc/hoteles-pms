@@ -17,52 +17,39 @@ echo "<br><br>";
 
 if ($roomTypeReservations) { ?>
 
-	<table width="1088" border="1">
+	<table width="970" border="1">
       <tr>
     
 		<td width="110">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/id_reservation', '# Confirmación');
-            ?>     
- 		</td>
+            ?> 		</td>
         
      	<td width="110">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/number', '# Habitación');
-            ?>    
-      	</td>
+            ?>      	</td>
     
-  		<td width="115">
+  		<td width="130">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/checkIn', 'Fecha Check In');
-            ?>    
-      	</td>
+            ?>      	</td>
     
-		<td width="115">
+		<td width="130">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/checkOut', 'Fecha Check Out');
-            ?>    
-        </td>
+            ?>        </td>
     
-		<td width="200">
+		<td width="300">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/lastName', 'Cliente');
-            ?>    
-        </td>
+            ?>        </td>
     
-		<td width="180">
+		<td width="150">
 			<?php
             echo anchor('rooms/roomTypeReservations/'.$roomTypeId.'/restatus', 'Estado');
-            ?>        
-       	</td>
-    
-    	<td width="60">Adultos</td>
-    
-    	<td width="60">Niños</td>
-    
-    	<td width="80">Pago</td>
-    
-      </tr>
+            ?>       	</td>
+   	  </tr>
  
  	  <?php 
  	  foreach ($roomTypeReservations as $row) { ?>
@@ -71,14 +58,12 @@ if ($roomTypeReservations) { ?>
             <td>
                 <?php 
                 echo anchor('reservations/infoReservation/'.$row['id_reservation'].'/n/', $row['id_reservation']);
-                ?>
-            </td>
+                ?>            </td>
             
             <td>
                 <?php 
                 echo anchor('rooms/infoRoom/'.$row['id_room'],$row['number']);
-                ?>
-            </td>
+                ?>            </td>
             
             <td>
                 <?php 
@@ -90,8 +75,7 @@ if ($roomTypeReservations) { ?>
                 $month         = $date_array[1];
                 $day           = $date_array[2];
                 echo $day.'-'.$month.'-'.$year;
-                ?>
-            </td>
+                ?>            </td>
         
             <td>
                 <?php 
@@ -103,42 +87,24 @@ if ($roomTypeReservations) { ?>
                 $month          = $date_array[1];
                 $day            = $date_array[2];
                 echo $day.'-'.$month.'-'.$year;
-                ?>
-            </td>
+                ?>            </td>
         
             <td>
                 <?php 
                 echo anchor('guests/infoGuestReservations/'.$row['fk_guest'], $row['lastName'].', '.$row['name']);
-                ?>    
-            </td>
+                ?>            </td>
             
             <td>
                 <?php 
                 echo lang($row['restatus']);
-                ?>
-            </td>
-            
-            <td>
-                <?php 
-                echo $row['adults'];
-                ?>
-            </td>
-            
-            <td>
-                <?php 
-                echo $row['children'];
-                ?>
-            </td>
-            
-            <td>&nbsp;</td>
-          
+                ?>            </td>
           </tr>
           <?php
   	  }
   	  ?>
 	</table>
     
-    <br />
+<br />
     
 	<?php
 	

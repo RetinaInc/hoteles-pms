@@ -5,6 +5,12 @@ $this->load->view('pms/header');
 
 <h3>Modificar Monto Habitación</h3>
 
+<span class="Estilo1">
+	<?php
+    echo validation_errors();
+    ?>
+</span>
+    
 <?php  
 foreach ($roomReservationInfo as $row) {
 	
@@ -124,11 +130,11 @@ echo form_open('reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$ro
 
 <table width="454" border="0">
   <tr>
-    <td width="122">Nuevo Monto</td>
+    <td width="122">Nuevo monto</td>
     
     <td width="127">
         <input type="text" name="new_total" id="new_total" value="<?php echo set_value('new_total')?>" maxlength="10" size="10" 
-        onKeyPress="return numbersonly(this, event)"/> Bs.F. 
+        onKeyPress="return pricenumbers(this, event)"/> Bs.F. 
     </td>
     
     <td width="191">
@@ -146,4 +152,6 @@ echo form_open('reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$ro
 
 <?php
 echo form_close();
+
+echo anchor('reservations/infoReservation/'.$reservationId.'/n/', 'Cancelar', array('onClick' => "return confirm('Seguro que desea cancelar? Se perderá la información')"));
 ?>

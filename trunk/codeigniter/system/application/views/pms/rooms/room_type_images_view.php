@@ -20,8 +20,13 @@ foreach ($roomTypeImages as $row) {
 	?>
     <img src="<?php echo base_url() . "assets/images/" .$row['image']; ?>"/>
 	<?php 
-	echo anchor('rooms/deleteRoomTypeImage/'.$imageId, 'Eliminar', array('onClick' => "return confirm('Seguro que desea eliminar?')"));	
-	echo "<br><br>";
+	$userRole = $this->session->userdata('userrole');
+
+	if ($userRole != 'Employee') {
+	
+		echo anchor('rooms/deleteRoomTypeImage/'.$imageId, 'Eliminar', array('onClick' => "return confirm('Seguro que desea eliminar?')"));	
+		echo "<br><br>";
+	}
 }
 	
 echo "<br><br>";

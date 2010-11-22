@@ -71,7 +71,8 @@ class Rooms_model extends Model
 
 		$this->db->where('RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
-	
+		$this->db->order_by('num');
+		
 		$query = $this->db->get('RESERVATION RE, ROOM_RESERVATION RR, ROOM RO, ROOM_TYPE RT');
 		return $query->result_array();
 	}
@@ -174,7 +175,7 @@ class Rooms_model extends Model
 		$this->db->where('paxMax >=', $totalPers);
 		$this->db->where('paxStd <=', $totalPers);
 		$this->db->where($where);
-		$this->db->order_by('paxMax');
+		$this->db->order_by('scale');
 		$query = $this->db->get('ROOM_TYPE');
 		return $query->result_array();
 	}
@@ -197,6 +198,21 @@ class Rooms_model extends Model
 	function getAsRoom($hotel, $roomType, $checkIn, $checkOut)
 	{	
 		$where = "id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.fk_room_type = ".$roomType." AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.status != 'Canceled' AND RE.status != 'No Show' AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
+		
+		$this->db->select('RO.id_room, RO.number');
+		$this->db->where('RO.status', 'Running');
+		$this->db->where('RO.disable', 1);
+		$this->db->where('RO.fk_room_type = RT.id_room_type');
+		$this->db->where('RT.fk_hotel', $hotel);
+		$this->db->where('RT.id_room_type', $roomType);
+		$this->db->where($where);
+		$query = $this->db->get('ROOM RO, ROOM_TYPE RT');
+		return $query->row_array(); 
+	}
+	
+	function getAsRoomQuotation($hotel, $roomType, $checkIn, $checkOut, $reservationId)
+	{	
+		$where = "id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.fk_room_type = ".$roomType." AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.id_reservation != ".$reservationId." AND RE.status != 'Canceled' AND RE.status != 'No Show' AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
 		
 		$this->db->select('RO.id_room, RO.number');
 		$this->db->where('RO.status', 'Running');
@@ -242,7 +258,7 @@ class Rooms_model extends Model
 	
 	function getRoomTypeAvailability($hotel, $reservationId, $roomType, $checkIn, $checkOut)
 	{	
-		$where = "id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.fk_room_type = ".$roomType." AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.status != 'Canceled' AND RE.id_reservation != ".$reservationId." AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
+		$where = "id_room NOT IN(SELECT RO.id_room FROM ROOM RO, ROOM_RESERVATION RR, RESERVATION RE WHERE RO.fk_room_type = ".$roomType." AND RO.id_room = RR.fk_room AND RR.fk_reservation = RE.id_reservation AND RE.status != 'Canceled' AND ((RE.checkIn <= '".$checkIn."' AND RE.checkOut > '".$checkIn."') OR (RE.checkIn < '".$checkOut."' AND RE.checkOut >= '".$checkOut."') OR (RE.checkIn >= '".$checkIn."' AND RE.checkOut <= '".$checkOut."')))";
 		
 		$this->db->select('RO.id_room, RO.number');
 		$this->db->where('RO.status', 'Running');
@@ -269,6 +285,21 @@ class Rooms_model extends Model
 		$this->db->where('RT.paxStd <=', $totalPer);
 		$this->db->where($where);
 		$query = $this->db->get('ROOM RO, ROOM_TYPE RT');
+		return $query->result_array();
+	}
+	
+	
+	function getImageInfo($hotel, $roomType, $field, $value)
+	{
+		if ($field != null && $value != null) {
+		
+  			$this->db->where($field, $value);
+  		}
+		
+		$this->db->where('fk_hotel', $hotel);
+		$this->db->where('fk_room_type', $roomType);
+		
+		$query = $this->db->get('IMAGE');
 		return $query->result_array();
 	}
 	

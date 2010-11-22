@@ -6,7 +6,12 @@ $this->load->view('pms/header');
 <h3>Tipos de Habitaciones</h3>
 
 <?php
-echo anchor('rooms/addRoomType/','Agregar Nuevo Tipo de Habitación')."<br>";
+$userRole = $this->session->userdata('userrole');
+
+if ($userRole != 'Employee') {
+
+	echo anchor('rooms/addRoomType/','Agregar Nuevo Tipo de Habitación')."<br>";
+}
 
 if ($roomTypesDis) {
 	

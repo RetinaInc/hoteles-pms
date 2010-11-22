@@ -185,12 +185,14 @@ class Guests extends Controller
 		$this->form_validation->set_rules('guest_id_type','lang:id_type','trim|xss_clean|required');
 		$this->form_validation->set_rules('guest_id_num','lang:id_num','trim|xss_clean|required|max_length[10]|callback_checkGuestId');
 		$this->form_validation->set_rules('guest_name','lang:name','trim|xss_clean|required|max_length[30]');
-		$this->form_validation->set_rules('guest_name2','lang:name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_2name','lang:2name','trim|xss_clean|max_length[30]');
 		$this->form_validation->set_rules('guest_last_name','lang:last_name','trim|xss_clean|required|max_length[30]');
-		$this->form_validation->set_rules('guest_last_name2','lang:last_name2','trim|xss_clean|max_length[30]');
+		$this->form_validation->set_rules('guest_2last_name','lang:2last_name','trim|xss_clean|max_length[30]');
 		$this->form_validation->set_rules('guest_telephone','lang:telephone','trim|xss_clean|required|numeric|max_length[20]');
 		$this->form_validation->set_rules('guest_email','lang:email','trim|xss_clean|required|valid_email|max_length[50]');
 		$this->form_validation->set_rules('guest_address','lang:address','trim|xss_clean|max_length[300]');
+		$this->form_validation->set_rules('guest_corp_rif','lang:corp_rif','trim|xss_clean|max_length[20]');
+		$this->form_validation->set_rules('guest_corp_name','lang:corp_name','trim|xss_clean|max_length[100]');
 			
 		if ($this->form_validation->run() == FALSE) {
 			
@@ -200,6 +202,7 @@ class Guests extends Controller
 		
 				$guest = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
 					
+				$data['error'] = NULL;
 				$data['guest'] = $guest;
 		
 				$this->load->view('pms/guests/guest_edit_view', $data);
@@ -212,31 +215,76 @@ class Guests extends Controller
 				
 		} else {
 			
+			$complete = 'Yes';
+			$error    = NULL;
+			
 			$guestIdType    = set_value('guest_id_type');
 			$guestIdNum     = set_value('guest_id_num');
 			$guestName      = set_value('guest_name');
-			$guestName2     = set_value('guest_name2');
+			$guest2Name     = set_value('guest_2name');
 			$guestLastName  = set_value('guest_last_name');
-			$guestLastName2 = set_value('guest_last_name2');
+			$guest2LastName = set_value('guest_2last_name');
 			$guestTelephone = set_value('guest_telephone');
 			$guestEmail     = set_value('guest_email');
 			$guestAddress   = set_value('guest_address');
+			$guestCorpRif   = set_value('guest_corp_rif');
+			$guestCorpName  = set_value('guest_corp_name');
 				
-			$data = array(
-				'idType'    => $guestIdType,
-				'idNum'     => $guestIdNum,
-				'name'      => ucwords(strtolower($guestName)),
-				'name2'     => ucwords(strtolower($guestName2)),
-				'lastName'  => ucwords(strtolower($guestLastName)),
-				'lastName2' => ucwords(strtolower($guestLastName2)),
-				'telephone' => $guestTelephone,
-				'email'     => $guestEmail,
-				'address'   => $guestAddress
-				);
-				
-			$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
+			if ($guestIdNum == NULL) {
+				$guestIdType = NULL;
+				$guestIdNum  = NULL;
+			}
+			if ($guest2Name == NULL) {
+				$guest2Name = NULL;
+			}
+			if ($guest2LastName == NULL) {
+				$guest2LastName = NULL;
+			}
+			if ($guestAddress == NULL) {
+				$guestAddress = NULL;
+			}
+			if ($guestCorpRif == NULL) {
+				$guestCorpRif = NULL;
+			}
+			if ($guestCorpName == NULL) {
+				$guestCorpName = NULL;
+			}
 					
-			$this->infoGuestReservations($guestId); 
+			if ((($guestCorpRif != NULL) && ($guestCorpName == NULL)) || (($guestCorpRif == NULL) && ($guestCorpName != NULL))) {
+				
+				$complete = 'No';
+				$error    = lang("errorAllCorpInfo");
+			}
+				
+			if ($complete == 'No') {
+				
+				$guest = $this->GSM->getGuestInfo($hotel, 'id_guest', $guestId, null, null, null, 1);
+					
+				$data['error'] = $error;
+				$data['guest'] = $guest;
+		
+				$this->load->view('pms/guests/guest_edit_view', $data);
+			
+			} else {
+				
+				$data = array(
+					'idType'    => $guestIdType,
+					'idNum'     => $guestIdNum,
+					'name'      => ucwords(strtolower($guestName)),
+					'name2'     => ucwords(strtolower($guest2Name)),
+					'lastName'  => ucwords(strtolower($guestLastName)),
+					'lastName2' => ucwords(strtolower($guest2LastName)),
+					'telephone' => $guestTelephone,
+					'email'     => $guestEmail,
+					'address'   => $guestAddress,
+					'corpRif'   => $guestCorpRif,
+					'corpName'  => ucwords(strtolower($guestCorpName))
+					);
+					
+				$this->GNM->update('GUEST', 'id_guest', $guestId, $data);  
+						
+				$this->infoGuestReservations($guestId); 
+			}
 		}
 	}
 	

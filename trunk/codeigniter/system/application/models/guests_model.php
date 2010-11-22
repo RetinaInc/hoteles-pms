@@ -25,7 +25,7 @@ class Guests_model extends Model
 			$this->db->where('G.disable', 1);
 		}
 
-	    $this->db->select('DISTINCT(G.id_guest), G.idType, G.idNum, G.name, G.name2, G.lastName, G.lastName2, G.telephone, G.email, G.address, G.disable');
+	    $this->db->select('DISTINCT(G.id_guest), G.idType, G.idNum, G.name, G.name2, G.lastName, G.lastName2, G.telephone, G.email, G.address, G.corpRif, G.corpName, G.disable');
 		$this->db->where('G.id_guest = RE.fk_guest AND RE.id_reservation = RR.fk_reservation AND RR.fk_room = RO.id_room AND RO.fk_room_type = RT.id_room_type');
 		$this->db->where('RT.fk_hotel', $hotel);
 	

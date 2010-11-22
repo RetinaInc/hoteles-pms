@@ -88,6 +88,30 @@ function getReservationInfo($hotel, $field, $value, $order, $lim1, $lim2, $disab
 }
 
 
+function getReservationsReport($hotel, $field1, $value1, $field2, $value2, $month, $year)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('reservations_model');
+	
+	$result = $CI->reservations_model->getReservationsReport($hotel, $field1, $value1, $field2, $value2, $month, $year);
+		
+	return $result;
+}
+
+
+function getRoomResReport($hotel, $field1, $value1, $field2, $value2, $field3, $value3, $month, $year)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('reservations_model');
+	
+	$result = $CI->reservations_model->getRoomResReport($hotel, $field1, $value1, $field2, $value2, $field3, $value3, $month, $year);
+		
+	return $result;
+}
+
+
 function getRoomTypes($hotel, $totalPers)
 {
 	$CI =& get_instance();
@@ -95,6 +119,18 @@ function getRoomTypes($hotel, $totalPers)
 	$CI->load->model('rooms_model');
 	
 	$result = $CI->rooms_model->getRoomTypes($hotel, $totalPers);
+		
+	return $result;
+}
+
+
+function getRoomInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable)
+{
+	$CI =& get_instance();
+
+	$CI->load->model('rooms_model');
+	
+	$result = $CI->rooms_model->getRoomInfo($hotel, $field, $value, $order, $lim1, $lim2, $disable);
 		
 	return $result;
 }

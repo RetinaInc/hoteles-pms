@@ -62,32 +62,29 @@ foreach ($hotelInfo as $row) {
 
 	?>
 	
-	<table width="825" border="0">
+	<table width="840" border="0">
 	
 	  <tr>
-		<td width="138" height="40">* Nombre</td>
-		<td>
-		  <input name="hotel_name" type="text" value="<?php echo $row['name']; ?>" size="100" />   	
-       	</td>
+		<td width="140" height="40">* Nombre</td>
+		<td colspan="2">
+		  <input name="hotel_name" type="text" value="<?php echo $row['name']; ?>" size="100" />       	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">* Tipo</td>
-		<td width="677">
-		<input name="hotel_type" type="text" value="<?php echo $row['type']; ?>" size="30" maxlength="50" />   	
-     	</td>
+		<td colspan="2">
+		<input name="hotel_type" type="text" value="<?php echo $row['type']; ?>" size="30" maxlength="50" />     	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40"> Descripción</td>
-		<td>
-			<textarea name="hotel_description" cols="30" rows="2"><?php echo $row['description']; ?></textarea>   	
-       	</td>
+		<td colspan="2">
+			<textarea name="hotel_description" cols="30" rows="2"><?php echo $row['description']; ?></textarea>       	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">* País/Ciudad</td>
-		<td>
+		<td colspan="2">
 		  País
 		  <select name="hotel_country" id="hotel_country">
 				<?php
@@ -134,27 +131,24 @@ foreach ($hotelInfo as $row) {
 					}
 				}
 				?>
-		  </select>   	
-     	</td>
+		  </select>     	</td>
 	  </tr>
       
 	  <tr>
 		<td height="40">* Dirección</td>
-		<td>
-			<textarea name="hotel_address" cols="30" rows="2"><?php echo $row['address']; ?></textarea>  	
-       	</td>
+		<td colspan="2">
+			<textarea name="hotel_address" cols="30" rows="2"><?php echo $row['address']; ?></textarea>       	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">Referencias direcci&oacute;n</td>
-		<td>
-        	<textarea name="hotel_ref_address" cols="30" rows="2"><?php echo $row['refAddress']; ?></textarea>
-     	</td>
+		<td colspan="2">
+        	<textarea name="hotel_ref_address" cols="30" rows="2"><?php echo $row['refAddress']; ?></textarea>     	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">Teléfonos</td>
-		<td>*
+		<td colspan="2">*
         	<?php
 			$type1 = NULL;
 			$numb1 = NULL;
@@ -217,33 +211,43 @@ foreach ($hotelInfo as $row) {
 			?>
     
             <input type="text" name="hotel_tel_num_3" id="hotel_tel_num_3" value="<?php echo $numb3; ?>" 
-            onKeyPress="return numbersonly(this, event)"/>     
-      	</td>
+            onKeyPress="return numbersonly(this, event)"/>      	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">Página web</td>
-		<td>
-			<input name="hotel_web_page" type="text" value="<?php echo $row['webPage']; ?>" size="42" maxlength="100" />    
-      	</td>
+		<td colspan="2">
+			<input name="hotel_web_page" type="text" value="<?php echo $row['webPage']; ?>" size="42" maxlength="100" />      	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">* Correo electrónico</td>
-		<td>
-			<input name="hotel_email" type="text" value="<?php echo $row['email']; ?>" size="42" maxlength="50" />  	
-      	</td>
+		<td colspan="2">
+			<input name="hotel_email" type="text" value="<?php echo $row['email']; ?>" size="42" maxlength="50" />      	</td>
 	  </tr>
       
       <tr>
-    	<td height="40">Informaci&oacute;n cancelaci&oacute;n:</td>
-    	<td>
-    		<textarea name="hotel_cancel_info" cols="40" rows="2"><?php echo $row['cancelInfo']; ?></textarea>
- 		</td>
+    	<td height="40">Informaci&oacute;n:</td>
+    	<td colspan="2">
+    		<textarea name="hotel_info" cols="40" rows="2"><?php echo $row['info']; ?></textarea> 		</td>
   	  </tr>
+      
+      <tr>
+        <td height="40" colspan="3">* Pol&iacute;tica de cancelaci&oacute;n: Se debe cancelar
+          <input name="hotel_cancel_hours" type="text" id="hotel_cancel_hours" value="<?php echo $row['cancelHours']; ?>" size="3" maxlength="3" onkeypress="return numbersonly(this, event)"/>
+        horas antes para evitar recargo. 	
+   		</td>
+  	</tr>
+    
+      <tr>
+        <td height="40" colspan="3">* Recargo por cancelaci&oacute;n tard&iacute;a o falta de presencia:
+			<input name="hotel_cancel_fee" type="text" id="hotel_cancel_fee" value="<?php echo $row['cancelFee']; ?>" size="3" maxlength="3" onkeypress="return numbersonly(this, event)"/>
+			% 
+      	</td>
+      </tr>
 	</table>
 	
-	<?php
+<?php
 }
 ?>
 <br />

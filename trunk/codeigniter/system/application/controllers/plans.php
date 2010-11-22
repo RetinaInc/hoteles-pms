@@ -97,7 +97,19 @@ class Plans extends Controller
 		
 			if ($userId) {
 		
-				$this->load->view('pms/plans/plan_add_view');
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+			
+					$this->load->view('pms/plans/plan_add_view');
+					
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 			
 			} else {
 				
@@ -138,12 +150,24 @@ class Plans extends Controller
 			$userId = $this->session->userdata('userid');
 		
 			if ($userId) {
-			
-				$plan = $this->GNM->getInfo($hotel, 'PLAN','id_plan', $planId, null, null, null, 1);
 				
-				$data['plan'] = $plan;
-			
-				$this->load->view('pms/plans/plan_edit_view', $data);
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+				
+					$plan = $this->GNM->getInfo($hotel, 'PLAN','id_plan', $planId, null, null, null, 1);
+					
+					$data['plan'] = $plan;
+				
+					$this->load->view('pms/plans/plan_edit_view', $data);
+				
+				} else {
+					
+					$data['error'] = lang("errorNoPrivileges");
+					$data['type']  = 'error_priv';
+				
+					$this->load->view('pms/error', $data);
+				}
 				
 			} else {
 				
@@ -177,12 +201,24 @@ class Plans extends Controller
 		
 		if ($userId) {
 
-			$this->GNM->disable('PLAN', 'id_plan', $planId); 
-		
-			$data['message'] = lang("disablePlanMessage");
-			$data['type'] = 'plans';
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->load->view('pms/success', $data); 
+			if ($userRole != 'Employee') {
+				
+				$this->GNM->disable('PLAN', 'id_plan', $planId); 
+			
+				$data['message'] = lang("disablePlanMessage");
+				$data['type'] = 'plans';
+					
+				$this->load->view('pms/success', $data);
+			
+			} else {
+			
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			} 
 		
 		} else {
 			
@@ -198,16 +234,28 @@ class Plans extends Controller
 		
 		if ($userId) {
 		
-			$data = array(
-					'disable' => 1
-					);
+			$userRole = $this->session->userdata('userrole');
 				
-			$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
+			if ($userRole != 'Employee') {
 			
-			$data['message'] = lang("enablePlanMessage");
-			$data['type'] = 'plans';
+				$data = array(
+						'disable' => 1
+						);
+					
+				$this->GNM->update('PLAN', 'id_plan', $planId, $data);   
 				
-			$this->load->view('pms/success', $data); 	
+				$data['message'] = lang("enablePlanMessage");
+				$data['type'] = 'plans';
+					
+				$this->load->view('pms/success', $data); 
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
+			}	
 			
 		} else {
 		

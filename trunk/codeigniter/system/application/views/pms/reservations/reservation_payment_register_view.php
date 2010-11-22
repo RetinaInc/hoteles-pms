@@ -47,6 +47,8 @@ $this->load->view('pms/header');
 foreach ($reservation as $row) {
 
 	$reservationId = $row['id_reservation'];
+	$status        = $row['status'];
+	$totalFee      = $row['totalFee'];
 	$guestId       = $row['fk_guest'];
 	
 	$checkIn  = $row['checkIn'];
@@ -133,14 +135,23 @@ foreach ($reservation as $row) {
 }
 
 $total = 0;
-foreach ($reservationRoomInfo as $row) {
 
-	$total = $total + $row['total'];
+if (($status == 'Canceled') || ($status == 'No Show')) {
+		
+		$total = $totalFee;
+		
+} else {
+
+	foreach ($reservationRoomInfo as $row) {
+	
+		$total = $total + $row['total'];
+	}
 }
 
 echo 'Total reservación: ', $total.' Bs.F.'."<br>";
 
 $paid = 0;
+
 foreach ($payments as $row) {
 
 	$paid = $paid + $row['amount'];
@@ -215,7 +226,7 @@ echo form_hidden('to_pay', $amountToPay);
     
     <td width="250">
         <input name="payment_amount" type="text" id="payment_amount" value="<?php echo set_value('payment_amount'); ?>" size="30" maxlength="10" 
-        onKeyPress="return numbersonly(this, event)"/> Bs.F.
+        onKeyPress="return pricenumbers(this, event)"/> Bs.F.
    	</td>
   </tr>
   

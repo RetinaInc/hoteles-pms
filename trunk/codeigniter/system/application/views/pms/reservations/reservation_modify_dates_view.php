@@ -73,11 +73,8 @@ foreach ($reservationRooms as $row) {
 <?php
 if (isset($error)) {
 
-	if ($error != 1) {
-	
-		echo "<br><br>";
-		echo "<span class='Estilo1'>".$error."</span>";
-	}
+	echo "<br><br>";
+	echo "<span class='Estilo1'>".$error."</span>";
 }
 
 $attributes = array('name' => 'form1', 'id' => 'form1');
@@ -96,7 +93,12 @@ echo form_open('reservations/modifyReservationDates/'.$reservationId, $attribute
 	 
 <?php
 echo "<br>";
-echo form_submit('sumit', 'Buscar Disponibilidad');
+$att = array(
+	'name'        => 'submit',
+    'id'          => 'submit',
+    'onClick'     => "return confirm('Seguro que desea cambiar las fechas?')"
+);
+echo form_submit($att, 'Cambiar Fechas');
 echo form_close();
 
 echo "<br><br>";

@@ -82,14 +82,16 @@ echo form_close();
 </span>
 
 <?php 
-if (isset($error)) {
+if (isset($error1)) {
 
-    if ($error != 1) {
-    
-        echo "<span class='Estilo1'>".$error."</span>";
-    }
+	echo "<span class='Estilo1'>".$error1."</span>";
 }
 
+if (isset($error2)) {
+
+	echo "<br><br>";
+	echo "<span class='Estilo1'>".$error2."</span>";
+}
 
 if ($guest) {
 	
@@ -123,79 +125,6 @@ if ($guest) {
 		
 			echo 'Dirección: ', $row['address']."<br>";
 		}
-	
-		/*
-		?>
-		
-		<table width="758" border="0">
-		
-		  <tr>
-			<td width="100" height="39">ID</td>
-		  
-			<td width="270">
-				<?php
-				$options = array(
-                	'V' => 'V',
-                  	'E' => 'E',
-                  	'P' => 'P'
-                );
-
-				echo form_dropdown('guest_id_type', $options, $row['idType']);
-				?>
-			  <input name="guest_id_num" type="text" id="guest_id_num" value="<?php echo $row['idNum']; ?>" size="10" maxlength="10" onKeyPress="return numbersonly(this, event)"/>
-			  
-			</td>
-			<td width="100">&nbsp;</td>
-			<td width="270">&nbsp;</td>
-		  </tr>
-		  
-		  <tr>
-			<td height="41">* Nombre</td>
-			<td>
-				<input name="guest_name" type="text" id="guest_name" value="<?php echo $row['name']; ?>" size="30" maxlength="30" />
-           	</td>
-			<td>Seg. Nombre</td>
-			<td>
-				<input name="guest_2name" type="text" id="guest_2name" value="<?php echo $row['name2']; ?>" size="30" maxlength="30" />
-           	</td>
-		  	</tr>
-		  
-		  <tr>
-			<td height="39">* Apellido</td>
-			<td>
-				<input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo $row['lastName']; ?>" size="30" maxlength="30" />    
-          	</td>
-			
-			<td>Seg. Apellido</td>
-			<td>
-				<input name="guest_2last_name" type="text" id="guest_2last_name" value="<?php echo $row['lastName2']; ?>" size="30" maxlength="30" />    
-           	</td>
-		  </tr>
-		  
-		  <tr>
-			<td height="37">* Tel&eacute;fono</td>
-			<td>
-				<input name="guest_telephone" type="text" id="guest_telephone" value="<?php echo $row['telephone']; ?>" size="20" maxlength="20" 
-				onKeyPress="return numbersonly(this, event)"/>    
-           	</td>
-			<td>* Correo</td>
-			<td>
-				<input name="guest_email" type="text" id="guest_email" value="<?php echo $row['email']; ?>" size="30" maxlength="50" />
-          	</td>
-		  </tr>
-		  
-		  <tr>
-			<td height="40">Direcci&oacute;n</td>
-			<td>
-				<textarea name="guest_address" cols="25" rows="2" id="guest_address"><?php echo $row['address']; ?></textarea>    
-			</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-		  </tr>
-		</table>
- 
-	<?php
-	*/
 	}
 	
 } else {
@@ -210,47 +139,65 @@ if ($guest) {
     	(*)Campos obligatorios
 	</span>
 
-	<table width="758" border="0">
+	<table width="1136" border="0">
 	
 	  <tr>
 		<td width="100" height="39">* ID</td>
 	  
 		<td width="270" id="ci">
-		<select name="guest_id_type" id="guest_id_type">
-		  <option value="V" <?php echo set_select('guest_id_type', 'V', TRUE); ?> >V-</option>
-		  <option value="E" <?php echo set_select('guest_id_type', 'E'); ?> >E-</option>
-		  <option value="P" <?php echo set_select('guest_id_type', 'P'); ?> >P-</option>
-		</select>
-		  <input name="guest_id_num" type="text" id="guest_id_num" value="<?php echo set_value('guest_id_num'); ?>" size="10" maxlength="10" onKeyPress="return numbersonly(this, event)"/>
-		  
-		</td>
+            <select name="guest_id_type" id="guest_id_type">
+              <option value="V" <?php echo set_select('guest_id_type', 'V', TRUE); ?> >V-</option>
+              <option value="E" <?php echo set_select('guest_id_type', 'E'); ?> >E-</option>
+              <option value="P" <?php echo set_select('guest_id_type', 'P'); ?> >P-</option>
+            </select>
+              <input name="guest_id_num" type="text" id="guest_id_num" value="<?php echo set_value('guest_id_num'); ?>" size="10" maxlength="10" onKeyPress="return numbersonly(this, event)"/>		
+      	</td>
+        
 		<td width="100">&nbsp;</td>
 		
 		<td width="270">&nbsp;</td>
-	  </tr>
+        
+	    <td colspan="2">Información Corporación: </td>
+      </tr>
 	  
 	  <tr>
 		<td height="41">* Nombre</td>
 		
 		<td>
-			<input name="guest_name" type="text" id="guest_name" value="<?php echo set_value('guest_name'); ?>" size="30" maxlength="30" />    </td>
-		
+			<input name="guest_name" type="text" id="guest_name" value="<?php echo set_value('guest_name'); ?>" size="30" maxlength="30" />
+      	</td>
+        
 		<td>Seg. Nombre</td>
 		
 		<td>
-			<input name="guest_2name" type="text" id="guest_2name" value="<?php echo set_value('guest_2name'); ?>" size="30" maxlength="30" />    </td>
+			<input name="guest_2name" type="text" id="guest_2name" value="<?php echo set_value('guest_2name'); ?>" size="30" maxlength="30" />
+      	</td>
+        
+	    <td width="100">Rif: </td>
+        
+	    <td width="270">
+        	<input name="guest_corp_rif" type="text" id="guest_corp_rif" value="<?php echo set_value('guest_corp_rif'); ?>" size="20" maxlength="20" />
+      	</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="39">* Apellido</td>
 		
 		<td>
-			<input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo set_value('guest_last_name'); ?>" size="30" maxlength="30" />    </td>
+			<input name="guest_last_name" type="text" id="guest_last_name" value="<?php echo set_value('guest_last_name'); ?>" size="30" maxlength="30" />
+       	</td>
 		
 		<td>Seg. Apellido</td>
 		
 		<td>
-			<input name="guest_2last_name" type="text" id="guest_2last_name" value="<?php echo set_value('guest_2last_name'); ?>" size="30" maxlength="30" />    </td>
+			<input name="guest_2last_name" type="text" id="guest_2last_name" value="<?php echo set_value('guest_2last_name'); ?>" size="30" maxlength="30" />
+       	</td>
+        
+	    <td>Nombre: </td>
+        
+	    <td>
+        	<input name="guest_corp_name" type="text" id="guest_corp_name" value="<?php echo set_value('guest_corp_name'); ?>" size="30" maxlength="100" />
+       	</td>
 	  </tr>
 	  
 	  <tr>
@@ -258,32 +205,42 @@ if ($guest) {
 		
 		<td>
 			<input name="guest_telephone" type="text" id="guest_telephone" value="<?php echo set_value('guest_telephone'); ?>" size="20" maxlength="20" 
-			onKeyPress="return numbersonly(this, event)"/>    </td>
+			onKeyPress="return numbersonly(this, event)"/>
+      	</td>
 		
-		<td>* Correo</td>
+		<td>* Correo electr&oacute;nico</td>
 		
 		<td>
-			<input name="guest_email" type="text" id="guest_email" value="<?php echo set_value('guest_email'); ?>" size="30" maxlength="50" />    </td>
+			<input name="guest_email" type="text" id="guest_email" value="<?php echo set_value('guest_email'); ?>" size="30" maxlength="50" />
+       	</td>
+        
+	    <td>&nbsp;</td>
+        
+	    <td>&nbsp;</td>
 	  </tr>
 	  
 	  <tr>
 		<td height="40">Direcci&oacute;n</td>
+        
 		<td>
-			<textarea name="guest_address" cols="25" rows="2" id="guest_address"><?php echo set_value('guest_address'); ?></textarea>    
-		</td>
+			<textarea name="guest_address" cols="25" rows="2" id="guest_address"><?php echo set_value('guest_address'); ?></textarea>
+       	</td>
+        
 		<td>&nbsp;</td>
 		<td>&nbsp;</td>
+	    <td>&nbsp;</td>
+	    <td>&nbsp;</td>
 	  </tr>
 	</table>
 	
-	<?php
+<?php
 }
 ?> 
 
 
 <table>
   <tr>
-    <td width="100" height="76">Detalles de la reservación:</td>
+    <td width="100" height="76">Detalles reservación:</td>
     <td width="270">
       <textarea name="reservation_details" cols="25" rows="2" id="reservation_details"><?php echo set_value('reservation_details');?></textarea>   	
    	</td>

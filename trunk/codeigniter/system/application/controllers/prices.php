@@ -174,13 +174,22 @@ class Prices extends Controller
 			} else {
 				
 				$data['type']      = 'noWeekdays';
-				$data['error']     = 1;
+				$data['error']     = NULL;
 				$data['season']    = $season;
 				$data['rate']      = $rate;
 				$data['plan']      = $plan;
 				$data['roomTypes'] = $roomTypes;
 			
-				$this->load->view('pms/prices/prices_add_view', $data);
+				$userRole = $this->session->userdata('userrole');
+				
+				if ($userRole != 'Employee') {
+
+					$this->load->view('pms/prices/prices_add_view', $data);
+					
+				} else {
+					
+					$this->load->view('pms/prices/prices_no_view', $data);
+				}
 			}
 			
 		} else {
@@ -198,101 +207,113 @@ class Prices extends Controller
 		
 		if ($userId) {
 		
-			$seasonId = $this->uri->segment(3);
-			$rateId   = $this->uri->segment(4);
-			$planId   = $this->uri->segment(5);
-			
-			$hotel = $this->session->userdata('hotelid');
-			
-			$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
-			$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
-			$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
-			
-			$complete = 'Yes';
-			
-			foreach ($roomTypes as $row) {
-			
-				$id = $row['id_room_type'];
+			$userRole = $this->session->userdata('userrole');
 				
-				$valP = 'pricepn'.$id;
-				$pricePerNight = $_POST[$valP];		
-	
-				if ($pricePerNight == NULL) {
-					$complete = 'No';
-				} 
-			}
+			if ($userRole != 'Employee') {
 			
-			if ($_POST['pricepn_children'] == NULL) {
+				$seasonId = $this->uri->segment(3);
+				$rateId   = $this->uri->segment(4);
+				$planId   = $this->uri->segment(5);
 				
-				$complete = 'No';
-			} 
-			
-			if ($complete == 'No') {
-	
-				$type  = 'noWeekdays';
-				$error = lang("errorPrices");
-					
-				$data['type']      = $type;
-				$data['error']     = $error;
-				$data['season']    = $season;
-				$data['rate']      = $rate;
-				$data['plan']      = $plan;
-				$data['roomTypes'] = $roomTypes;
+				$hotel = $this->session->userdata('hotelid');
 				
-				$this->load->view('pms/prices/prices_add_view', $data);
-					
-			} else {
-			
+				$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
+				$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
+				$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
+				
+				$complete = 'Yes';
+				
 				foreach ($roomTypes as $row) {
-			
+				
 					$id = $row['id_room_type'];
 					
 					$valP = 'pricepn'.$id;
-					$pricePerNight = $_POST[$valP];
-							
-					$data = array(
-						'pricePerNight' => $pricePerNight,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Adults',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => $id
-						);
-				
-					$this->GNM->insert('PRICE', $data);  
+					$pricePerNight = $_POST[$valP];		
+		
+					if ($pricePerNight == NULL) {
+						$complete = 'No';
+					} 
 				}
 				
-				$pricePerNightChildren = $_POST['pricepn_children'];
+				if ($_POST['pricepn_children'] == NULL) {
+					
+					$complete = 'No';
+				} 
 				
-					$data = array(
-						'pricePerNight' => $pricePerNightChildren,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Children',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-						);
+				if ($complete == 'No') {
+		
+					$type  = 'noWeekdays';
+					$error = lang("errorPrices");
+						
+					$data['type']      = $type;
+					$data['error']     = $error;
+					$data['season']    = $season;
+					$data['rate']      = $rate;
+					$data['plan']      = $plan;
+					$data['roomTypes'] = $roomTypes;
+					
+					$this->load->view('pms/prices/prices_add_view', $data);
+						
+				} else {
 				
-					$this->GNM->insert('PRICE', $data);  
+					foreach ($roomTypes as $row) {
+				
+						$id = $row['id_room_type'];
+						
+						$valP = 'pricepn'.$id;
+						$pricePerNight = $_POST[$valP];
+								
+						$data = array(
+							'pricePerNight' => $pricePerNight,
+							'hasWeekdays'   => 'No',
+							'monPrice'  => NULL,
+							'tuePrice'  => NULL,
+							'wedPrice'  => NULL,
+							'thuPrice'  => NULL,
+							'friPrice'  => NULL,
+							'satPrice'  => NULL,
+							'sunPrice'  => NULL,
+							'persType'  => 'Adults',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => $id
+							);
+					
+						$this->GNM->insert('PRICE', $data);  
+					}
+					
+					$pricePerNightChildren = $_POST['pricepn_children'];
+					
+						$data = array(
+							'pricePerNight' => $pricePerNightChildren,
+							'hasWeekdays'   => 'No',
+							'monPrice'  => NULL,
+							'tuePrice'  => NULL,
+							'wedPrice'  => NULL,
+							'thuPrice'  => NULL,
+							'friPrice'  => NULL,
+							'satPrice'  => NULL,
+							'sunPrice'  => NULL,
+							'persType'  => 'Children',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => NULL
+							);
+					
+						$this->GNM->insert('PRICE', $data);  
+				
+					$this->checkPrices($seasonId, $rateId, $planId);
+				}
 			
-				$this->checkPrices($seasonId, $rateId, $planId);
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
 		
 		} else {
@@ -309,147 +330,159 @@ class Prices extends Controller
 		
 		if ($userId) {
 		
-			$seasonId = $this->uri->segment(3);
-			$rateId   = $this->uri->segment(4);
-			$planId   = $this->uri->segment(5);
+			$userRole = $this->session->userdata('userrole');
+				
+			if ($userRole != 'Employee') {
 			
-			$hotel = $this->session->userdata('hotelid');
-			
-			$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
-			$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
-			$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
-			
-			$complete = 'Yes';
-			
-			foreach ($roomTypes as $row) {
-			
-				$id = $row['id_room_type'];
+				$seasonId = $this->uri->segment(3);
+				$rateId   = $this->uri->segment(4);
+				$planId   = $this->uri->segment(5);
 				
-				$valM = 'mon_price'.$id;
-				$varM = $_POST[$valM];
-			
-				$valT = 'tue_price'.$id;
-				$varT = $_POST[$valT];
+				$hotel = $this->session->userdata('hotelid');
 				
-				$valW = 'wed_price'.$id;
-				$varW = $_POST[$valT];
+				$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
+				$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
+				$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
 				
-				$valH = 'thu_price'.$id;
-				$varH = $_POST[$valH];
-				
-				$valF = 'fri_price'.$id;
-				$varF = $_POST[$valF];
-				
-				$valS = 'sat_price'.$id;
-				$varS = $_POST[$valS];
-				
-				$valU = 'sun_price'.$id;
-				$varU = $_POST[$valU];
-	
-				if (($varM == NULL) || ($varT == NULL) || ($varW == NULL) || ($varH == NULL) || 
-					($varF == NULL) || ($varS == NULL) || ($varU == NULL) ) {
-				
-					$complete = 'No';
-				} 
-			}
-			
-			if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
-			   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
-			   ($_POST['sun_price_children'] == NULL)) {
-			   	
-				$complete = 'No';
-			}					
-				
-			if ($complete == 'No') {
-			
-				$type  = 'hasWeekdays';
-				$error = lang("errorPrices");
-					
-				$data['type']      = $type;
-				$data['error']     = $error;
-				$data['season']    = $season;
-				$data['rate']      = $rate;
-				$data['plan']      = $plan;
-				$data['roomTypes'] = $roomTypes;
-				
-				$this->load->view('pms/prices/prices_add_view', $data);
-		
-			} else {
+				$complete = 'Yes';
 				
 				foreach ($roomTypes as $row) {
-			
+				
 					$id = $row['id_room_type'];
-						
+					
 					$valM = 'mon_price'.$id;
 					$varM = $_POST[$valM];
-					
+				
 					$valT = 'tue_price'.$id;
 					$varT = $_POST[$valT];
-						
+					
 					$valW = 'wed_price'.$id;
 					$varW = $_POST[$valT];
-						
+					
 					$valH = 'thu_price'.$id;
 					$varH = $_POST[$valH];
-						
+					
 					$valF = 'fri_price'.$id;
 					$varF = $_POST[$valF];
-						
+					
 					$valS = 'sat_price'.$id;
 					$varS = $_POST[$valS];
-						
+					
 					$valU = 'sun_price'.$id;
 					$varU = $_POST[$valU];
-				
-					$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $varM,
-						'tuePrice'  => $varT,
-						'wedPrice'  => $varW,
-						'thuPrice'  => $varH,
-						'friPrice'  => $varF,
-						'satPrice'  => $varS,
-						'sunPrice'  => $varU,
-						'persType'  => 'Adults',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => $id
-					);
-				
-					$this->GNM->insert('PRICE', $data);  
+		
+					if (($varM == NULL) || ($varT == NULL) || ($varW == NULL) || ($varH == NULL) || 
+						($varF == NULL) || ($varS == NULL) || ($varU == NULL) ) {
+					
+						$complete = 'No';
+					} 
 				}
 				
-				$childrenMon = $_POST['mon_price_children'];
-				$childrenTue = $_POST['tue_price_children'];
-				$childrenWed = $_POST['wed_price_children'];
-				$childrenThu = $_POST['thu_price_children'];
-				$childrenFri = $_POST['fri_price_children'];
-				$childrenSat = $_POST['sat_price_children'];
-				$childrenSun = $_POST['sun_price_children'];
+				if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
+				   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
+				   ($_POST['sun_price_children'] == NULL)) {
+					
+					$complete = 'No';
+				}					
+					
+				if ($complete == 'No') {
 				
-				$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $childrenMon,
-						'tuePrice'  => $childrenTue,
-						'wedPrice'  => $childrenWed,
-						'thuPrice'  => $childrenThu,
-						'friPrice'  => $childrenFri,
-						'satPrice'  => $childrenSat,
-						'sunPrice'  => $childrenSun,
-						'persType'  => 'Children',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-					);
+					$type  = 'hasWeekdays';
+					$error = lang("errorPrices");
+						
+					$data['type']      = $type;
+					$data['error']     = $error;
+					$data['season']    = $season;
+					$data['rate']      = $rate;
+					$data['plan']      = $plan;
+					$data['roomTypes'] = $roomTypes;
+					
+					$this->load->view('pms/prices/prices_add_view', $data);
+			
+				} else {
+					
+					foreach ($roomTypes as $row) {
 				
-				$this->GNM->insert('PRICE', $data);  
+						$id = $row['id_room_type'];
+							
+						$valM = 'mon_price'.$id;
+						$varM = $_POST[$valM];
+						
+						$valT = 'tue_price'.$id;
+						$varT = $_POST[$valT];
+							
+						$valW = 'wed_price'.$id;
+						$varW = $_POST[$valT];
+							
+						$valH = 'thu_price'.$id;
+						$varH = $_POST[$valH];
+							
+						$valF = 'fri_price'.$id;
+						$varF = $_POST[$valF];
+							
+						$valS = 'sat_price'.$id;
+						$varS = $_POST[$valS];
+							
+						$valU = 'sun_price'.$id;
+						$varU = $_POST[$valU];
+					
+						$data = array(
+							'pricePerNight' => NULL,
+							'hasWeekdays'   => 'Yes',
+							'monPrice'  => $varM,
+							'tuePrice'  => $varT,
+							'wedPrice'  => $varW,
+							'thuPrice'  => $varH,
+							'friPrice'  => $varF,
+							'satPrice'  => $varS,
+							'sunPrice'  => $varU,
+							'persType'  => 'Adults',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => $id
+						);
+					
+						$this->GNM->insert('PRICE', $data);  
+					}
+					
+					$childrenMon = $_POST['mon_price_children'];
+					$childrenTue = $_POST['tue_price_children'];
+					$childrenWed = $_POST['wed_price_children'];
+					$childrenThu = $_POST['thu_price_children'];
+					$childrenFri = $_POST['fri_price_children'];
+					$childrenSat = $_POST['sat_price_children'];
+					$childrenSun = $_POST['sun_price_children'];
+					
+					$data = array(
+							'pricePerNight' => NULL,
+							'hasWeekdays'   => 'Yes',
+							'monPrice'  => $childrenMon,
+							'tuePrice'  => $childrenTue,
+							'wedPrice'  => $childrenWed,
+							'thuPrice'  => $childrenThu,
+							'friPrice'  => $childrenFri,
+							'satPrice'  => $childrenSat,
+							'sunPrice'  => $childrenSun,
+							'persType'  => 'Children',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => NULL
+						);
+					
+					$this->GNM->insert('PRICE', $data);  
+					
+					$this->checkPrices($seasonId, $rateId, $planId);
+				}
+			
+			} else {
 				
-				$this->checkPrices($seasonId, $rateId, $planId);
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
 			
 		} else {
@@ -467,34 +500,46 @@ class Prices extends Controller
 		
 		if ($userId) {
 		
-			$seasonId = $this->uri->segment(3);
-			$rateId   = $this->uri->segment(4);
-			$planId   = $this->uri->segment(5);
-			
-			$hotel = $this->session->userdata('hotelid');
+			$userRole = $this->session->userdata('userrole');
 				
-			$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
-			$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
-			$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
-			$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
+			if ($userRole != 'Employee') {
 			
-			foreach ($prices as $row) {
-				if ($row['hasWeekdays'] == 'Yes') {
-					$type = 'hasWeekdays';
-				} else {
-					$type = 'noWeekdays';
+				$seasonId = $this->uri->segment(3);
+				$rateId   = $this->uri->segment(4);
+				$planId   = $this->uri->segment(5);
+				
+				$hotel = $this->session->userdata('hotelid');
+					
+				$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
+				$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
+				$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
+				$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
+				
+				foreach ($prices as $row) {
+					if ($row['hasWeekdays'] == 'Yes') {
+						$type = 'hasWeekdays';
+					} else {
+						$type = 'noWeekdays';
+					}
 				}
+				
+				$data['type']      = $type;
+				$data['season']    = $season;
+				$data['rate']      = $rate;
+				$data['plan']      = $plan;
+				$data['roomTypes'] = $roomTypes;
+				$data['prices']    = $prices;
+				
+				$this->load->view('pms/prices/prices_edit_view', $data);
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
-			
-			$data['type']      = $type;
-			$data['season']    = $season;
-			$data['rate']      = $rate;
-			$data['plan']      = $plan;
-			$data['roomTypes'] = $roomTypes;
-			$data['prices']    = $prices;
-			
-			$this->load->view('pms/prices/prices_edit_view', $data);
 			
 		} else {
 			
@@ -511,115 +556,127 @@ class Prices extends Controller
 		
 		if ($userId) {
 		
-			$seasonId = $this->uri->segment(3);
-			$rateId   = $this->uri->segment(4);
-			$planId   = $this->uri->segment(5);
-			
-			$hotel = $this->session->userdata('hotelid');
-			
-			$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
-			$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
-			$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
-			$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
-			
-			$complete = 'Yes';
-			
-			foreach ($roomTypes as $row) {
-			
-				$id = $row['id_room_type'];
+			$userRole = $this->session->userdata('userrole');
 				
-				$valP = 'pricepn'.$id;
-				$pricePerNight = $_POST[$valP];		
-	
-				if ($pricePerNight == NULL) {
-					$complete = 'No';
-				} 
-			}
+			if ($userRole != 'Employee') {
 			
-			if ($_POST['pricepn_children'] == NULL) {
+				$seasonId = $this->uri->segment(3);
+				$rateId   = $this->uri->segment(4);
+				$planId   = $this->uri->segment(5);
 				
-				$complete = 'No';
-			} 
-			
-			if ($complete == 'No') {
-	
-				$type  = 'noWeekdays';
-				$error = lang("errorPrices");
-					
-				$data['type']      = $type;
-				$data['error']     = $error;
-				$data['season']    = $season;
-				$data['rate']      = $rate;
-				$data['plan']      = $plan;
-				$data['roomTypes'] = $roomTypes;
-				$data['prices']    = $prices;
+				$hotel = $this->session->userdata('hotelid');
 				
-				$this->load->view('pms/prices/prices_edit_view', $data);
-					
-			} else {
-			
+				$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
+				$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
+				$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
+				$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
+				
+				$complete = 'Yes';
+				
 				foreach ($roomTypes as $row) {
-			
+				
 					$id = $row['id_room_type'];
 					
 					$valP = 'pricepn'.$id;
-					$pricePerNight = $_POST[$valP];
-							
-					$data = array(
-						'pricePerNight' => $pricePerNight,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Adults',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => $id
-						);
-				
-					$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);  
+					$pricePerNight = $_POST[$valP];		
+		
+					if ($pricePerNight == NULL) {
+						$complete = 'No';
+					} 
 				}
 				
-				$pricePerNightChildren = $_POST['pricepn_children'];
-				
-				if ($pricePerNightChildren != NULL) {
-				
-					$data = array(
-						'pricePerNight' => $pricePerNightChildren,
-						'hasWeekdays'   => 'No',
-						'monPrice'  => NULL,
-						'tuePrice'  => NULL,
-						'wedPrice'  => NULL,
-						'thuPrice'  => NULL,
-						'friPrice'  => NULL,
-						'satPrice'  => NULL,
-						'sunPrice'  => NULL,
-						'persType'  => 'Children',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-						);
-				
-					$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Children');
+				if ($_POST['pricepn_children'] == NULL) {
 					
-					if ($exPrice) {
-					
-						$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Children', $data); 
+					$complete = 'No';
+				} 
+				
+				if ($complete == 'No') {
+		
+					$type  = 'noWeekdays';
+					$error = lang("errorPrices");
 						
-					} else {
+					$data['type']      = $type;
+					$data['error']     = $error;
+					$data['season']    = $season;
+					$data['rate']      = $rate;
+					$data['plan']      = $plan;
+					$data['roomTypes'] = $roomTypes;
+					$data['prices']    = $prices;
 					
-						$this->GNM->insert('PRICE', $data);
-					}
-				}
+					$this->load->view('pms/prices/prices_edit_view', $data);
+						
+				} else {
 				
-				$this->checkPrices($seasonId, $rateId, $planId);
+					foreach ($roomTypes as $row) {
+				
+						$id = $row['id_room_type'];
+						
+						$valP = 'pricepn'.$id;
+						$pricePerNight = $_POST[$valP];
+								
+						$data = array(
+							'pricePerNight' => $pricePerNight,
+							'hasWeekdays'   => 'No',
+							'monPrice'  => NULL,
+							'tuePrice'  => NULL,
+							'wedPrice'  => NULL,
+							'thuPrice'  => NULL,
+							'friPrice'  => NULL,
+							'satPrice'  => NULL,
+							'sunPrice'  => NULL,
+							'persType'  => 'Adults',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => $id
+							);
+					
+						$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);  
+					}
+					
+					$pricePerNightChildren = $_POST['pricepn_children'];
+					
+					if ($pricePerNightChildren != NULL) {
+					
+						$data = array(
+							'pricePerNight' => $pricePerNightChildren,
+							'hasWeekdays'   => 'No',
+							'monPrice'  => NULL,
+							'tuePrice'  => NULL,
+							'wedPrice'  => NULL,
+							'thuPrice'  => NULL,
+							'friPrice'  => NULL,
+							'satPrice'  => NULL,
+							'sunPrice'  => NULL,
+							'persType'  => 'Children',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => NULL
+							);
+					
+						$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Children');
+						
+						if ($exPrice) {
+						
+							$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Children', $data); 
+							
+						} else {
+						
+							$this->GNM->insert('PRICE', $data);
+						}
+					}
+					
+					$this->checkPrices($seasonId, $rateId, $planId);
+				}
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
 			
 		 } else {
@@ -637,158 +694,170 @@ class Prices extends Controller
 		
 		if ($userId) {
 			
-			$seasonId = $this->uri->segment(3);
-			$rateId   = $this->uri->segment(4);
-			$planId   = $this->uri->segment(5);
-			
-			$hotel = $this->session->userdata('hotelid');
-			
-			$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
-			$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
-			$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
-			$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
-			$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
-			
-			$complete = 'Yes';
-			
-			foreach ($roomTypes as $row) {
-			
-				$id = $row['id_room_type'];
+			$userRole = $this->session->userdata('userrole');
 				
-				$valM = 'mon_price'.$id;
-				$varM = $_POST[$valM];
+			if ($userRole != 'Employee') {
 			
-				$valT = 'tue_price'.$id;
-				$varT = $_POST[$valT];
+				$seasonId = $this->uri->segment(3);
+				$rateId   = $this->uri->segment(4);
+				$planId   = $this->uri->segment(5);
 				
-				$valW = 'wed_price'.$id;
-				$varW = $_POST[$valT];
+				$hotel = $this->session->userdata('hotelid');
 				
-				$valH = 'thu_price'.$id;
-				$varH = $_POST[$valH];
+				$season    = $this->GNM->getInfo($hotel, 'SEASON',   'id_season', $seasonId, null, null, null, 1);
+				$rate      = $this->GNM->getInfo($hotel, 'RATE',     'id_rate',   $rateId,   null, null, null, 1);
+				$plan      = $this->GNM->getInfo($hotel, 'PLAN',     'id_plan',   $planId,   null, null, null, 1);
+				$roomTypes = $this->GNM->getInfo($hotel, 'ROOM_TYPE', null,       null,      null, null, null, 1);
+				$prices    = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, null);
 				
-				$valF = 'fri_price'.$id;
-				$varF = $_POST[$valF];
-				
-				$valS = 'sat_price'.$id;
-				$varS = $_POST[$valS];
-				
-				$valU = 'sun_price'.$id;
-				$varU = $_POST[$valU];
-	
-				if (($varM == NULL) || ($varT == NULL) || ($varW == NULL) || ($varH == NULL) || 
-					($varF == NULL) || ($varS == NULL) || ($varU == NULL) ) {
-				
-					$complete = 'No';
-				} 
-			}
-			
-			if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
-			   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
-			   ($_POST['sun_price_children'] == NULL)) {
-			   	
-				$complete = 'No';
-			}	
-			
-			if ($complete == 'No') {
-			
-				$type  = 'hasWeekdays';
-				$error = lang("errorPrices");
-			
-				$data['type']      = $type;
-				$data['error']     = $error;
-				$data['season']    = $season;
-				$data['rate']      = $rate;
-				$data['plan']      = $plan;
-				$data['roomTypes'] = $roomTypes;
-				$data['prices']    = $prices;
-				
-				$this->load->view('pms/prices/prices_edit_view', $data);
-		
-			} else {
+				$complete = 'Yes';
 				
 				foreach ($roomTypes as $row) {
-			
+				
 					$id = $row['id_room_type'];
-						
+					
 					$valM = 'mon_price'.$id;
 					$varM = $_POST[$valM];
-					
+				
 					$valT = 'tue_price'.$id;
 					$varT = $_POST[$valT];
-						
+					
 					$valW = 'wed_price'.$id;
 					$varW = $_POST[$valT];
-						
+					
 					$valH = 'thu_price'.$id;
 					$varH = $_POST[$valH];
-						
+					
 					$valF = 'fri_price'.$id;
 					$varF = $_POST[$valF];
-						
+					
 					$valS = 'sat_price'.$id;
 					$varS = $_POST[$valS];
-						
+					
 					$valU = 'sun_price'.$id;
 					$varU = $_POST[$valU];
-				
-					$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $varM,
-						'tuePrice'  => $varT,
-						'wedPrice'  => $varW,
-						'thuPrice'  => $varH,
-						'friPrice'  => $varF,
-						'satPrice'  => $varS,
-						'sunPrice'  => $varU,
-						'persType'  => 'Adults',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => $id
-					);
-				
-					$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);   
+		
+					if (($varM == NULL) || ($varT == NULL) || ($varW == NULL) || ($varH == NULL) || 
+						($varF == NULL) || ($varS == NULL) || ($varU == NULL) ) {
+					
+						$complete = 'No';
+					} 
 				}
 				
-				$childrenMon = $_POST['mon_price_children'];
-				$childrenTue = $_POST['tue_price_children'];
-				$childrenWed = $_POST['wed_price_children'];
-				$childrenThu = $_POST['thu_price_children'];
-				$childrenFri = $_POST['fri_price_children'];
-				$childrenSat = $_POST['sat_price_children'];
-				$childrenSun = $_POST['sun_price_children'];
-				
-				$data = array(
-						'pricePerNight' => NULL,
-						'hasWeekdays'   => 'Yes',
-						'monPrice'  => $childrenMon,
-						'tuePrice'  => $childrenTue,
-						'wedPrice'  => $childrenWed,
-						'thuPrice'  => $childrenThu,
-						'friPrice'  => $childrenFri,
-						'satPrice'  => $childrenSat,
-						'sunPrice'  => $childrenSun,
-						'persType'  => 'Children',
-						'fk_season' => $seasonId,
-						'fk_rate'   => $rateId,
-						'fk_plan'   => $planId,
-						'fk_room_type' => NULL
-					);
-				
-				$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Children');
+				if (($_POST['mon_price_children'] == NULL) || ($_POST['tue_price_children'] == NULL) || ($_POST['wed_price_children'] == NULL) ||
+				   ($_POST['thu_price_children'] == NULL) || ($_POST['fri_price_children'] == NULL) || ($_POST['sat_price_children'] == NULL) ||
+				   ($_POST['sun_price_children'] == NULL)) {
 					
-				if ($exPrice) {
+					$complete = 'No';
+				}	
+				
+				if ($complete == 'No') {
+				
+					$type  = 'hasWeekdays';
+					$error = lang("errorPrices");
+				
+					$data['type']      = $type;
+					$data['error']     = $error;
+					$data['season']    = $season;
+					$data['rate']      = $rate;
+					$data['plan']      = $plan;
+					$data['roomTypes'] = $roomTypes;
+					$data['prices']    = $prices;
 					
-					$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Children', $data); 
-						
+					$this->load->view('pms/prices/prices_edit_view', $data);
+			
 				} else {
 					
-					$this->GNM->insert('PRICE', $data);
-				} 
+					foreach ($roomTypes as $row) {
 				
-				$this->checkPrices($seasonId, $rateId, $planId);
+						$id = $row['id_room_type'];
+							
+						$valM = 'mon_price'.$id;
+						$varM = $_POST[$valM];
+						
+						$valT = 'tue_price'.$id;
+						$varT = $_POST[$valT];
+							
+						$valW = 'wed_price'.$id;
+						$varW = $_POST[$valT];
+							
+						$valH = 'thu_price'.$id;
+						$varH = $_POST[$valH];
+							
+						$valF = 'fri_price'.$id;
+						$varF = $_POST[$valF];
+							
+						$valS = 'sat_price'.$id;
+						$varS = $_POST[$valS];
+							
+						$valU = 'sun_price'.$id;
+						$varU = $_POST[$valU];
+					
+						$data = array(
+							'pricePerNight' => NULL,
+							'hasWeekdays'   => 'Yes',
+							'monPrice'  => $varM,
+							'tuePrice'  => $varT,
+							'wedPrice'  => $varW,
+							'thuPrice'  => $varH,
+							'friPrice'  => $varF,
+							'satPrice'  => $varS,
+							'sunPrice'  => $varU,
+							'persType'  => 'Adults',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => $id
+						);
+					
+						$this->PRM->updatePrice($seasonId, $rateId, $planId, $id, 'Adults', $data);   
+					}
+					
+					$childrenMon = $_POST['mon_price_children'];
+					$childrenTue = $_POST['tue_price_children'];
+					$childrenWed = $_POST['wed_price_children'];
+					$childrenThu = $_POST['thu_price_children'];
+					$childrenFri = $_POST['fri_price_children'];
+					$childrenSat = $_POST['sat_price_children'];
+					$childrenSun = $_POST['sun_price_children'];
+					
+					$data = array(
+							'pricePerNight' => NULL,
+							'hasWeekdays'   => 'Yes',
+							'monPrice'  => $childrenMon,
+							'tuePrice'  => $childrenTue,
+							'wedPrice'  => $childrenWed,
+							'thuPrice'  => $childrenThu,
+							'friPrice'  => $childrenFri,
+							'satPrice'  => $childrenSat,
+							'sunPrice'  => $childrenSun,
+							'persType'  => 'Children',
+							'fk_season' => $seasonId,
+							'fk_rate'   => $rateId,
+							'fk_plan'   => $planId,
+							'fk_room_type' => NULL
+						);
+					
+					$exPrice = $this->PRM->getPriceInfo($seasonId, $rateId, $planId, null, 'Children');
+						
+					if ($exPrice) {
+						
+						$this->PRM->updatePrice($seasonId, $rateId, $planId, null, 'Children', $data); 
+							
+					} else {
+						
+						$this->GNM->insert('PRICE', $data);
+					} 
+					
+					$this->checkPrices($seasonId, $rateId, $planId);
+				}
+			
+			} else {
+				
+				$data['error'] = lang("errorNoPrivileges");
+				$data['type']  = 'error_priv';
+				
+				$this->load->view('pms/error', $data);
 			}
 			
 		} else {

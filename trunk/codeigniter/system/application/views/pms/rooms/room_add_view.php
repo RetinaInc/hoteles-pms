@@ -32,13 +32,15 @@ echo form_open('rooms/addRoom');
   	  <input name="room_name" type="text" id="room_name" value="<?php echo set_value('room_name'); ?>" size="30" maxlength="50"/>
 	</p>
     
+    <!--
     <p>* Estado:			
 	  <select name="room_status" id="room_status">
     	<option value="Running" <?php echo set_select('room_status', 'Running'); ?> >Funcionando</option>
       	<option value="Out of service" <?php echo set_select('room_status', 'Out of service'); ?> >Fuera de servicio</option>
   	</select>
     </p>
-                
+     -->
+              
 	 <p>* Tipo de habitación:
      <select name="room_room_type" id="room_room_type"><?php
 		foreach ($roomTypes as $row) { 

@@ -46,5 +46,9 @@ if ($type == 'error_season') {
 	echo anchor('seasons/viewSeasons', 'Volver a temporadas');
 }
 
+if ($type == 'error_priv') {
+	
+	echo anchor('users/main', 'Inicio');
+}
 
 ?>

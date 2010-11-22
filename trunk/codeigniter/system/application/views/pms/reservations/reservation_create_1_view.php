@@ -181,8 +181,8 @@ echo form_open('reservations/createReservation1/', $attributes);
     
     <td width="160">Adultos: 
 		<select name="reservation_adults1" id="reservation_adults1">
-        	<option value="1" <?php echo set_select('reservation_adults1', '1', TRUE); ?> >1</option>
-        	<option value="2" <?php echo set_select('reservation_adults1', '2'); ?> >2</option>
+        	<option value="1" <?php echo set_select('reservation_adults1', '1'); ?> >1</option>
+        	<option value="2" <?php echo set_select('reservation_adults1', '2', TRUE); ?> >2</option>
         	<option value="3" <?php echo set_select('reservation_adults1', '3'); ?> >3</option>
         	<option value="4" <?php echo set_select('reservation_adults1', '4'); ?> >4</option>
         	<option value="5" <?php echo set_select('reservation_adults1', '5'); ?> >5</option>

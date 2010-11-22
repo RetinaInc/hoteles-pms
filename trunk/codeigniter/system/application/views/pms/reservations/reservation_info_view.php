@@ -13,6 +13,12 @@ if (isset($message)) {
 	echo "<strong>".$message."</strong>";
 	echo "<br><br>";
 }
+
+if (isset($error)) {
+
+	echo "<br><br>";
+	echo "<span class='Estilo1'>".$error."</span>";
+}
 	
 if (isset($reservation)) {
 
@@ -21,22 +27,52 @@ if (isset($reservation)) {
 		$reservationId = $row['id_reservation'];
 		$resDate	   = $row['resDate'];
 		$status        = $row['status'];
-		$payStatus     = $row['paymentStat'];
 		$checkIn       = $row['checkIn'];
 		$checkOut      = $row['checkOut'];
+		$details       = $row['details'];
+		$payStatus     = $row['paymentStat'];
+		$totalFee      = $row['totalFee'];
 		$guestId       = $row['fk_guest'];
 		
 		$rD_array  = explode (' ',$resDate);
 		$rDate     = $rD_array[0];
+		$rTime     = $rD_array[1];
 	
-		$reservDate  = date('l', strtotime($rDate));
-        $reservDay   = $weekDays[date('N', strtotime($reservDate))];
+		$reservDay   = date('l', strtotime($rDate));
+        $reservSDay  = $weekDays[date('N', strtotime($reservDay))];
+		
         $unixResDate = human_to_unix($resDate);
-        $reservDate  = date ("j/m/Y" , $unixResDate);
-				
+        $reservDate  = date ("j/m/Y h:i a" , $unixResDate);
+		
+		/*
+		$time  = strtotime($rTime);
+		$sTime = strtotime("4:30:00");
+		$resTime = ($time - $sTime);
+		$reservTime  = date ("H:i:s" , $resTime);
+		*/
+		
 		echo 'Reservación #'.$reservationId."<br>";
 		echo 'Estado: ', lang($row['status'])."<br>";
-		echo 'Fecha Reservación: ', $reservDay.' '.$reservDate."<br><br>";
+		echo 'Fecha Reservación: ', $reservSDay.' '.$reservDate."<br>";
+		
+		if ($status == 'Canceled') {
+			
+			$cancelDate = $row['cancelDate'];
+			
+			$cD_array  = explode (' ',$cancelDate);
+			$cDate     = $cD_array[0];
+			$cTime     = $cD_array[1];
+		
+			$canDay  = date('l', strtotime($cDate));
+			$canSDay = $weekDays[date('N', strtotime($canDay))];
+			
+			$unixCanDate = human_to_unix($cancelDate);
+			$canDate  = date ("j/m/Y h:i a" , $unixCanDate);
+			
+			echo 'Fecha Cancelación: ', $canSDay.' '.$canDate."<br>";
+		}
+		
+		echo "<br>";
 	}
 	
 	$datestring = "%Y-%m-%d";
@@ -72,17 +108,24 @@ if (isset($reservation)) {
 	
 	echo "<br>".'INFORMACIÓN RESERVACIÓN'."<br><br>";
 	
-	$total = 0;
-	$paid = 0;
+	$total    = 0;
+	$paid     = 0;
 	$children = 'No';
 	
-	foreach ($reservationRoomInfo as $row) {
+	if (($status == 'Canceled') || ($status == 'No Show')) {
+		
+		$total = $totalFee;
+		
+	} else {
 	
-		$total = $total + $row['total'];
+		foreach ($reservationRoomInfo as $row) {
 		
-		if ($row['children'] != 0) {
-		
-			$children = 'Yes';
+			$total = $total + $row['total'];
+			
+			if ($row['children'] != 0) {
+			
+				$children = 'Yes';
+			}
 		}
 	}
 	
@@ -92,89 +135,152 @@ if (isset($reservation)) {
 	}
 	
 	$amountToPay = $total - $paid;
+	
 	?>
     
-	<table width="898" border="0">
+	<table width="1118" border="0">
     
 	  <?php
 	  foreach ($reservation as $row) {
 	
 	  	  ?>
         
-	  	  <tr>
+  		  <tr>
 			<td width="220">
 				<?php 
                 echo 'Tarifa ', $row['ratename']; 
-                ?>
-       	 	</td>
+                ?>       	 	</td>
         
-			<td width="220">
+			<td width="260">
 				<?php 
                 $checkInDate = date('l', strtotime($ciDate));
                 $checkInDay  = $weekDays[date('N', strtotime($checkInDate))];
                 $unixInDate  = human_to_unix($row['checkIn']);
-                $checkInDate = date ("j/m/Y" , $unixInDate);
+				
+				if (($status == 'Checked In') || ($status == 'Checked Out')) {
+					
+                	$checkInDate = date ("j/m/Y H:s a" , $unixInDate);
+					
+				} else {	
+					
+					$checkInDate = date ("j/m/Y" , $unixInDate);
+				}
+				
                 echo 'Llegada: ', $checkInDay.' '.$checkInDate;
-                ?>
-			</td>
+                ?>			</td>
         
-			<td width="220">
+		  <td width="220">
 				<?php 
                 echo 'Cant. noches: ', $nights; 
-                ?>
-        	</td>
+                ?>        	</td>
         
-			<td width="220">
+	  <td colspan="2">
 				<?php 
-                echo 'Total a pagar: ', $total.' Bs.F.'; 
-                ?>
-        	</td>
-	  	  </tr>
+                echo 'Total a pagar: ';
+				
+				if (($status == 'Canceled') && ($total != 0)) {
+					
+					echo "<span class='Estilo3'>".$total.' Bs.F. '."</span>";
+					echo "<span class='Estilo1'>".' (Recargo por cancelación tardía)'."</span><br>";
+					echo anchor('reservations/modifyReservationFee/'.$reservationId, 'Modificar Monto');
+					
+				} else if (($status == 'No Show') && ($total != 0)) {
+					
+					echo "<span class='Estilo3'>".$total.' Bs.F. '."</span>";
+					echo "<span class='Estilo1'>".' (Recargo por falta de presencia)'."</span><br>";
+					echo anchor('reservations/modifyReservationFee/'.$reservationId, 'Modificar Monto');
+					
+				} else {
+					
+					echo $total.' Bs.F.'; 
+				}
+                ?>            	</td>
+  	  	  </tr>
       
 		  <tr>
 			<td>
 				<?php 
                 echo 'Plan ', $row['planname']; 
-                ?>
-        	</td>
+                ?>          	</td>
         
 			<td>
 				<?php 
                 $checkOutDate = date('l', strtotime($coDate));
                 $checkOutDay  = $weekDays[date('N', strtotime($checkOutDate))];
                 $unixCoDate   = human_to_unix($row['checkOut']);
-                $checkOutDate = date ("j/m/Y" , $unixCoDate);
+				
+				if ($status == 'Checked Out') {
+					
+                	$checkOutDate = date ("j/m/Y H:s a" , $unixCoDate);
+					
+				} else {	
+					
+					$checkOutDate = date ("j/m/Y" , $unixCoDate);
+				}
+				
                 echo 'Salida: ', $checkOutDay.' '.$checkOutDate;
-                ?>
-			</td>
+                ?>           	</td>
         
 			<td>
 				<?php 
                 echo 'Cant. habitaciones: ', $reservationRoomCount; 
-                ?>
-        	</td>
+                ?>           	</td>
         
-			<td>
+			<td colspan="2">
 				<?php 
-                echo 'Total pagado: ', $paid.' Bs.F.'; 
-                ?>
-        	</td>
+				if ($total != 0) {
+				
+                	echo 'Total pagado: ', $paid.' Bs.F.';
+				} 
+                ?>           	</td>
       	  </tr>
-	  <?php
+          
+          <tr>
+		  	<td colspan="5">&nbsp;</td>
+      	   </tr>
+            
+          <?php
+		  if ($details != NULL) {
+			
+			?> 
+		  	<tr>
+		   	 	<td colspan="5"><strong>Detalles reservación:</strong></td>
+      	 	</tr>
+            
+		  	<tr>
+		  	 	<td colspan="4">
+					<?php
+                    echo $details;
+                    ?>           		</td>
+  	  		    <td width="151">&nbsp;</td>
+		  	</tr>
+            <?php
+		  }
+			
+		  ?>
+          <tr>
+		  	  <td colspan="5">
+              	<?php
+		  		echo anchor('reservations/modifyReservationDetails/'.$reservationId,'Modificar/Agregar Detalles');
+		  		?>
+              </td>
+	  	  </tr>
+          <?php	  
 	  }
 	  ?>
 	</table>
 	
-	<br />
+<br />
 	
 	INFORMACIÓN HABITACIÓN(ES)
     
     <br /><br />
     
-	<table width="937" border="0">
+	<table width="1015" border="0">
     
 	  <tr>
-		<td width="73">#</td>
+	    <td width="45">&nbsp;</td>
+		<td width="101">#</td>
         
 		<td width="73">Tipo</td>
         
@@ -191,7 +297,7 @@ if (isset($reservation)) {
 			
 		if ($reservationRoomCount > 1) {
 			?>
-			<td width="229">Cliente</td>
+			<td width="230">Cliente</td>
 			<?php
 		}
 		?>
@@ -207,29 +313,32 @@ if (isset($reservation)) {
 	  foreach ($reservationRoomInfo as $row) {
 	  ?>
 	  	<tr>
+	  	  <td>
+			  <?php
+			  echo $row['num'].'.';
+              ?>
+          </td>
+          
 			<td height="41">
 				<?php 
                 echo $row['number'];
-                ?>
-        	</td>
+                ?>        	
+           	</td>
         
 			<td>
 				<?php 
                 echo $row['abrv'];
-                ?>
-        	</td>
+                ?>        	</td>
         
 			<td>
 				<?php 
                 echo $row['adults'];
-                ?>
-        	</td>
+                ?>        	</td>
         
 			<td>
 				<?php 
                 echo $row['children'];
-                ?>
-        	</td>
+                ?>        	</td>
         
 	  		<?php
 			if ($children == 'Yes') {
@@ -243,8 +352,7 @@ if (isset($reservation)) {
                             echo $row1['age']."&nbsp;&nbsp;";
                         }
                     }
-                    ?>
-            	</td>
+                    ?>            	</td>
 	  		<?php
      		}
 		
@@ -260,12 +368,15 @@ if (isset($reservation)) {
 								
 								echo $row1['name'].' '. $row1['lastName']."<br>";
                             	echo $row1['idType'].' - '.$row1['idNum']."<br>";
-                    			echo anchor('reservations/modifyRoomReservationOtherGuest/'.$reservationId.'/'.$row1['id_other_guest'],'Cambiar')."<br><br>";
+								
+								if ($status == 'Reserved') {
+                    			
+									echo anchor('reservations/modifyRoomReservationOtherGuest/'.$reservationId.'/'.$row1['id_other_guest'],'Cambiar')."<br><br>";
+								}
 							}
                         }
                     }
-                    ?>
-				</td>
+                    ?>				</td>
 				<?php
 			}
 			?>
@@ -274,8 +385,7 @@ if (isset($reservation)) {
 				<?php 
                 echo $row['total'];
                 ?> 
-                Bs.F.
-        	</td>
+                Bs.F.        	</td>
         	
 			<?php 
 			if (($date <= $ciDate)&& ($status != 'Canceled')) {
@@ -283,8 +393,7 @@ if (isset($reservation)) {
         		<td>
 					<?php
                     echo anchor('reservations/modifyReservationRooms/'.$reservationId.'/'.$row['id_room'],'Cambiar Habitación');
-                    ?>
-            	</td>
+                    ?>            	</td>
 				<?php
 			} 	
 		 
@@ -293,12 +402,10 @@ if (isset($reservation)) {
             	<td id="modT">
 					<?php
                     echo anchor('reservations/modifyRoomReservationTotal/'.$reservationId.'/'.$row['id_room'],'Modificar Monto');
-                    ?>
-            	</td>
+                    ?>            	</td>
 			<?php
 			} 	
 			?>
-            
 	    </tr>
         
 	  <?php
@@ -306,7 +413,7 @@ if (isset($reservation)) {
 	  ?>
 	</table>
 	
-	<br />
+<br />
 	
 	<table width="200" border="1">
     
@@ -315,8 +422,13 @@ if (isset($reservation)) {
 	  </tr>
       
 	  <?php
+	  
+	  $opciones = 'No';
+	  
 	  if ($paid != 0) {
-	  ?>
+	  	
+		$opciones = 'Yes';
+	  	?>
 	  	<tr>
 			<td>
 				<?php 
@@ -327,8 +439,10 @@ if (isset($reservation)) {
 	  <?php
 	  }
 	  
-	  if ($payStatus != 'Paid') {
-	  ?>
+	  if (($payStatus != 'Paid') && ($total != 0)) {
+	  	
+		$opciones = 'Yes';
+	  	?>
 	  	<tr>
 			<td>
 				<?php 
@@ -340,7 +454,9 @@ if (isset($reservation)) {
 	  }
 	  
 	  if (($date == $ciDate) && ($status != 'Canceled') && ($status != 'Checked In')) {
-	  ?>
+	  	
+		$opciones = 'Yes';
+	  	?>
 		<tr>
 			<td>
 				<?php
@@ -352,7 +468,9 @@ if (isset($reservation)) {
 	  }
 	  
 	  if ($status == 'Checked In') {
-	  ?>
+	  	
+		$opciones = 'Yes';
+	  	?>
 		<tr>
 			<td>
 				<?php
@@ -370,8 +488,11 @@ if (isset($reservation)) {
 	  <?php
 	  }
 	  
-	  if (($date < $ciDate)&& ($status != 'Canceled')) {
-	  ?>
+	  //if (($date < $ciDate)&& ($status != 'Canceled')) {
+	  if ($status == 'Reserved') {
+	  	
+		$opciones = 'Yes';
+	  	?>
 		<tr>
 			<td>
 				<?php
@@ -383,11 +504,22 @@ if (isset($reservation)) {
 	  }
 	 
 	  if (($date <= $ciDate)&& ($status != 'Canceled')) {
-	  ?>
+	  	
+		$opciones = 'Yes';
+	  	?>
 		<tr>
 			<td><?php echo anchor(base_url().'reservations/modifyReservationDates/'.$reservationId, 'Cambiar fechas')?></td>
 		</tr>
 	  <?php
+	  }
+	  
+	  if ($opciones == 'No') {
+	  	
+		?>
+        <tr>
+			<td><?php echo 'No hay opciones!';?></td>
+		</tr>
+        <?php
 	  }
 	  ?>
 	</table>

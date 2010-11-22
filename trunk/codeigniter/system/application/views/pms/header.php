@@ -149,11 +149,17 @@ else
 <?php
 $sessionUserId = $this->session->userdata('userid');
 $hotel         = $this->session->userdata('hotelid');
-$hotelInfo     = getInfo(null, 'HOTEL', 'id_hotel', $hotel,  null, null, null, 1);
+$hotelInfo     = getInfo(null,   'HOTEL', 'id_hotel', $hotel,         null,       null, null, 1);
+$userInfo      = getInfo($hotel, 'USER',  'id_user',  $sessionUserId, 'lastName', null, null, 1);
 
 foreach ($hotelInfo as $row) {
 
-	echo 'Hotel: ', $row['id_hotel'].' '.$row['name'].' | ';
+	echo 'Hotel: ', $row['name'].' | ';
+}
+
+foreach ($userInfo as $row) {
+
+	echo 'Usuario: ', $row['name'].' '.$row['name2'].' '.$row['lastName'].' '.$row['lastName2'].' | ';
 }
 
 $datestring = "%Y-%m-%d";
@@ -177,7 +183,8 @@ echo anchor('guests/viewGuests/','Clientes').' | ';
 echo anchor('seasons/viewSeasons/','Temporadas').' | ';
 echo anchor('rates/viewRates/','Tarifas').' | ';
 echo anchor('plans/viewPlans/','Planes').' | ';
-echo anchor('prices/selectSeasonPrices/','Precios');
+echo anchor('prices/selectSeasonPrices/','Precios').' | ';
+echo anchor('reports/selectReport/','Reportes');
 
 echo "<br><br>";
 ?>
