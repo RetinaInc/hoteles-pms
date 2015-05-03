@@ -1,0 +1,1 @@
+Pasantia: diseño, desarrollo e implementación de Herramienta de Gestión de Hoteles (PMS) y Sistema Central de Reservaciones (CRM)
